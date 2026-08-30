@@ -51,6 +51,7 @@ graph TD
         SKILL_SPRING["[[spring-oauth2-auth-skill|Spring OAuth2 Внедрение]]"]
         SKILL_EMAIL["[[transactional-email-skill|Email с CID Inline]]"]
         SKILL_SEO["[[seo-analytics-agent-skill|SEO Analytics Agent]]"]
+        SKILL_GIT["[[obsidian-git-sync-rule|Obsidian Git Sync]]"]
     end
     
     subgraph "04 Templates"
@@ -74,7 +75,7 @@ graph TD
 
     INDEX --> ARCH_BE & ARCH_FE & ARCH_AI & ARCH_OPS & ARCH_DEPLOY & ARCH_PLAY & ARCH_AIVIS & ARCH_RAG & ARCH_SPRING & ARCH_GOOGLE & ARCH_X & ARCH_EMAIL & ARCH_LEGAL
     INDEX --> TOK_FIGMA & TOK_COL & TOK_TYP & TOK_GEO & TOK_ANI & TOK_HERO & TOK_CMP
-    INDEX --> SKILL_PROMPT & SKILL_MCP & SKILL_ACP & SKILL_MD & SKILL_QA & SKILL_L1 & SKILL_CMS & SKILL_IMPORT & SKILL_SPRING & SKILL_EMAIL & SKILL_SEO
+    INDEX --> SKILL_PROMPT & SKILL_MCP & SKILL_ACP & SKILL_MD & SKILL_QA & SKILL_L1 & SKILL_CMS & SKILL_IMPORT & SKILL_SPRING & SKILL_EMAIL & SKILL_SEO & SKILL_GIT
     INDEX --> TPL_BRIEF & TPL_FIELDMAP & TPL_SPRING & TPL_CASE & TPL_CASEMD & TPL_SERV & TPL_ORD & TPL_SEO & TPL_LEG
     INDEX --> PIT & RAG & GLOSS & FAQ
 ```
@@ -119,6 +120,7 @@ graph TD
 - **[[spring-oauth2-auth-skill|spring-oauth2-auth-skill.md]]** — Пошаговая инструкция по настройке Spring Boot с Google и X (Twitter) OAuth2 PKCE.
 - **[[transactional-email-skill|transactional-email-skill.md]]** — Регламент верстки транзакционных писем с гарантированной поддержкой картинок через CID (JavaMailSender / Nodemailer).
 - **[[seo-analytics-agent-skill|seo-analytics-agent-skill.md]]** — Автономный Java SEO Analytics Agent: SerpApi, 24h кэш (Redis+Caffeine), строгая локализация (RU/EN/HE), предобработка данных для LLM (-85% токенов), Gemini 3.6 Flash.
+- **[[obsidian-git-sync-rule|obsidian-git-sync-rule.md]]** — Обязательное правило и протокол синхронизации базы знаний с GitHub репозиторием при любых изменениях (Agent rules + Obsidian Git plugin).
 
 ### [[04-Templates/portfolio-case-template|📁 04-Templates (Шаблоны артефактов)]]
 - **[[brief-yaml-cms-template|brief-yaml-cms-template.md]]** — Полная матрица соответствия полей между `brief.yaml` и PostgreSQL/Payload CMS.
