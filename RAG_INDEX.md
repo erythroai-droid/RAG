@@ -90,6 +90,7 @@ Rules:
 | “Email autoresponder / order@ & team@ / n8n / IMAP & SMTP Hostinger / RFC 3834” | `docs/infrastructure/n8n-email-autoresponder.md`; `infra/n8n/workflows/email-autoresponder.json`; `PIT-037` |
 | “n8n audit cron reconciliation / stuck jobs” | `docs/infrastructure/n8n-audit-reconcile.md`; `infra/n8n/workflows/audit-reconcile.json` |
 | “Google / X OAuth2 redirect white screen / legacy domain / ambiguous mapping” | `PIT-048`; `01-Architecture/google-oauth2-integration-guide.md`; `01-Architecture/spring-boot-oauth2-architecture.md` |
+| “OAuth2 user cancellation / Cancel button / ERR_SSL_PROTOCOL_ERROR / failureHandler” | `PIT-049`; `01-Architecture/spring-boot-oauth2-architecture.md`; `05-Glossary-FAQ/pitfalls-troubleshooting.md` |
 
 ---
 

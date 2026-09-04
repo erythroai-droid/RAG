@@ -801,6 +801,42 @@ Never hardcode legacy hosts in OAuth callback success handlers. Keep decoupled f
 
 ---
 
+## PIT-049 — OAuth2 provider cancellation ("Cancel" button) triggers ERR_SSL_PROTOCOL_ERROR or 401 via default failureHandler
+
+**Tags:** `spring-boot`, `oauth2`, `twitter`, `google`, `failure-handler`, `decoupled`, `cors`, `ssl`  
+**Seen:** 2026-09-04 — Montblanc (`montblanc-frontend.vercel.app` + Spring Boot backend on VPS)
+
+**Symptom:**
+When a user clicks "Cancel" on the provider consent / account selection screen (e.g. on `twitter.com` or `accounts.google.com`), the browser encounters `ERR_SSL_PROTOCOL_ERROR` or gets redirected to an invalid backend port URL like `http://46.202.155.56:8080/login?error` instead of returning cleanly to the application sign-in page.
+
+**Cause:**
+Spring Security's default `oauth2Login()` configuration attaches a `SimpleUrlAuthenticationFailureHandler` which forwards or redirects to `/login?error`. In a modern decoupled architecture where the client is a Next.js SPA hosted on Vercel and the backend runs behind Nginx without full SSL termination on internal port 8080, `/login?error` is undefined on the client and the backend cannot serve it, resulting in SSL/protocol crashes or broken navigation.
+
+**Fix:**
+1. Configure an explicit `failureHandler` in Spring Security's `oauth2Login()` DSL:
+```java
+.oauth2Login(oauth2 -> oauth2
+    .authorizationEndpoint(auth -> auth.authorizationRequestResolver(resolver))
+    .userInfoEndpoint(userInfo -> userInfo.userService(twitterOAuth2UserService))
+    .successHandler(successHandler)
+    .failureHandler((request, response, exception) -> {
+        response.sendRedirect("https://montblanc-frontend.vercel.app/sign-in?error=oauth_cancelled");
+    })
+)
+```
+2. In the frontend sign-in container (`SignInContainer.jsx`), read the `error` query parameter:
+```javascript
+const errorParam = searchParams.get("error");
+if (errorParam === "oauth_cancelled") {
+    setError(intl.locale === "ru" ? "Вход был отменён." : "Sign in was cancelled.");
+}
+```
+
+**Prevent:**
+Always configure a custom `AuthenticationFailureHandler` alongside `AuthenticationSuccessHandler` for Spring OAuth2 when operating in decoupled SPA + REST architectures.
+
+---
+
 ## Checklist before merging CMS / schema PRs
 
 - [ ] Migration file under `src/migrations/` + registered in `index.ts`

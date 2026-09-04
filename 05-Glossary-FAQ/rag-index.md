@@ -92,6 +92,7 @@ Rules:
 | “Middleware Edge / node:console / markdown negotiation build” | `PIT-024`; `PLAYBOOK.md` §9.20 |
 | “Unit CI green tests but exit 1 / unhandled rejection / order slug 404” | `PIT-025`, `PIT-026`; `vitest.setup.ts` |
 | “Google / X OAuth2 redirect white screen / legacy domain / ambiguous mapping” | `PIT-048`; `01-Architecture/google-oauth2-integration-guide.md`; `01-Architecture/spring-boot-oauth2-architecture.md` |
+| “OAuth2 user cancellation / Cancel button / ERR_SSL_PROTOCOL_ERROR / failureHandler” | `PIT-049`; `01-Architecture/spring-boot-oauth2-architecture.md`; `05-Glossary-FAQ/pitfalls-troubleshooting.md` |
 
 ---
 
