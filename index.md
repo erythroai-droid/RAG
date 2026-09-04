@@ -18,6 +18,7 @@ graph TD
         ARCH_FE["[[frontend-architecture|Фронтенд и UI]]"]
         ARCH_AI["[[ai-agent-architecture|AI-агенты и Протоколы]]"]
         ARCH_OPS["[[devops-infra-architecture|Инфраструктура и CI/CD]]"]
+        ARCH_AUDIT["[[ai-audit-architecture|AI Audit MVP]]"]
         ARCH_DEPLOY["[[deployment|Deployment journal]]"]
         ARCH_PLAY["[[playbook|Playbook продукта]]"]
         ARCH_AIVIS["[[ai-visibility|AI Visibility]]"]
@@ -73,7 +74,7 @@ graph TD
         FAQ["[[architectural-faq|Архитектурный FAQ]]"]
     end
 
-    INDEX --> ARCH_BE & ARCH_FE & ARCH_AI & ARCH_OPS & ARCH_DEPLOY & ARCH_PLAY & ARCH_AIVIS & ARCH_RAG & ARCH_SPRING & ARCH_GOOGLE & ARCH_X & ARCH_EMAIL & ARCH_LEGAL
+    INDEX --> ARCH_BE & ARCH_FE & ARCH_AI & ARCH_OPS & ARCH_AUDIT & ARCH_DEPLOY & ARCH_PLAY & ARCH_AIVIS & ARCH_RAG & ARCH_SPRING & ARCH_GOOGLE & ARCH_X & ARCH_EMAIL & ARCH_LEGAL
     INDEX --> TOK_FIGMA & TOK_COL & TOK_TYP & TOK_GEO & TOK_ANI & TOK_HERO & TOK_CMP
     INDEX --> SKILL_PROMPT & SKILL_MCP & SKILL_ACP & SKILL_MD & SKILL_QA & SKILL_L1 & SKILL_CMS & SKILL_IMPORT & SKILL_SPRING & SKILL_EMAIL & SKILL_SEO & SKILL_GIT
     INDEX --> TPL_BRIEF & TPL_FIELDMAP & TPL_SPRING & TPL_CASE & TPL_CASEMD & TPL_SERV & TPL_ORD & TPL_SEO & TPL_LEG
@@ -94,6 +95,8 @@ graph TD
 - **[[frontend-architecture|frontend-architecture.md]]** — Next.js 15 App Router, React 19, TypeScript strict, Tailwind CSS, стресс-тестирование длины строк (+40%), логические свойства (RTL).
 - **[[ai-agent-architecture|ai-agent-architecture.md]]** — MCP (Model Context Protocol), ACP (Agentic Commerce Protocol), `llms.txt`, Markdown Content Negotiation, Schema.org.
 - **[[devops-infra-architecture|devops-infra-architecture.md]]** — Vercel Serverless, Supabase Postgres, Cloudflare WAF/DNS/Rate Limiting, Hostinger SMTP, Docker, GitHub Actions CI/CD.
+- **[[ai-audit-architecture|ai-audit-architecture.md]]** — AI Audit MVP: R2, contact-submissions, `/audit/report/[id]`, n8n/worker без оплаты. Synced from `docs/architecture/ai-audit-architecture.md`.
+- **[[r2-audit-storage|r2-audit-storage.md]]** — R2 bucket `erythro-audit-reports`, env vars, API token. Synced from `docs/architecture/r2-audit-storage.md`.
 - **[[deployment|deployment.md]]** — Журнал деплоя erythro.ai (Vercel, Blob, миграции, CI, DNS, почта, AI Crawl Control). Synced from `docs/DEPLOYMENT.md`.
 - **[[playbook|playbook.md]]** — Продуктовый playbook и хронология v1 (фазы A–F, i18n, GSAP, CMS). Synced from `docs/PLAYBOOK.md`.
 - **[[ai-visibility|ai-visibility.md]]** — AI visibility pack: llms.txt, MCP, schema, Content Signals, markdown negotiation. Synced from `docs/AI_VISIBILITY.md`.

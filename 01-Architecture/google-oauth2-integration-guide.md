@@ -168,6 +168,8 @@ Spring сформирует URL: `https://accounts.google.com/o/oauth2/v2/auth?c
 | **invalid_client** | Неверный client_id/secret | Проверить Credentials в Google Console |
 | **authorization_request_not_found** | Сессия теряется при redirect | `same-site=none`, `secure=true` |
 | **403 / blocked** | Consent screen не настроен | Настроить OAuth consent screen, добавить scopes |
+| **Редирект на старый домен / белый экран** | `APP_BASE_URL` указывает на backend/старый хост | В `SuccessHandler` фильтровать `originHost` и направлять на URL decoupled SPA (Vercel) |
+| **Ambiguous mapping crash** | Дублирование `@GetMapping("/api/me")` в разных контроллерах | Оставить эндпоинт в `AuthController`, расширив `UserSessionDTO` (email, isAdmin) |
 
 ---
 

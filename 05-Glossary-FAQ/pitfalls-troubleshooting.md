@@ -628,6 +628,179 @@ CI runs the fix script before API tests.
 
 ---
 
+## PIT-039 — GitHub Secret Scanning: hardcoded Google API key (public leak)
+
+**Tags:** `security`, `secrets`, `github`, `pagespeed`, `google-api`  
+**Seen:** 2026-09-02 GitHub Secret scanning alert #1 — `AuditCollector.java` fallback `PAGESPEED_API_KEY`.
+
+**Symptom:** GitHub Security → Secret scanning alerts shows **Google API Key** with **Public leak**. Key prefix `AIzaSy…` in `services/audit-agent/QA_Auditor/src/main/java/ai/erythro/AuditCollector.java`.
+
+**Cause:** Last-resort hardcoded Google API key in `getPageSpeedApiKey()` instead of env / `.env` only. Public repo = anyone can call PageSpeed Insights (or whatever APIs the key allows) on your quota/billing.
+
+**Fix (order matters):**
+1. **Revoke/rotate first** in [Google Cloud Console → Credentials](https://console.cloud.google.com/apis/credentials): delete or restrict the leaked key, create a new one.
+2. Put the new key only in env (`PAGESPEED_API_KEY` / `GEMINI_API_KEY`) or local `.env` (gitignored) — never in source.
+3. Remove hardcoded fallback from code (return `null` → anonymous PageSpeed mode).
+4. Commit, push, then in the GitHub alert: **Revoke** (if GitHub can) → **Close as remediated**.
+
+**Prevent:** No `AIza…` / tokens in Java/TS source. Pre-commit secret scan (gitleaks / GitHub push protection). Do not rewrite public git history unless coordinated — rotation is the real kill switch.
+
+---
+
+## PIT-040 — Duplicate auto-replies: Hostinger Mail Autoreply + n8n
+
+**Tags:** `n8n`, `email`, `autoresponder`, `hostinger`, `duplicate`  
+**Seen:** 2026-09-03 `order@erythro.ai` — two different confirmation emails on one inbound message.
+
+**Symptom:** Client receives **two** auto-replies:
+1. Generic Hostinger Mail text: *“Thank you for reaching out…”* / *“technical specialist will get back to you within one business day”* / signature *“Erythro.ai Team”* + *“High-Performance Web & Scalable AI Infrastructure”*.
+2. Branded n8n text from `Process & Sign Autoresponder` (Hello {name}, Customer Service Orders, Tel / Email / URL, *Hi-Load Web Development…*).
+
+The generic body is **not** in `infra/n8n/workflows/email-autoresponder.json`.
+
+**Cause:** Two independent senders on the same mailbox.
+1. **Hostinger Mail Autoreply / Vacation** on `order@erythro.ai` (and possibly `team@`) fires on inbound SMTP *before* IMAP. It appends the Hostinger webmail signature (`hmail-signature`, tagline *High-Performance Web & Scalable AI Infrastructure*). These messages are not saved to `INBOX.Sent`.
+2. **n8n IMAP → SMTP** then sends the JS template.
+
+**Fix:** Keep n8n only. Disable Hostinger Autoreply:
+1. [Hostinger Mail](https://mail.hostinger.com/) → `order@erythro.ai` → **Settings → Auto-reply** (or **Vacation**) → **Off**. Repeat for `team@erythro.ai` if set.
+2. Alternative: hPanel → **Emails** → account menu → **Autoresponder** → disable.
+3. Optional: update the Hostinger **Signature** to the n8n branded block so *manual* webmail replies match; Autoreply must still stay off.
+
+**Prevent:** Before activating an n8n IMAP autoresponder, confirm Hostinger Autoreply/Vacation is off for every watched mailbox. Do not run two auto-reply layers on one inbox.
+
+---
+
+## PIT-041 — Do not HTTP-fetch a user-supplied website URL (SSRF)
+
+**Tags:** `ssrf`, `audit`, `dns`, `forms`  
+**Seen:** 2026-09-03 — website live-check on `/audit` (replaced a proposed n8n workflow)
+
+**Symptom:** “Verify the site exists” by `fetch(userUrl)` from Vercel/n8n can hit `127.0.0.1`, RFC1918, link-local, or cloud metadata.
+
+**Cause:** The URL is attacker-controlled. Server-side HTTP to that URL is classic SSRF.
+
+**Fix:** Format-check the hostname, block localhost / `*.local` / raw IPs, `dns.lookup` only, then require at least one **public** A/AAAA. No HTTP to the target. Implementation: `src/lib/checkWebsite.ts`, `POST /api/audit/check-website`.
+
+**Prevent:** Never proxy or GET a client-supplied URL from app/n8n for “is this site real?”. DNS to a public IP is enough for the form; the audit worker already fetches the site later in its own sandbox.
+
+---
+
+## PIT-042 — Chrome autofill squares the audit pill inputs
+
+**Tags:** `audit`, `forms`, `css`, `autofill`, `chrome`  
+**Seen:** 2026-09-03 — `/audit` name / email / website / phone pills
+
+**Symptom:** After browser autofill, pill fields lose rounded corners (rectangular yellow/gray overlay).
+
+**Cause:** Chrome paints `:-webkit-autofill` as a rectangle. The pill used `overflow-visible` (so language/country dropdowns can escape), so the overlay ignored the pill `border-radius`.
+
+**Fix:** `overflow-hidden` on pills without dropdowns; phone input keeps its own end radius; inset `box-shadow` + `-webkit-text-fill-color` on `:-webkit-autofill` to match dark/light field colors (`src/app/(frontend)/styles.css`, `AuditPillShell`).
+
+**Prevent:** Do not leave rounded form shells at `overflow-visible` without either clipping or giving autofilled inputs their own radius + autofill override.
+
+---
+
+## PIT-043 — Turnstile widget blocked or siteverify skipped
+
+**Tags:** `turnstile`, `csp`, `forms`, `env`  
+**Seen:** 2026-09-03 — contact / audit / order intake
+
+**Symptom:** Widget iframe empty; console CSP `frame-src` / `script-src` / `worker-src` violation. Widget chrome shows «Невозможно подключиться к веб-сайту» (error 600010). Or forms submit without a challenge locally, then `403` on production.
+
+**Cause:** CSP omitted `https://challenges.cloudflare.com` in `frame-src` (script-only is not enough), or blocked Turnstile's `blob:` Web Worker (`worker-src` inherits `default-src 'self'`). Next.js inlines only `NEXT_PUBLIC_*` sitekeys; Cloudflare dashboard names (`TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY`) need the `next.config` env map + secret alias. Production `TURNSTILE_HOSTNAMES` must not include `localhost`. Widget domains in the Cloudflare dashboard *must* include `localhost` for local testing. Opening via a LAN IP (`172.x`) also fails — that hostname is not on the widget.
+
+**Fix:** CSP needs `script-src` / `connect-src` / `frame-src` → `https://challenges.cloudflare.com`, plus `worker-src 'self' blob:` and `blob:` on `script-src`. Accept `TURNSTILE_SITE_KEY` → `NEXT_PUBLIC_TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY` → `TURNSTILE_SECRET`. Siteverify only on the server (`src/lib/turnstile.ts`). Restart `next dev` after changing public env or CSP. Open local as `http://localhost:3000` (or 3001), not the Hyper-V/WSL LAN IP.
+
+**Prevent:** Never call siteverify from the browser. Reset the widget in `finally` after every submit (tokens are single-use). Mirror Vercel env for Production + Preview.
+
+---
+
+## PIT-044 — Form “thank you” is API SMTP, not n8n IMAP
+
+**Tags:** `email`, `forms`, `n8n`, `autoresponder`, `smtp`  
+**Seen:** 2026-09-04 — contact / order / audit forms
+
+**Symptom:** After a site form submit, staff get the notify mail on `order@erythro.ai`, but the client never receives «спасибо, заявка принята». n8n IMAP autoresponder works for mail sent *from Gmail/other* to `order@`.
+
+**Cause:** Site notify is From `"Erythro.ai" <order@erythro.ai>` To the CMS notify inbox (often the same mailbox), Reply-To = visitor, `Auto-Submitted: auto-generated`. n8n `Process & Sign Autoresponder` skips `From @erythro.ai` and `Auto-Submitted` ≠ `no`. Hostinger Autoreply must stay Off (PIT-040). Teaching n8n to reply to that Reply-To would risk mail loops.
+
+**Fix:** Send a separate confirmation with `sendClientAcknowledgement` in `src/lib/contactNotification.ts` after CMS persist: To = visitor email, From = `order@erythro.ai`, Reply-To = `order@erythro.ai`, `Auto-Submitted: auto-replied`. Do not fail `/api/contact` if ack SMTP fails. n8n stays for inbound mail from **external** mailboxes only.
+
+**Prevent:** Do not re-enable Hostinger Autoreply. Do not make n8n answer internal notify mail. Keep form ack and IMAP autoresponder as two different paths.
+
+---
+
+## PIT-045 — Cloudflare Insights beacon blocked by CSP
+
+**Tags:** `csp`, `cloudflare`, `web-analytics`, `psi`  
+**Seen:** 2026-09-04 `erythro.ai` — PageSpeed / Chrome Issues: `beacon.min.js` CSP violation
+
+**Symptom:** Console / PSI: Loading `https://static.cloudflareinsights.com/beacon.min.js/...` violates `script-src`. Chrome Issues panel: Content security policy on `/beacon.min.js`.
+
+**Cause:** Cloudflare Web Analytics auto-injects the Insights beacon on proxied zones. CSP in `next.config.ts` listed Turnstile (`challenges.cloudflare.com`) but not the Insights hosts.
+
+**Fix:** Allow `https://static.cloudflareinsights.com` on `script-src` and `https://cloudflareinsights.com` on `connect-src` (manual beacons). Auto-injected RUM also posts to `'self'` `/cdn-cgi/rum`, which was already allowed. Do not pin the hashed `/beacon.min.js/v…` path — Cloudflare rotates it.
+
+**Prevent:** When enabling a Cloudflare/Vercel/GA script, add both the script origin and its report endpoint to CSP in the same change. Re-check PSI console after deploy.
+
+---
+
+## PIT-046 — Hebrew (RTL) modals show a horizontal scrollbar
+
+**Tags:** `rtl`, `i18n`, `modals`, `overflow`, `hebrew`  
+**Seen:** 2026-09-04 — contact / solutions order modal, audit order modal (`dir=he`)
+
+**Symptom:** Dialog panel grows a horizontal scrollbar only in Hebrew. EN/RU look fine.
+
+**Cause:** `overflow-y: auto` without an explicit `overflow-x` computes `overflow-x` to `auto`. In RTL that surfaces a few pixels of overflow from: the vertical scrollbar on the inline-start edge, `position: absolute` close (`end-4`) contributing to `scrollWidth`, trailing `letter-spacing` on full-width `tracking-widest` buttons, and LTR chrome (Turnstile iframe, `dir=ltr` inputs).
+
+**Fix:** Clip on an outer `overflow-hidden` shell; keep vertical scroll on an inner `overflow-y-auto overflow-x-hidden min-w-0` scroller; park the close button on the outer shell. Shared `.faq-accordion-scroll` also sets `overflow-x: hidden`. Same pattern as FAQ accordion / a11y panel.
+
+**Prevent:** Never put `overflow-y-auto` alone on an RTL dialog. Always pair with `overflow-x-hidden` (or clip the X axis on a wrapper). Re-check `he` after any modal/form chrome change.
+
+---
+
+## PIT-047 — Turnstile widget language follows the browser, not the site locale
+
+**Tags:** `turnstile`, `i18n`, `forms`  
+**Seen:** 2026-09-04 — contact / order / audit forms in EN and HE showed Russian «Успешно»
+
+**Symptom:** Site UI is English or Hebrew, but Cloudflare Turnstile success/privacy copy stays in Russian (or whatever the OS/browser language is).
+
+**Cause:** `turnstile.render` defaults to `language: 'auto'`, which uses the visitor’s browser locale. `TurnstileField` did not pass `language`, so a Russian Windows/Chrome profile always got RU chrome.
+
+**Fix:** Pass `language: 'en' | 'ru' | 'he'` from the site locale into `turnstile.render` (`src/components/TurnstileField.tsx`). Re-render the widget when locale changes.
+
+**Prevent:** Do not rely on Turnstile `auto` for a tri-locale site. Always set `language` from the same locale the form copy uses.
+
+---
+
+## PIT-048 — Spring OAuth2 redirect lands on legacy domain (APP_BASE_URL vs decoupled frontend) & Ambiguous mapping crash
+
+**Tags:** `spring-boot`, `oauth2`, `google`, `redirect`, `docker`, `cors`, `session`  
+**Seen:** 2026-09-04 — Montblanc (`montblanc-frontend.vercel.app` + Spring Boot backend on VPS)
+
+**Symptom:**
+1. After completing Google OAuth 2.0 authentication, the browser redirects to the old monolith domain (e.g. `https://pizza-na-dom.mk.ua/admin`) showing a blank screen, instead of the modern frontend (`https://montblanc-frontend.vercel.app/admin`). Manually navigating to Vercel opens the admin panel correctly because the session cookie was established.
+2. After adding `/api/me` to `LoginController`, the Spring Boot container crashes on startup in an endless restart loop with `IllegalStateException: Ambiguous mapping. Cannot map 'loginController' method getMe(HttpSession) to {GET [/api/me]}: There is already 'authController' bean method me(HttpSession) mapped`.
+
+**Cause:**
+1. In `application.properties` and VPS `docker-compose.yml`, `APP_BASE_URL` defaulted to `https://pizza-na-dom.mk.ua`. In `GoogleOAuth2SuccessHandler`, `response.sendRedirect(baseUrl + redirectTarget)` used `appBaseUrl` fallback, sending users to the legacy domain.
+2. `AuthController` already registered `/api/me` and `/api/logout`. Adding duplicate routes in `LoginController` caused Spring MVC `RequestMappingHandlerMapping` conflict, aborting context initialization.
+3. VPS container ran an old embedded jar layer from Docker build instead of the updated compiled artifact.
+
+**Fix:**
+1. In `GoogleOAuth2SuccessHandler.java`, strictly sanitize `baseUrl` to filter out legacy domains and VPS IPs, directing redirects to the decoupled SPA frontend (`https://montblanc-frontend.vercel.app`).
+2. Set `APP_BASE_URL=https://montblanc-frontend.vercel.app` in `application.properties`, `.env`, and `docker-compose.yml`.
+3. In `docker-compose.yml`, mount `./app.jar:/app/app.jar` so hot updates via SCP take effect immediately on container restart without slow image rebuilds.
+4. Remove duplicate mappings from `LoginController.java`. Enrich existing `UserSessionDTO` and `AuthController.me()` with `isAdmin`, `email`, and `authenticated` flags.
+
+**Prevent:**
+Never hardcode legacy hosts in OAuth callback success handlers. Keep decoupled frontend base URL configurable via env. In Spring Boot, always check existing controllers before adding new REST mappings to prevent Ambiguous Mapping crashes.
+
+---
+
 ## Checklist before merging CMS / schema PRs
 
 - [ ] Migration file under `src/migrations/` + registered in `index.ts`
@@ -647,3 +820,13 @@ CI runs the fix script before API tests.
 - [ ] If CI reports missing CMS columns that migrations already list — restore with `pnpm db:fix-*` (PIT-028)
 - [ ] Audit landing/order copy must match QA_Auditor report tiers (PIT-029)
 - [ ] Audit order/form intake must POST structured website / auditLanguage / planSlug (PIT-030)
+- [ ] No hardcoded API keys / `AIza…` in source; secrets only via env (PIT-039)
+- [ ] n8n IMAP autoresponder: Hostinger Autoreply/Vacation must be Off (PIT-040)
+- [ ] User-supplied website check: DNS + public IP only, never HTTP-fetch the URL (PIT-041)
+- [ ] Rounded pill inputs: clip autofill or set input radius + `:-webkit-autofill` override (PIT-042)
+- [ ] Turnstile: CSP `frame-src` + `worker-src blob:` + sitekey `NEXT_PUBLIC_` (or `TURNSTILE_SITE_KEY` map); prod hostnames without localhost (PIT-043)
+- [ ] Form client ack is API SMTP to the visitor; n8n IMAP only answers inbound from external mailboxes (PIT-044)
+- [ ] Cloudflare Insights/Web Analytics: CSP `script-src` `static.cloudflareinsights.com` + `connect-src` `cloudflareinsights.com` (PIT-045)
+- [ ] RTL/Hebrew dialogs: `overflow-y-auto` must pair with `overflow-x-hidden` (or an `overflow-hidden` wrapper) (PIT-046)
+- [ ] Turnstile widget `language` must follow the site locale, not browser `auto` (PIT-047)
+- [ ] OAuth SuccessHandler redirect must target the decoupled frontend URL, never the legacy backend host (PIT-048)

@@ -74,6 +74,9 @@ DATABASE_URL=postgresql://postgres.<ref>:<password>@aws-1-...pooler.supabase.com
 | `NEXT_PUBLIC_SITE_URL` | `https://erythro.ai` | canonical / OG |
 | `REVALIDATION_TOKEN` | (опционально) | для On-Demand Revalidation из n8n — добавить позже |
 | `SMTP_PASS` | пароль ящика Hostinger `order@erythro.ai` | форма шлёт с `order@erythro.ai` на email из Site Settings → Contacts |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | sitekey виджета (публичный). Алиас: `TURNSTILE_SITE_KEY` | Cloudflare Turnstile на формах |
+| `TURNSTILE_SECRET` | secret виджета. Алиас: `TURNSTILE_SECRET_KEY` | server-side siteverify, не в браузер |
+| `TURNSTILE_HOSTNAMES` | `erythro.ai,www.erythro.ai` (prod) | allowlist hostname из siteverify; **без** localhost на проде |
 
 Локально те же значения лежат в `.env` (он в `.gitignore`, в репозиторий не попадает).
 
@@ -500,8 +503,12 @@ Hostinger Emails → Mailboxes → Domain settings → **Check status** (до 24
 
 1. Пишет документ в коллекцию `contact-submissions` (админка).
 2. Читает Site Settings → Contacts → Email.
-3. Шлёт SMTP через `src/lib/contactNotification.ts`: **from** `"Erythro.ai" <order@erythro.ai>`,
-   **to** = Site Settings notify target(s), Reply-To = имя + email посетителя.
+3. Шлёт SMTP **сотрудникам** через `src/lib/contactNotification.ts`: **from** `"Erythro.ai" <order@erythro.ai>`,
+   **to** = Site Settings notify target(s), Reply-To = имя + email посетителя,
+   `Auto-Submitted: auto-generated`.
+4. Шлёт SMTP **клиенту** подтверждение «заявка принята» (`sendClientAcknowledgement`):
+   **to** = email из формы, Reply-To = `order@erythro.ai`, `Auto-Submitted: auto-replied`.
+   n8n IMAP на это не отвечает (From `@erythro.ai` + Auto-Submitted). Ошибка ack не валит `/api/contact`.
 
 Транспорт: `smtp.hostinger.com:465` (fallback 587 STARTTLS). Пароль ящика — Vercel env
 **`SMTP_PASS`** (Production + Preview). Опционально: `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`,
@@ -517,15 +524,24 @@ Hostinger Emails → Mailboxes → Domain settings → **Check status** (до 24
 
 ### 13.3. Защита `POST /api/contact`
 
-Единственная точка приёма форм (модалка /contacts / order) — изолированный route:
+Единственная точка приёма форм (модалка /contacts /audit / order) — изолированный route:
 
 1. **App rate limit** по IP (`cf-connecting-ip` → `x-forwarded-for`), default **5 / 60s**
    (`CONTACT_RATE_LIMIT_MAX`, `CONTACT_RATE_LIMIT_WINDOW_MS`). Ответ `429` + `Retry-After`.
    In-memory per Vercel isolate — **не** общий счётчик по всем инстансам.
 2. **Cloudflare Rate Limiting** (edge, до Vercel) — обязательное дополнение, см. ниже.
-3. **Sanitize + validate** (`contactSubmissionGuard`) до записи в Payload и SMTP:
+3. **Honeypot** (`company_website`) — заполненный бот получает silent `200` без CMS/SMTP.
+4. **Turnstile siteverify** (`https://challenges.cloudflare.com/turnstile/v0/siteverify`):
+   токен `cf-turnstile-response`, `success === true`, `action` = `source`
+   (`contact` / `audit` / `order`), hostname из `TURNSTILE_HOSTNAMES`
+   (локально по умолчанию `localhost,127.0.0.1`; прод — хост из `NEXT_PUBLIC_SITE_URL`,
+   **без** localhost). Production без secret — fail-closed `403`.
+   Виджет: `TurnstileField` (explicit render + `reset` в `finally`).
+   CSP: `script-src` / `connect-src` / `frame-src` → `https://challenges.cloudflare.com`,
+   плюс `worker-src 'self' blob:` (PIT-043).
+5. **Sanitize + validate** (`contactSubmissionGuard`) до записи в Payload и SMTP:
    срез HTML/control chars, лимиты длины, строгий email/locale.
-4. Затем CMS `contact-submissions` и SMTP notify.
+6. Затем CMS `contact-submissions` и SMTP notify.
 
 #### Cloudflare Rate Limiting на `/api/contact`
 
@@ -680,8 +696,12 @@ Hostinger Emails → Mailboxes → Domain settings → **Check status** (до 24
 
 1. Пишет документ в коллекцию `contact-submissions` (админка).
 2. Читает Site Settings → Contacts → Email.
-3. Шлёт SMTP через `src/lib/contactNotification.ts`: **from** `"Erythro.ai" <order@erythro.ai>`
-   (display name + mailbox), **to** = Site Settings notify target(s), Reply-To = имя + email посетителя.
+3. Шлёт SMTP **сотрудникам** через `src/lib/contactNotification.ts`: **from** `"Erythro.ai" <order@erythro.ai>`
+   (display name + mailbox), **to** = Site Settings notify target(s), Reply-To = имя + email посетителя,
+   `Auto-Submitted: auto-generated`.
+4. Шлёт SMTP **клиенту** подтверждение «заявка принята» (`sendClientAcknowledgement`):
+   **to** = email из формы, Reply-To = `order@erythro.ai`, `Auto-Submitted: auto-replied`.
+   n8n IMAP на это не отвечает (From `@erythro.ai` + Auto-Submitted). Ошибка ack не валит `/api/contact`.
 
 Транспорт: `smtp.hostinger.com:465` (fallback 587 STARTTLS). Пароль ящика — Vercel env
 **`SMTP_PASS`** (Production + Preview). Опционально: `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`,
@@ -696,15 +716,24 @@ Hostinger Emails → Mailboxes → Domain settings → **Check status** (до 24
 
 ### 13.3. Защита `POST /api/contact`
 
-Единственная точка приёма форм (модалка /contacts / order) — изолированный route:
+Единственная точка приёма форм (модалка /contacts /audit / order) — изолированный route:
 
 1. **App rate limit** по IP (`cf-connecting-ip` → `x-forwarded-for`), default **5 / 60s**
    (`CONTACT_RATE_LIMIT_MAX`, `CONTACT_RATE_LIMIT_WINDOW_MS`). Ответ `429` + `Retry-After`.
    In-memory per Vercel isolate — **не** общий счётчик по всем инстансам.
 2. **Cloudflare Rate Limiting** (edge, до Vercel) — обязательное дополнение, см. ниже.
-3. **Sanitize + validate** (`contactSubmissionGuard`) до записи в Payload и SMTP:
+3. **Honeypot** (`company_website`) — заполненный бот получает silent `200` без CMS/SMTP.
+4. **Turnstile siteverify** (`https://challenges.cloudflare.com/turnstile/v0/siteverify`):
+   токен `cf-turnstile-response`, `success === true`, `action` = `source`
+   (`contact` / `audit` / `order`), hostname из `TURNSTILE_HOSTNAMES`
+   (локально по умолчанию `localhost,127.0.0.1`; прод — хост из `NEXT_PUBLIC_SITE_URL`,
+   **без** localhost). Production без secret — fail-closed `403`.
+   Виджет: `TurnstileField` (explicit render + `reset` в `finally`).
+   CSP: `script-src` / `connect-src` / `frame-src` → `https://challenges.cloudflare.com`,
+   плюс `worker-src 'self' blob:` (PIT-043).
+5. **Sanitize + validate** (`contactSubmissionGuard`) до записи в Payload и SMTP:
    срез HTML/control chars, лимиты длины, строгий email/locale.
-4. Затем CMS `contact-submissions` и SMTP notify.
+6. Затем CMS `contact-submissions` и SMTP notify.
 
 #### Cloudflare Rate Limiting на `/api/contact`
 

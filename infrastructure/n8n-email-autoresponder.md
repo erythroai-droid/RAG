@@ -21,6 +21,7 @@
    - Опция **Append n8n Attribution** в узлах SMTP выключена (`OFF`), предотвращая появление строки *"This email was sent automatically with n8n"*.
 6. **SMTP Reply**:
    - Отправляет ответ с соответствующего адреса с корректными заголовками трединга (`In-Reply-To`, `References`, `Auto-Submitted: auto-replied`).
+7. **Не покрывает заявки с сайта.** `POST /api/contact` шлёт notify From `order@erythro.ai` (n8n это пропускает). Подтверждение клиенту «заявка принята» — отдельный SMTP из приложения (`sendClientAcknowledgement`, PIT-044), не IMAP Reply-To.
 
 ---
 
@@ -76,3 +77,8 @@ py -3 scripts/deploy_n8n_email_autoresponder.py
 2. **Workflows → Import from File** → `infra/n8n/workflows/email-autoresponder.json`
 3. Привязать учетные данные IMAP и SMTP к соответствующим узлам.
 4. Включить переключатель **Active**.
+5. **Обязательно выключить Hostinger Autoreply** на тех же ящиках (иначе клиент получит два письма — см. PIT-040):
+   - [Hostinger Mail](https://mail.hostinger.com/) → Settings → **Auto-reply / Vacation** → Off (`order@` и `team@`).
+   - Или hPanel → Emails → Autoresponder → disable.
+
+Подпись Hostinger webmail (*High-Performance Web & Scalable AI Infrastructure*) — это не n8n. Её можно оставить/обновить для ручных писем из webmail; автоответ должен быть только в n8n.

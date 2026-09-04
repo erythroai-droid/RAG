@@ -91,6 +91,7 @@ Rules:
 | “AI visibility / llms.txt / MCP / Organization schema” | `AI_VISIBILITY.md`; `DEPLOYMENT.md` §15; `PLAYBOOK.md` §9.18–9.20 |
 | “Middleware Edge / node:console / markdown negotiation build” | `PIT-024`; `PLAYBOOK.md` §9.20 |
 | “Unit CI green tests but exit 1 / unhandled rejection / order slug 404” | `PIT-025`, `PIT-026`; `vitest.setup.ts` |
+| “Google / X OAuth2 redirect white screen / legacy domain / ambiguous mapping” | `PIT-048`; `01-Architecture/google-oauth2-integration-guide.md`; `01-Architecture/spring-boot-oauth2-architecture.md` |
 
 ---
 
