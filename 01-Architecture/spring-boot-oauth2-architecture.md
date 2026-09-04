@@ -304,3 +304,11 @@ public class EmailService {
 | **403 на `/2/users/me`** | Отсутствует scope `users.read` | Проверить параметр `scope` в `application.properties` |
 | **`invalid_user_info_response`** | `DefaultOAuth2UserService` пытается прочесть корень JSON вместо `data` | Использовать кастомный `TwitterOAuth2UserService` |
 | **Неверный `redirect_uri` за Nginx** | Схема протокола подменяется на `http://` | Включить `server.forward-headers-strategy=framework` и прокси-заголовки `X-Forwarded-Proto: https` |
+
+---
+
+## 8. Ролевая модель панели управления (RBAC: Super Admin vs Customer)
+
+Для разделения доступа к данным заказов используется поле `category` сущности `User`:
+- **`category = 'admin'` (Super Admin):** полный доступ ко всем заказам магазина (`ordersRepository.findAll()`), глобальной статистике продаж, управлению товарами (`/admin/products`), категориями (`/admin/categories`) и удалению заказов.
+- **`category = 'user'` (Customer / Личный кабинет):** разрешён вход в кабинет `/admin` («Мои заказы»), где отображаются **только собственные заказы** пользователя по `userId` и `email` (`ordersRepository.findByUserIdOrEmailOrderByIdDesc()`). Управление товарами, категориями и удаление заказов надёжно закрыты на уровне бэкенда проверкой `checkAdmin(session)` (HTTP 403) и скрыты в интерфейсе.
