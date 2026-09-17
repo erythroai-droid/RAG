@@ -627,3 +627,11 @@ Legal / contacts / page heroes — **§9.15**. Формы и адресная к
 **Не делать:** поднимать пустой Postgres в Unit job «ради 5432» — без сида планов это не лечит PIT-025 и не убирает PIT-026 без мока Payload.
 
 Подробности: [`PITFALLS.md`](./PITFALLS.md) PIT-024…026.
+
+### 9.21. Мобильная форма: honeypot + почта (2026-09-06)
+
+С телефона форма показывала «успешно», письма на `order@` / `team@` не приходили; с десктопа — приходили. Ловушка `company_website` / «Company website» заполнялась iOS/Chrome Autofill (рядом с настоящим `website` на `/order` и `/audit`). `/api/contact` молча отдавал `{ ok: true }` без CMS и SMTP.
+
+**Фикс:** `hp_erythro_trap`, label Fax, `readOnly`, clip-hide. Проверено на проде: письма с мобилки доходят. Грабли: PIT-054 (Unread / n8n markAsRead, пароль `team@` ≠ `SMTP_PASS`), PIT-055.
+
+Код: `src/lib/contactHoneypot.ts`, `src/components/ContactHoneypotField.tsx`.

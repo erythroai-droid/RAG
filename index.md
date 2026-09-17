@@ -2,7 +2,7 @@
 
 > **Корпоративный диспетчер знаний, архитектурных стандартов и регламентов для AI-агентов и разработчиков.**  
 > Создано для обеспечения преемственности архитектуры, предотвращения рецидивов ошибок (Pitfalls) и быстрого развертывания новых AI-проектов.
-> **Sync (2026-08-28):** зеркала `erythro-ai/docs/*` добавлены/обновлены (playbook, deployment, ai-visibility, hero-motion, rag-index, import-project, cms-field-map, case-study-template, pitfalls PIT-001…026). Правило двухсторонней синхронизации: правки docs ↔ Knowledge-Base.
+> **Sync (2026-09-06):** зеркала `erythro-ai/docs/*` — Access `/admin*` + DMARC quarantine runbook (PIT-064), R2 media, PLAN-deferred, RAG_INDEX ingest map. Правило двухсторонней синхронизации: правки docs ↔ Knowledge-Base.
 
 
 ---
@@ -68,7 +68,7 @@ graph TD
     end
     
     subgraph "05 Glossary & FAQ"
-        PIT["[[pitfalls-troubleshooting|Каталог факапов (PIT-001..026)]]"]
+        PIT["[[pitfalls-troubleshooting|Каталог факапов (PIT-001..064)]]"]
         RAG["[[rag-index|RAG Index / ingest map]]"]
         GLOSS["[[technical-glossary|Глоссарий терминов]]"]
         FAQ["[[architectural-faq|Архитектурный FAQ]]"]
@@ -97,7 +97,22 @@ graph TD
 - **[[devops-infra-architecture|devops-infra-architecture.md]]** — Vercel Serverless, Supabase Postgres, Cloudflare WAF/DNS/Rate Limiting, Hostinger SMTP, Docker, GitHub Actions CI/CD.
 - **[[ai-audit-architecture|ai-audit-architecture.md]]** — AI Audit MVP: R2, contact-submissions, `/audit/report/[id]`, n8n/worker без оплаты. Synced from `docs/architecture/ai-audit-architecture.md`.
 - **[[r2-audit-storage|r2-audit-storage.md]]** — R2 bucket `erythro-audit-reports`, env vars, API token. Synced from `docs/architecture/r2-audit-storage.md`.
+- **[[r2-media-storage|r2-media-storage.md]]** — Payload media on R2 (`erythro-media`), public URL, Blob cutover. Synced from `docs/architecture/r2-media-storage.md`.
+- **[[gemini-consultant|gemini-consultant.md]]** — ИИ-консультант на Gemini Flash + CMS KB. Synced from `docs/architecture/gemini-consultant.md`.
+- **[[grok-bot-consultant|grok-bot-consultant.md]]** — Публичный консультант на сайте (xAI API / Grok), поток данных и цены. Synced from `docs/architecture/grok-bot-consultant.md`.
+- **[[erythro-knowledge-base|erythro-knowledge-base.md]]** — Снимок базы знаний лидогенерации и цен live CMS для ИИ-консультанта. Synced from `docs/consultant/erythro-knowledge-base.md`.
+- **[[ai-token-spend|ai-token-spend.md]]** — Карта AI token spend: COGS/OPEX, ключи, месячный ритуал. Synced from `docs/architecture/ai-token-spend.md`.
+- **[[audit-rate-limiting|audit-rate-limiting.md]]** — Лимитирование повторного аудита (5 дней) и учет IP. Synced from `docs/architecture/audit-rate-limiting.md`.
+- **[[audit-page-cms-schema|audit-page-cms-schema.md]]** — CMS схема и локализация страницы аудита.
+- **[[vps-n8n|vps-n8n.md]]** — Хостинг n8n на VPS за Caddy, пин версии (2.39.6), cron и воркфлоу.
+- **[[n8n-audit-reconcile|n8n-audit-reconcile.md]]** — Реконсиляция зависших аудитов (Vercel Cron + n8n). Synced from `docs/infrastructure/n8n-audit-reconcile.md`.
+- **[[n8n-email-autoresponder|n8n-email-autoresponder.md]]** — n8n email autoresponder для order@ и team@. Synced from `docs/infrastructure/n8n-email-autoresponder.md`.
+- **[[caddy-dns-audit-worker|caddy-dns-audit-worker.md]]** — Caddy reverse proxy и DNS конфигурация для Audit Worker.
+- **[[brand-entity-promotion|brand-entity-promotion.md]]** — Стратегия позиционирования бренда и сущностей в AI-поиске и каталогах.
 - **[[deployment|deployment.md]]** — Журнал деплоя erythro.ai (Vercel, Blob, миграции, CI, DNS, почта, AI Crawl Control). Synced from `docs/DEPLOYMENT.md`.
+- **[[vps-firewall-cloudflare-access|vps-firewall-cloudflare-access.md]]** — UFW baseline, Cloudflare Access `/admin*`, DMARC quarantine→reject checklist. Synced from `docs/infrastructure/vps-firewall-cloudflare-access.md`.
+- **[[vps-docker-ports|vps-docker-ports.md]]** — Docker publish rules (no `0.0.0.0`). Synced from `docs/infrastructure/vps-docker-ports.md`.
+- **[[PLAN-deferred|PLAN-deferred.md]]** — Deferred hardening / perf backlog (DMARC reject ~2026-09-13). Synced from `docs/PLAN-deferred.md`.
 - **[[playbook|playbook.md]]** — Продуктовый playbook и хронология v1 (фазы A–F, i18n, GSAP, CMS). Synced from `docs/PLAYBOOK.md`.
 - **[[ai-visibility|ai-visibility.md]]** — AI visibility pack: llms.txt, MCP, schema, Content Signals, markdown negotiation. Synced from `docs/AI_VISIBILITY.md`.
 - **[[compliance-legal-architecture|compliance-legal-architecture.md]]** — Поправка №13 к закону о защите конфиденциальности (Израиль), Документ определения базы данных (DBD), шифрование бэкапов AES-256-GCM, IS 5568 / WCAG 2.1 AA, GDPR и EU AI Act.
@@ -137,7 +152,8 @@ graph TD
 - **[[legal-page-template|legal-page-template.md]]** — Шаблоны юридических документов: Privacy Policy, Terms of Service, Accessibility Statement (IS 5568 / WCAG 2.1 AA).
 
 ### [[05-Glossary-FAQ/pitfalls-troubleshooting|📁 05-Glossary-FAQ (База инцидентов и FAQ)]]
-- **[[pitfalls-troubleshooting|pitfalls-troubleshooting.md]]** — Каталог известных факапов (`PIT-001` – `PIT-026`): симптомы, причины, проверенные решения и правила профилактики. Synced from `docs/PITFALLS.md`.
+- **[[pitfalls-troubleshooting|pitfalls-troubleshooting.md]]** — Каталог известных факапов (`PIT-001` – `PIT-064`): симптомы, причины, проверенные решения и правила профилактики. Synced from `docs/PITFALLS.md`.
 - **[[rag-index|rag-index.md]]** — Ingest map для RAG (chunking, tags, routing). Synced from `docs/RAG_INDEX.md`.
 - **[[technical-glossary|technical-glossary.md]]** — Алфавитный глоссарий терминов: MCP, ACP, RAG, ISR, Drizzle, Lexical, GSAP, TTFB, CSP, HSTS, WCAG.
 - **[[architectural-faq|architectural-faq.md]]** — Ответы на частые архитектурные вопросы для быстрого старта новых клиентских проектов.
+- **[[vercel-agent-readiness|vercel-agent-readiness.md]]** — Регламент и чек-лист готовности проекта к взаимодействию с AI-агентами по стандартам Vercel Level 1.

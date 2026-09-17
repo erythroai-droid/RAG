@@ -22,6 +22,7 @@
 6. **SMTP Reply**:
    - Отправляет ответ с соответствующего адреса с корректными заголовками трединга (`In-Reply-To`, `References`, `Auto-Submitted: auto-replied`).
 7. **Не покрывает заявки с сайта.** `POST /api/contact` шлёт notify From `order@erythro.ai` (n8n это пропускает). Подтверждение клиенту «заявка принята» — отдельный SMTP из приложения (`sendClientAcknowledgement`, PIT-044), не IMAP Reply-To.
+8. **Не пишет в CMS/БД.** Тело письма и вложения не сохраняются (`downloadAttachments: false`). В HTML-приветствии имя из `From` экранируется (`escapeHtml`, PIT-082).
 
 ---
 
@@ -58,9 +59,9 @@ Hi-Load Web Development & Ai Agents Automation
 | Тип | Host | Port | SSL/TLS | User | Password |
 |---|---|---|---|---|---|
 | **IMAP (Order)** | `imap.hostinger.com` | `993` | Yes | `order@erythro.ai` | `[MAIL_PASS]` |
-| **IMAP (Team)** | `imap.hostinger.com` | `993` | Yes | `team@erythro.ai` | `[MAIL_PASS]` |
-| **SMTP (Order)** | `smtp.hostinger.com` | `465` | Yes | `order@erythro.ai` | `[MAIL_PASS]` |
-| **SMTP (Team)** | `smtp.hostinger.com` | `465` | Yes | `team@erythro.ai` | `[MAIL_PASS]` |
+| **IMAP (Team)** | `imap.hostinger.com` | `993` | Yes | `team@erythro.ai` | password of **this** mailbox (not Vercel `SMTP_PASS`) |
+| **SMTP (Order)** | `smtp.hostinger.com` | `465` | Yes | `order@erythro.ai` | `[MAIL_PASS]` = Vercel `SMTP_PASS` |
+| **SMTP (Team)** | `smtp.hostinger.com` | `465` | Yes | `team@erythro.ai` | password of **this** mailbox (not Vercel `SMTP_PASS`) |
 
 ---
 

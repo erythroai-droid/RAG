@@ -1,12 +1,3 @@
-# Deployment journal (Erythro.ai)
-
-#architecture #devops #deploy #vercel #supabase #ci
-
-> **Synced from:** `erythro-ai/docs/DEPLOYMENT.md`  
-> **Sync date:** 2026-08-28  
-> Canonical source of truth for this file lives in the project repo; keep both sides updated (two-way sync rule).
-
----
 # Деплой Erythro.ai: Supabase + Vercel
 
 Журнал боевого деплоя проекта на прод. Описывает **что настроено**, **какие ошибки сборки
@@ -60,6 +51,10 @@ DATABASE_URL=postgresql://postgres.<ref>:<password>@aws-1-...pooler.supabase.com
 `scripts/seed.ts`. Схема Payload запушена туда же (dev `push`).
 > ⚠️ Пользователей-админов сид **не создаёт** — первый админ создаётся вручную через `/admin`
 > на задеплоенном сайте.
+
+### Предотвращение засыпания БД (Free Tier Keepalive)
+На бесплатном тарифе Supabase проект засыпает (pauses) после 7 дней неактивности.
+Для предотвращения настроен GitHub Actions workflow `.github/workflows/keepalive-db.yml` (каждые 3 дня) и скрипт `scripts/ping-db.mjs` (`pnpm db:ping`), который шлет легковесный ping-запрос к Postgres и HTTP endpoint.
 
 ---
 
@@ -181,6 +176,9 @@ pnpm install            # при no-TTY ошибке: $env:CI="true"; pnpm insta
 # Локальная прод-сборка (быстрый сигнал перед пушем)
 pnpm run build
 
+# Проверка доступности и пинг БД (keepalive)
+pnpm db:ping
+
 # Сидинг Supabase
 pnpm exec tsx scripts/seed.ts
 
@@ -208,6 +206,8 @@ pnpm test:e2e
 ## 8. Медиа-хранилище (Vercel Blob)
 
 Загрузки Payload (коллекция `media`) хранятся в Vercel Blob, а не на эфемерной ФС.
+
+**AI Audit reports:** целевое хранилище — Cloudflare R2 bucket `erythro-audit-reports` (см. [`architecture/r2-audit-storage.md`](./architecture/r2-audit-storage.md)). Media Payload пока на Blob; cutover на R2 — отдельный шаг.
 
 **Код:**
 - Пакет `@payloadcms/storage-vercel-blob` (версия синхронна с ядром Payload — все `@payloadcms/*`
@@ -447,6 +447,7 @@ URL вычисляется в afterRead-хуке, так что ссылка ч�
 | `pnpm db:fix-portfolio-richtext` | varchar → jsonb для Lexical полей |
 | `pnpm db:fix-site-settings-page-heroes` | Page hero media FK в Site Settings |
 | `pnpm db:fix-solution-feature-columns` | `home_only` + features `full` jsonb (PIT-028) |
+| `pnpm db:fix-contact-submissions-audit-fields` | audit website / language / plan / status (PIT-030) |
 
 Также без отдельного `db:fix-*` (только migration): `20260815_010000_site_settings_emails`
 (адресная книга + notify/display selects).
@@ -492,7 +493,7 @@ Vercel Domains → DNS. Автоподключение в hPanel не срабо
 | CNAME | `hostingermail-a._domainkey` | — | `hostingermail-a.dkim.mail.hostinger.com` |
 | CNAME | `hostingermail-b._domainkey` | — | `hostingermail-b.dkim.mail.hostinger.com` |
 | CNAME | `hostingermail-c._domainkey` | — | `hostingermail-c.dkim.mail.hostinger.com` |
-| TXT | `_dmarc` | — | `v=DMARC1; p=none; rua=mailto:order@erythro.ai` |
+| TXT | `_dmarc` | — | `v=DMARC1; p=quarantine; rua=mailto:order@erythro.ai; pct=100;` (was `p=none`; tighten to `p=reject` after a week of clean reports) |
 
 В Name для DKIM только `hostingermail-a._domainkey`, без `.erythro.ai`. После сохранения —
 Hostinger Emails → Mailboxes → Domain settings → **Check status** (до 24 ч на пропагацию).
@@ -530,7 +531,7 @@ Hostinger Emails → Mailboxes → Domain settings → **Check status** (до 24
    (`CONTACT_RATE_LIMIT_MAX`, `CONTACT_RATE_LIMIT_WINDOW_MS`). Ответ `429` + `Retry-After`.
    In-memory per Vercel isolate — **не** общий счётчик по всем инстансам.
 2. **Cloudflare Rate Limiting** (edge, до Vercel) — обязательное дополнение, см. ниже.
-3. **Honeypot** (`company_website`) — заполненный бот получает silent `200` без CMS/SMTP.
+3. **Honeypot** (`hp_erythro_trap`; legacy `company_website` still dropped) — заполненный бот получает silent `200` без CMS/SMTP. Не называть поле company/website: iOS/Chrome autofill на мобилке ложно срабатывает.
 4. **Turnstile siteverify** (`https://challenges.cloudflare.com/turnstile/v0/siteverify`):
    токен `cf-turnstile-response`, `success === true`, `action` = `source`
    (`contact` / `audit` / `order`), hostname из `TURNSTILE_HOSTNAMES`
@@ -605,6 +606,7 @@ pnpm cf:contact-rate-limit
 - `/openapi.json` — OpenAPI 3 для Brand API / MCP (`rel=service-desc`)
 - Markdown negotiation — `Accept: text/markdown` → `src/app/api/markdown-negotiate/`
 - ACP discovery — `/.well-known/acp.json` (и `/.well-known/acp`)
+- `/.well-known/security.txt` — RFC 9116 (`Contact: mailto:order@erythro.ai`, Expires 2027-01-01)
 
 **Проверка после деплоя:**
 
@@ -614,6 +616,7 @@ curl -sI https://erythro.ai/ | findstr /i "^link:"
 curl -s https://erythro.ai/llms.txt
 curl -s https://erythro.ai/.well-known/mcp
 curl -s https://erythro.ai/.well-known/api-catalog
+curl -s https://erythro.ai/.well-known/security.txt
 curl -s https://erythro.ai/openapi.json
 curl -s https://erythro.ai/about
 curl -s https://erythro.ai/robots.txt
@@ -685,7 +688,7 @@ ALIAS/CAA сайта не трогать.
 | CNAME | `hostingermail-a._domainkey` | — | `hostingermail-a.dkim.mail.hostinger.com` |
 | CNAME | `hostingermail-b._domainkey` | — | `hostingermail-b.dkim.mail.hostinger.com` |
 | CNAME | `hostingermail-c._domainkey` | — | `hostingermail-c.dkim.mail.hostinger.com` |
-| TXT | `_dmarc` | — | `v=DMARC1; p=none; rua=mailto:order@erythro.ai` |
+| TXT | `_dmarc` | — | `v=DMARC1; p=quarantine; rua=mailto:order@erythro.ai; pct=100;` (was `p=none`; tighten to `p=reject` after a week of clean reports) |
 
 В Name для DKIM только `hostingermail-a._domainkey`, без `.erythro.ai`. После сохранения —
 Hostinger Emails → Mailboxes → Domain settings → **Check status** (до 24 ч на пропагацию).
@@ -722,7 +725,7 @@ Hostinger Emails → Mailboxes → Domain settings → **Check status** (до 24
    (`CONTACT_RATE_LIMIT_MAX`, `CONTACT_RATE_LIMIT_WINDOW_MS`). Ответ `429` + `Retry-After`.
    In-memory per Vercel isolate — **не** общий счётчик по всем инстансам.
 2. **Cloudflare Rate Limiting** (edge, до Vercel) — обязательное дополнение, см. ниже.
-3. **Honeypot** (`company_website`) — заполненный бот получает silent `200` без CMS/SMTP.
+3. **Honeypot** (`hp_erythro_trap`; legacy `company_website` still dropped) — заполненный бот получает silent `200` без CMS/SMTP. Не называть поле company/website: iOS/Chrome autofill на мобилке ложно срабатывает.
 4. **Turnstile siteverify** (`https://challenges.cloudflare.com/turnstile/v0/siteverify`):
    токен `cf-turnstile-response`, `success === true`, `action` = `source`
    (`contact` / `audit` / `order`), hostname из `TURNSTILE_HOSTNAMES`

@@ -1,26 +1,16 @@
-# RAG Index (Erythro.ai)
-
-#rag #meta #ingest #knowledge-base
-
-> **Synced from:** `erythro-ai/docs/RAG_INDEX.md`  
-> **Sync date:** 2026-08-28  
-> **Стандарт оценки и оптимизации:** См. архитектурный регламент [[rag-evaluation-guide|Руководство по оценке и оптимизации RAG-систем]].  
-> Canonical source of truth for this file lives in the project repo; keep both sides updated (two-way sync rule).
-
----
 # RAG index — Erythro.ai knowledge base
 
 Manifest for building a retrieval corpus from `docs/`. Use this file as the **ingest map**:
 what to chunk, how to tag, and which questions each source answers.
 
-Last updated: 2026-08-28.
+Last updated: 2026-09-06.
 
 ---
 
 ## Goals
 
-1. Answer ops questions: deploy, CI, Blob, migrations, SSL, Vercel hangs.
-2. Answer product/CMS questions: portfolio fields, i18n, Lexical, heroes, images.
+1. Answer ops questions: deploy, CI, Blob, migrations, SSL, Vercel hangs, n8n workflows.
+2. Answer product/CMS questions: portfolio fields, i18n, Lexical, heroes, images, audit pipeline.
 3. Answer “don’t repeat this bug” via `PITFALLS.md` (preferred for incident retrieval).
 4. Answer “how to build a similar site” via `PLAYBOOK.md` §3 (phases A–F) + chronology §2/§9.
 5. Support future agents (Cursor / n8n / import scripts) with stable, self-contained chunks.
@@ -39,7 +29,19 @@ Last updated: 2026-08-28.
 | `docs/AI_VISIBILITY.md` | AI visibility pack (llms.txt, MCP, schema) | One chunk per `##` heading | `ai`, `seo`, `schema`, `robots` |
 | `docs/RAG_INDEX.md` | This map | Single small chunk or skip | `meta`, `rag` |
 | `docs/IMPORT_PROJECT.md` | Pointer to import tool | Skip or one chunk | `portfolio`, `cms`, `import` |
+| `docs/architecture/ai-audit-architecture.md` | AI Audit MVP (R2, worker, no payment) | One chunk per `##` | `audit`, `r2`, `n8n`, `infra` |
+| `docs/architecture/r2-audit-storage.md` | R2 bucket + env for audit reports | One chunk | `r2`, `audit`, `storage` |
+| `docs/architecture/audit-rate-limiting.md` | 5-day audit rate limit & IP tracking | One chunk per `##` | `audit`, `rate-limit`, `anti-spam`, `ip` |
+| `docs/infrastructure/n8n-audit-reconcile.md` | n8n cron reconcile for stuck audits | One chunk | `n8n`, `audit`, `reconcile`, `vps` |
+| `docs/infrastructure/n8n-email-autoresponder.md` | n8n email autoresponder for order@ & team@ | One chunk per `##` | `n8n`, `email`, `autoresponder`, `imap`, `smtp` |
+| `docs/infrastructure/vps-firewall-cloudflare-access.md` | VPS UFW + Cloudflare Access `/admin*` + DMARC quarantine→reject | One chunk per `##` | `security`, `access`, `zero-trust`, `dmarc`, `ufw`, `admin` |
+| `docs/infrastructure/vps-docker-ports.md` | Hostinger VPS Docker publish rules (no 0.0.0.0) | One chunk | `vps`, `docker`, `ufw`, `security` |
+| `docs/architecture/r2-media-storage.md` | Payload media on R2 (bucket, public URL, Blob cutover) | One chunk per `##` | `r2`, `media`, `blob`, `storage` |
+| `docs/PLAN-deferred.md` | Deferred hardening / perf backlog | One chunk (whole file) | `deferred`, `security`, `dmarc`, `access`, `perf` |
+| `docs/architecture/ai-token-spend.md` | AI token spend map: COGS/OPEX, keys, monthly ritual | One chunk per `##` | `finops`, `gemini`, `cursor`, `cogs` |
 | `scripts/import-project/README.md` | Portfolio folder → CMS import | One chunk per `##` | `portfolio`, `cms`, `import` |
+| `scripts/set-dmarc-reject.mjs` | Raise `_dmarc` to `p=reject` (after quarantine window) | Skip body secrets; one chunk: purpose + env + dry-run | `dmarc`, `dns`, `security` |
+| `scripts/create-cloudflare-access-admin.mjs` | Create Access app for `/admin*` via API token | One chunk: purpose + required scopes | `access`, `cloudflare`, `admin` |
 
 **Optional later (not docs yet):** `scripts/seed.ts` header comments, `payload.config.ts` plugin block, `.github/workflows/test.yml` — only if docs lag behind code.
 
@@ -85,14 +87,24 @@ Rules:
 | “How to add a CMS field” | `PORTFOLIO_CMS.md` schema playbook; `PLAYBOOK.md` §3 фаза B |
 | “How we built X historically” | `PLAYBOOK.md` §2 + §9.* chronology; v1 close = §9.17 |
 | “Automate filling projects” | `scripts/import-project/README.md`; `PLAYBOOK.md` §9.12 |
-| “Contact form / Hostinger / no email / MX / spam” | `PIT-020`, `PIT-021`; `DEPLOYMENT.md` §13; `PLAYBOOK.md` §9.14–9.16 |
+| “Contact form / Hostinger / no email / MX / spam / mobile success no mail / Unread empty” | `PIT-020`, `PIT-021`, `PIT-054`, `PIT-055`; `DEPLOYMENT.md` §13; `PLAYBOOK.md` §9.14–9.16, §9.21 |
 | “E2E hang / Playwright / drizzle y/N” | `PIT-022`, `PIT-023`; `PLAYBOOK.md` §5 |
 | “Legal / contacts / page heroes” | `PLAYBOOK.md` §9.15 |
 | “AI visibility / llms.txt / MCP / Organization schema” | `AI_VISIBILITY.md`; `DEPLOYMENT.md` §15; `PLAYBOOK.md` §9.18–9.20 |
 | “Middleware Edge / node:console / markdown negotiation build” | `PIT-024`; `PLAYBOOK.md` §9.20 |
 | “Unit CI green tests but exit 1 / unhandled rejection / order slug 404” | `PIT-025`, `PIT-026`; `vitest.setup.ts` |
-| “Google / X OAuth2 redirect white screen / legacy domain / ambiguous mapping” | `PIT-048`; `01-Architecture/google-oauth2-integration-guide.md`; `01-Architecture/spring-boot-oauth2-architecture.md` |
-| “OAuth2 user cancellation / Cancel button / ERR_SSL_PROTOCOL_ERROR / failureHandler” | `PIT-049`; `01-Architecture/spring-boot-oauth2-architecture.md`; `05-Glossary-FAQ/pitfalls-troubleshooting.md` |
+| “Free AI Audit rate limiting / 1 domain per user / 5 days / IP tracking” | `docs/architecture/audit-rate-limiting.md`; `src/lib/auditRateLimit.ts` |
+| “Email autoresponder / order@ & team@ / n8n / IMAP & SMTP Hostinger / RFC 3834 / duplicate Hostinger Autoreply / form client ack” | `docs/infrastructure/n8n-email-autoresponder.md`; `infra/n8n/workflows/email-autoresponder.json`; `PIT-037`; `PIT-038`; `PIT-040`; `PIT-044`; `src/lib/contactNotification.ts` |
+| “Audit form website check / DNS / SSRF / no n8n workflow” | `docs/architecture/ai-audit-architecture.md` §3.1; `src/lib/checkWebsite.ts`; `PIT-041` |
+| “n8n audit cron reconciliation / stuck jobs” | `docs/infrastructure/n8n-audit-reconcile.md`; `infra/n8n/workflows/audit-reconcile.json` |
+| “CSP / Cloudflare Insights / beacon.min.js / PageSpeed console” | `next.config.ts` `CONTENT_SECURITY_POLICY`; `PIT-045`; `PIT-043` |
+| “security.txt / RFC 9116 / vulnerability disclosure contact” | `src/app/.well-known/security.txt/route.ts`; `docs/AI_VISIBILITY.md` |
+| “Montblanc 502 Bad Gateway / goods not loading / admin login 502 / port 8080 blocked” | `PIT-060`; `docs/infrastructure/vps-docker-ports.md`; `docs/PITFALLS.md` |
+| “Cloudflare Access /admin / Zero Trust / Payload login gate / subdomain pitfall” | `docs/infrastructure/vps-firewall-cloudflare-access.md` §2; `PIT-064`; `scripts/create-cloudflare-access-admin.mjs` |
+| “DMARC quarantine / p=reject / order@ reports / _dmarc TXT” | `docs/infrastructure/vps-firewall-cloudflare-access.md` §2b; `docs/PLAN-deferred.md`; `docs/DEPLOYMENT.md` DMARC rows; `scripts/set-dmarc-reject.mjs` |
+| “Hero LCP / CLS / TBT / PSI score jumps / GSAP gate” | `PIT-057`–`PIT-063`; `docs/HERO_MOTION.md`; `docs/PLAN-deferred.md` |
+| “R2 media / Blob cutover / pub-…r2.dev / Payload uploads” | `docs/architecture/r2-media-storage.md`; `PIT` media/R2 entries; `docs/PLAN-deferred.md` |
+| “Deferred security / next hardening steps” | `docs/PLAN-deferred.md`; `.cursor/rules/deferred-hardening.mdc` |
 
 ---
 
@@ -120,6 +132,8 @@ Rules:
 - [x] Playbook §3 as full v1 implementation plan (2026-08-18); chronology through §9.18.
 - [x] Contact hardening + Cloudflare DNS + e2e pitfalls (PIT-020 update, PIT-022, PIT-023).
 - [x] `docs/AI_VISIBILITY.md` — llms.txt, MCP, schema, security headers (2026-08-22).
+- [x] Cloudflare Access `/admin*` + DMARC quarantine runbook + PIT-064 (2026-09-06).
+- [x] R2 media storage + VPS docker ports + PLAN-deferred in corpus (2026-09-06).
 - [ ] `docs/ORDER_CMS.md` mirroring portfolio for Solution Plans / order page.
 - [ ] `docs/I18N_RTL.md` consolidating BiDi / HE scrub / phone LTR fixes from commits.
 - [ ] Scalability track (new playbook section when that work starts — not v1).
