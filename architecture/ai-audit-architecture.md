@@ -1,18 +1,394 @@
 # Архитектурный регламент: Сервис AI-Аудита (MVP)
 
-См. каноническую копию: [[01-Architecture/ai-audit-architecture]].
+Статус: **MVP без оплаты**. Платежный шлюз, идемпотентность вебхуков, Telegram-алерты и отдельная RAG-коллекция — отложены (см. §8).
 
-### Управление в Payload Admin
+Связанные документы: [`DEPLOYMENT.md`](../DEPLOYMENT.md) · [`r2-audit-storage.md`](./r2-audit-storage.md) · [`infrastructure/vps-n8n.md`](../infrastructure/vps-n8n.md) · [`infrastructure/n8n-audit-reconcile.md`](../infrastructure/n8n-audit-reconcile.md) · [`RAG_INDEX.md`](../RAG_INDEX.md) · [`PITFALLS.md`](../PITFALLS.md)
 
-Отдельная коллекция `audits` не нужна. Ops-интерфейс поверх `contact-submissions`:
+---
+
+## 0. Границы MVP
+
+| В scope | Вне scope (позже) |
+|---|---|
+| Заявка с формы → запись в CMS → запуск worker | Stripe / Tranzila / Yaad Pay |
+| Генерация HTML/PDF-отчёта | Идемпотентность платёжных вебхуков |
+| Хранение отчёта в **Cloudflare R2** | Telegram DLQ/алерты |
+| Письмо клиенту с `order@erythro.ai` | Отдельная коллекция `KnowledgeBase` + pgvector |
+| Страница выдачи `/audit/report/[id]?k=…` | Cloudflare Pro/Enterprise |
+| Vercel Cron reconciliation (n8n optional) | Отдельная коллекция `audits` (пока расширяем `contact-submissions`) |
+
+---
+
+## 1. Системный стек и карта компонентов
+
+```text
+                         [ Пользователь / Клиент ]
+                                     │
+                                     ▼ (HTTPS / DNS Proxied)
+                          [ Cloudflare Free ]
+                          DNS · WAF · SSL · Rate Limit
+                                     │
+                                     ▼
+                    [ Vercel: Next.js 15 + Payload CMS 3 ]
+                    (Node serverless, не чистый Edge Runtime)
+                                     │
+            ┌────────────────────────┼────────────────────────┐
+            ▼                        ▼                        ▼
+ [ Supabase PostgreSQL ]   [ Cloudflare R2 ]      [ Hostinger VPS ]
+ - contact-submissions     - PDF / HTML отчёты    - Docker: proxy_network
+ - users, media meta       - S3-compatible API    - Caddy (SSL)
+ - Drizzle via Payload                            - n8n orchestrator
+                                                  - Audit worker (Playwright)
+
+ [ Hostinger SMTP ]
+ From: order@erythro.ai  →  клиент (+ notify inbox из Site Settings)
+```
+
+| Компонент | Платформа | Назначение |
+|---|---|---|
+| **Edge & DNS** | Cloudflare **Free** | DNS Proxied, базовый WAF, SSL/TLS Full (Strict) к origin, Rate Limiting на формы |
+| **Frontend & API** | Vercel (Node serverless) | Next.js App Router, Payload CMS, Zod, Server Actions / Route Handlers |
+| **База данных** | Supabase Managed PostgreSQL | Единый источник правды; заявки аудита в `contact-submissions` |
+| **Объектное хранилище** | **Cloudflare R2** | PDF/HTML-отчёты и тяжёлые дампы (миграция с Vercel Blob) |
+| **Compute & Worker** | Hostinger VPS (Docker) | Caddy, n8n, headless Chromium / Playwright worker |
+| **Почта** | Hostinger SMTP | Транзакционные письма с `order@erythro.ai` (Resend — только fallback, если настроен) |
+
+---
+
+## 2. Маршруты продукта
+
+| Маршрут | Роль |
+|---|---|
+| `/audit` | Лендинг / заказ AI-аудита (существующий) |
+| `/order/audit-free`, `/order/audit-diagnostic`, `/order/audit-pro` | Чекаут по тарифу (платные — Grow); данные из Plans `kind: audit` |
+| Pricing card **Manual** on `/audit` | Документ Plans `audit-manual`, `checkoutMode: contact` — `#contact-modal` (без `/order` / Grow) |
+| **`/audit/report/[id]?k=…`** | **Выдача результата** (polling; готовый отчёт → standalone HTML; без `k` → 404) |
+
+`/audit` и `/audit/report/[id]?k=…` не смешивать: лендинг ≠ страница результата.
+
+---
+
+## 3. Схема данных: расширение `contact-submissions`
+
+Отдельная коллекция `audits` **отложена**. MVP опирается на существующую `ContactSubmissions` (`source: 'audit'`).
+
+Файл: `src/collections/ContactSubmissions.ts`
+
+### 3.1. Уже есть (не ломать)
+
+| Поле | Назначение |
+|---|---|
+| `name`, `email`, `phone`, `message` | Контакт клиента |
+| `source` | `audit` для заявок аудита |
+| `locale` | Язык UI сайта |
+| `website` | Проверяемый URL. На blur формы: DNS A/AAAA на публичный IP через `POST /api/audit/check-website` (`src/lib/checkWebsite.ts`). **Не** HTTP-fetch пользовательского URL (SSRF). n8n для этой проверки не используется. |
+| `auditLanguage` | `en` \| `ru` \| `he` — язык отчёта |
+| `planSlug` | `audit-free` \| `audit-diagnostic` \| `audit-pro` (Manual: contact only, не payment create) |
+| `planTotal` | Отображаемая сумма (информативно; оплаты нет) |
+| `auditStatus` | `new` → `in_progress` → `report_sent` |
+
+### 3.2. Добавить для pipeline
+
+| Поле | Тип | Назначение |
+|---|---|---|
+| `auditScore` | `number` | Итоговая оценка 0–100 |
+| `auditSummary` | `json` | Структурированные выводы LLM |
+| `reportUrl` | `text` | Публичный/signed URL объекта в R2 |
+| `reportAccessToken` | `text` | Неугадываемый токен для `/audit/report/[id]?k=…` (обязателен для выдачи) |
+| `htmlResult` | `textarea` (опц.) | Компактный HTML до ~2MB; крупные — только R2 |
+| `retryCount` | `number`, default `0` | Счётчик авто-перезапусков |
+| `errorLast` | `textarea` (опц.) | Последняя ошибка worker (без Telegram в MVP — смотреть в CMS) |
+
+### 3.3. Статусы пайплайна
+
+Оплата платного аудита — отдельный контур (`docs/architecture/payplus-audit-checkout.md`): `pending` → IPN `paid` → тот же trigger воркера. Бесплатный аудит платёж не проходит.
+
+```text
+new  →  in_progress  →  report_sent
+                 ↘ failed   (после max retries; ручной разбор в /admin)
+```
+
+Access: публичный REST `create` **запрещён**. Создание только через server-side `/api/contact` (local Payload API). `read`/`update` — staff / service key.
+
+Импорты Payload 3: `import type { CollectionConfig } from 'payload'` (не `payload/types`).
+
+### 3.4. Управление в Payload Admin
 
 | Элемент | Где |
 |---|---|
-| Счётчики New / In progress / Failed / Report sent | Dashboard (`AuditsDashboard`) |
-| Пункт **AI Audits** в сайдбаре | `afterNavLinks` → фильтр `source=audit` |
-| Re-queue, ссылки на status page / report | UI-поле `auditActions` + list cell |
-| Staff API | `POST /api/audit/admin/requeue` (сессия Payload, не `AGENT_SECRET`) |
+| Тексты `/audit` (форма, How it works, Pricing intro/agency) | Global **Pages → Audit Page** (`audit-page`) — **без** массива карточек |
+| Карточки Pricing + заказы `/order/audit-*` | Collection **Plans** (`kind: AI Audit`) — **единый источник** Free / Diagnostic / Pro / Manual (sidebar **AI Audit plans**). Бейдж на карточке: поле **Card name**; Title — для `/order` и списка в admin |
+| Счётчики pipeline + re-queue | Dashboard + Contact Submissions / AI Audits |
+| Staff re-queue API | `POST /api/audit/admin/requeue` |
 
-Ручной re-queue: `auditStatus → new`, очистка `errorLast`, сброс `retryCount`, вызов `triggerAuditAgent`.
+Статический фолбэк карточек: `AUDIT_ORDER_PLANS` → `staticAuditPricingPlans()` (`src/lib/auditPricingPlans.ts`). Чтение: `getAuditPricingPlans()` / `fetchAuditPage`. После seed/migrate CMS Plans — источник правды. Синк из кода: `pnpm db:migrate-audit-plans-unify` (one-shot) или `pnpm db:fix-audit-pricing` (sync Plans only).
 
-Проверка адреса сайта на форме: DNS на публичный IP (`POST /api/audit/check-website`). Не n8n (PIT-041).
+---
+
+## 4. Хранилище: миграция на Cloudflare R2
+
+### 4.1. Решение
+
+| Было | Станет |
+|---|---|
+| Vercel Blob (`@payloadcms/storage-vercel-blob`) для media | **Cloudflare R2** — отчёты аудита; media Payload — либо тоже R2, либо поэтапно |
+
+Для AI-аудита отчёты **обязательно** пишутся в R2 (S3 API). Миграция media Payload с Blob → R2 — отдельный шаг в том же направлении (единый object store).
+
+### 4.2. Конфиг (ориентир)
+
+- Bucket: например `erythro-audit-reports` (и при полной миграции — `erythro-media`)
+- Доступ worker: R2 Access Key ID + Secret (S3-compatible endpoint)
+- Публичная выдача: `/audit/report/[id]?k=[reportAccessToken]` (токен в submission; без `k` → 404). Опционально R2 custom domain для прямых объектов.
+- Env (Vercel + VPS worker): `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET`, `R2_PUBLIC_BASE_URL` (если есть)
+
+Payload: заменить/добавить S3-compatible storage adapter под R2 вместо (или параллельно с выключением) Vercel Blob — см. `@payloadcms/storage-s3` + endpoint R2.
+
+> После смены storage-плагина обязателен `pnpm generate:importmap` (PIT-001 / admin blank).
+
+---
+
+## 5. Docker & Reverse Proxy (Hostinger VPS)
+
+Текущий n8n: HTTP на IP (см. `docs/infrastructure/vps-n8n.md`). Целевое состояние MVP — Caddy + HTTPS + общая сеть.
+
+### 5.1. Сеть
+
+```bash
+docker network create proxy_network
+```
+
+### 5.2. Caddy
+
+`/home/caddy/Caddyfile`:
+
+```caddy
+n8n.erythro.ai {
+    reverse_proxy n8n:5678
+}
+
+agent-api.erythro.ai {
+    reverse_proxy audit_agent_worker:8080
+}
+```
+
+`/home/caddy/docker-compose.yml`:
+
+```yaml
+services:
+  caddy:
+    image: caddy:latest
+    container_name: caddy_proxy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - proxy_network
+
+volumes:
+  caddy_data:
+  caddy_config:
+
+networks:
+  proxy_network:
+    external: true
+```
+
+DNS (Cloudflare Free, Proxied): `n8n`, `agent-api` → IP VPS. SSL Mode к origin: Full (Strict) после валидных сертификатов Caddy.
+
+### 5.3. n8n
+
+```yaml
+services:
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:2.41.7
+    container_name: n8n_app
+    restart: unless-stopped
+    environment:
+      - N8N_HOST=n8n.erythro.ai
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=https
+      - NODE_ENV=production
+      - WEBHOOK_URL=https://n8n.erythro.ai/
+      - GENERIC_TIMEZONE=Asia/Jerusalem
+      - N8N_DEFAULT_BINARY_DATA_MODE=filesystem
+    volumes:
+      - n8n_data:/home/node/.n8n
+    networks:
+      - proxy_network
+
+volumes:
+  n8n_data:
+
+networks:
+  proxy_network:
+    external: true
+```
+
+### 5.4. Audit worker
+
+Предпочтение MVP: **Node.js + Playwright** (единый язык со стеком сайта). Java/Spring — допустим как отдельный репозиторий агента, если уже есть кодовая база.
+
+Пример Node-ориентированного compose:
+
+```yaml
+services:
+  audit-agent:
+    build: .
+    container_name: audit_agent_worker
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - PAYLOAD_API_URL=https://erythro.ai
+      - AGENT_SECRET_TOKEN=${AGENT_SECRET_TOKEN}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - R2_ACCOUNT_ID=${R2_ACCOUNT_ID}
+      - R2_ACCESS_KEY_ID=${R2_ACCESS_KEY_ID}
+      - R2_SECRET_ACCESS_KEY=${R2_SECRET_ACCESS_KEY}
+      - R2_BUCKET=${R2_BUCKET}
+      - SMTP_HOST=smtp.hostinger.com
+      - SMTP_PORT=465
+      - SMTP_USER=order@erythro.ai
+      - SMTP_PASS=${SMTP_PASS}
+    deploy:
+      resources:
+        limits:
+          cpus: "1.5"
+          memory: 3500M
+    networks:
+      - proxy_network
+
+networks:
+  proxy_network:
+    external: true
+```
+
+Эндпоинт: `POST /api/run-audit` с заголовком `X-Agent-Secret-Key`. Ответ сразу `200 OK`, работа в фоне.
+
+Секреты только в env / secrets store — **не** коммитить в git и не класть plaintext в docs.
+
+---
+
+## 6. Data flow MVP (без оплаты)
+
+```text
+[Клиент: /audit или /order/audit-*]
+        │
+        ▼ (1) POST /api/contact  source=audit
+[Payload: contact-submissions]
+  auditStatus = new
+  planSlug / website / auditLanguage / …
+        │
+        ▼ (2) Сразу после create (без платёжного вебхука)
+[Авторизованный POST → agent-api.erythro.ai/api/run-audit]
+  Header: X-Agent-Secret-Key
+  Body: { submissionId, targetUrl, locale, planSlug, clientEmail, clientName }
+  Если 8s timeout: `after()` retry + Vercel Cron `/api/audit/reconcile` каждые 2 мин
+        │
+        ▼ (3) Worker
+  auditStatus → in_progress
+  Chromium / Lighthouse / Playwright → технический лог
+  LLM → выводы на auditLanguage
+  PDF/HTML → Cloudflare R2 → reportUrl
+  Письмо клиенту: From order@erythro.ai (Hostinger SMTP)
+        │
+        ▼ (4)
+[contact-submissions]
+  auditStatus = report_sent
+  auditScore, auditSummary, reportUrl
+        │
+        ▼ (5) Выдача
+  Email с ссылкой / вложением
+  Страница /audit/report/[id]?k=… (polling → redirect на /api/audit/report/[id]/html?k=…)
+```
+
+Когда подключат оплату: между шагами (1) и (2) встанет шлюз + webhook; шаг (2) станет «после paid». Контракт worker **не меняется**.
+
+### 6.1. Именование PDF (клиентское имя файла)
+
+Скачивание / email-вложение / `Content-Disposition` в R2:
+
+```text
+Erythro_Audit_[AUD-N]_[site]_[YYYY-MM-DD]_[LANG].pdf
+```
+
+| Часть | Правило | Пример |
+|---|---|---|
+| Префикс | фиксированный | `Erythro_Audit` |
+| Номер аудита | `AUD-{id}` | `AUD-110` |
+| Сайт | hostname без протокола; точки и прочие символы → `_` | `example_com` |
+| Дата | UTC `YYYY-MM-DD` (момент генерации) | `2026-09-10` |
+| Язык | `RU` / `EN` / `HE` | `RU` |
+
+Пример: `Erythro_Audit_AUD-110_example_com_2026-09-10_RU.pdf`
+
+Реализация: `services/audit-agent/src/pdfFilename.js` (`buildAuditPdfFilename`). Внутренние артефакты QA_Auditor (`reports/.../audit-report_{lang}.pdf`) и R2 object key (`audits/{id}/{ts}-{tier}.pdf`) этим шаблоном не переименовываются.
+
+### 6.2. Мобильный HTML-отчёт
+
+Клиентский HTML (A4-4) на узких экранах (`max-width: 720px`) перестраивается по Figma-фрейму **iPhone 17 - 1** (402px): вертикальный стек лого (тёмный) → title (красный) → tier strip `#f3f3f3` / чёрный текст → URL (красный) → meta `#f3f3f3` → gauge на `#f3f3f3` с красным кругом балла → scorecard (заголовок 24rem, подписи `max-content`, полосы `1fr`, одинаковый padding-inline) → секции → footer. На мобайле в футере только WhatsApp (email/телефон скрыты), `cta-title` 18rem. HE/EN/RU scorecard: колонка подписей по ширине текста, полосы забирают остаток; отступ от края карточки до текста = отступ до полос. CTA разблокировки Free/Diagnostic → `https://erythro.ai/order/audit-pro`. CSS: `MOBILE_SCREEN_CSS` в `A44ReportGenerator.java` (добавляется после rem→A4 конвертации, чтобы breakpoints остались в `px`). PDF/print не затрагивается. Уже сохранённые `htmlResult` в CMS обновятся только после нового прогона аудита.
+
+---
+
+## 7. Отказоустойчивость в MVP
+
+1. **Атомарный порядок доставки:** сначала R2 + статус `report_sent` в БД, затем письмо клиенту.
+2. **Cron reconciliation (Vercel primary, n8n optional):** every 2 min look for `source=audit` with `new` older than 2 min or `in_progress` older than 20 min without a finished report → restart worker, `retryCount++`. `/api/contact` also retries in `after()` if the first trigger times out.
+3. **Лимит попыток:** при `retryCount >= 3` → `failed`; разбор вручную в Payload Admin (Telegram — позже).
+4. **Многоканальная выдача:**
+   - Email с `order@erythro.ai`
+   - `/audit/report/[id]`
+   - Прямой `reportUrl` в R2 (по политике доступа)
+
+Идемпотентность платёжных вебхуков и Telegram DLQ — **вне MVP**.
+
+---
+
+## 8. Отложено (бэклог)
+
+| Тема | Когда |
+|---|---|
+| Платёжный цикл (Stripe / Tranzila / Yaad) + подпись вебхука + идемпотентность | После стабильного happy-path |
+| Telegram-алерты / DLQ | После базового `failed` в CMS |
+| Коллекция `audits` (вынос из contact-submissions) | При росте объёма / отдельном биллинге |
+| `KnowledgeBase` + pgvector | Отдельная RAG-фаза; пока корпус = `docs/` + Obsidian |
+| Cloudflare Pro/Enterprise | По нагрузке / бот-трафику |
+| Resend как primary SMTP | Только если Hostinger нестабилен |
+
+---
+
+## 9. Порядок внедрения (чеклист)
+
+1. [x] Bucket R2 + credentials; адаптер storage / SDK upload отчётов — bucket `erythro-audit-reports` (WEUR); credentials — вручную (см. [`r2-audit-storage.md`](./r2-audit-storage.md)); upload SDK — в worker
+2. [ ] Миграция media Payload Blob → R2 (или dual-write → cutover) + `generate:importmap`
+3. [x] Поля pipeline в `ContactSubmissions` + миграция Postgres (`20260831_120000_contact_submissions_audit_pipeline`)
+4. [x] Caddy + DNS `n8n` / `agent-api` на VPS — Caddy/n8n/worker подняты; DNS A (DNS only) + Let's Encrypt OK
+5. [x] Worker `/api/run-audit` + секрет — `services/audit-agent` на VPS; секрет в `AGENT_SECRET_TOKEN`
+6. [x] Триггер из `/api/contact` после create (`source=audit`) — `src/lib/auditAgentTrigger.ts` (нужен `AGENT_SECRET_TOKEN` + `AUDIT_AGENT_URL` на Vercel)
+7. [x] Страница `/audit/report/[id]?k=…` — polling; готовый отчёт как standalone HTML (`GET /api/audit/report/[id]/html?k=…`); без токена → 404
+8. [x] Письмо клиенту через существующий SMTP (`order@erythro.ai`) — worker `mail.js` + `SMTP_PASS` на VPS; email/name из `/api/contact` (fallback: CMS internal GET); ссылка в письме = `/audit/report/[id]?k=…` (не private R2)
+9. [x] Reconcile stuck jobs — Vercel Cron `GET /api/audit/reconcile` every 2 min (`vercel.json`) + optional n8n (`n8n-audit-reconcile.md`). `new` stale 2 min; `in_progress` 20 min. Contact `after()` retries a missed trigger.
+9a. [x] Реальный QA_Auditor (Java/Playwright) в `services/audit-agent/QA_Auditor` вместо stub HTML
+9b. [x] Управление пайплайном аудита в Payload Admin (dashboard, nav «AI Audits», re-queue)
+9c. [x] CMS: global `audit-page` + Plans `kind=audit` для `/audit` и `/order/audit-*`
+10. [x] Оплата Grow → тот же trigger, что п.6, после `getTransactionInfo` со `statusCode` 2. Ключи и кабинет: `docs/architecture/grow-audit-checkout.md`. Лимиты Free вернуть, когда терминал реально принимает оплату.
+11. [ ] (Позже) публичный `R2_PUBLIC_BASE_URL` / custom domain для прямых ссылок на HTML/PDF
+
+---
+
+## 10. Соответствие стеку Erythro.ai
+
+| Стандарт проекта | В этом регламенте |
+|---|---|
+| Next.js 15 App Router, React 19, Payload 3, Supabase | Да |
+| RTL / EN·RU·HE | `auditLanguage` + UI locale |
+| Cloudflare | Free, Proxied |
+| Почта | `order@erythro.ai` |
+| Object storage | Cloudflare R2 (целевое) |
+| VPS / n8n | Hostinger + Docker + Caddy |
+| Без оплаты в MVP | Да; payment — последний модуль |

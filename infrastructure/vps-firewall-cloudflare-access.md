@@ -84,34 +84,19 @@ No app code change required — Access sits in front of Vercel/Cloudflare. Docum
 
 **Dashboard (done):** Self-hosted app → hostname `erythro.ai` + `/admin*` (empty subdomain) → Allow policy for operator email.
 
-## 2b. DMARC quarantine (Cloudflare DNS)
+## 2b. DMARC reject (Cloudflare DNS)
 
-Live (2026-09-06): `_dmarc.erythro.ai` → `v=DMARC1; p=quarantine; rua=mailto:order@erythro.ai; pct=100;` (was `p=none`).
+Live (2026-09-18): `_dmarc.erythro.ai` → `v=DMARC1; p=reject; rua=mailto:order@erythro.ai; pct=100;` (was `p=quarantine` from 2026-09-06, before that `p=none`).
 
-**Do not raise to `p=reject` before ~2026-09-13.** Quarantine window must collect aggregate reports first.
+Raised after clean Google aggregate reports on `order@erythro.ai` (Hostinger → MailChannels, SPF+DKIM pass). Nameservers are Cloudflare (`alice`/`chris`), not Hostinger.
 
-### Checklist ~2026-09-13 (goal remaining)
-
-1. Inbox `order@erythro.ai`: open DMARC aggregate XML (often subject like `Report domain: erythro.ai`). Confirm no unexpected fail sources for legitimate mail (forms / transactional).
-2. If clean → Cloudflare DNS → edit TXT `_dmarc` to:
-
-```text
-v=DMARC1; p=reject; rua=mailto:order@erythro.ai; pct=100;
-```
-
-3. Verify: `curl.exe -s "https://cloudflare-dns.com/dns-query?name=_dmarc.erythro.ai&type=TXT" -H "accept: application/dns-json"` shows `p=reject`.
-4. Re-smoke Access: `curl.exe -sI https://erythro.ai/admin` still **302** Cloudflare Access (not bare 200).
-5. Mark done in `docs/PLAN-deferred.md` + Obsidian sync.
-
-**API helper (needs Zone DNS Edit token in `CLOUDFLARE_API_TOKEN`):**
+Verify:
 
 ```bash
-# after reading order@ reports
-node --env-file=.env.local scripts/set-dmarc-reject.mjs --dry-run
-node --env-file=.env.local scripts/set-dmarc-reject.mjs
+curl.exe -s "https://cloudflare-dns.com/dns-query?name=_dmarc.erythro.ai&type=TXT" -H "accept: application/dns-json"
 ```
 
-Or edit TXT in Cloudflare DNS UI. Nameservers are Cloudflare (`alice`/`chris`), not Hostinger.
+Helper if the TXT ever needs a change: `scripts/set-dmarc-reject.mjs` with `CLOUDFLARE_API_TOKEN` (Zone DNS Edit).
 
 ## 3. Inter-service auth (already in code)
 

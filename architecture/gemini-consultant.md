@@ -9,22 +9,29 @@
 Публичный консультант на сайте вызывает `POST /api/consult`. Мозг — **Gemini API** (`generativelanguage.googleapis.com`), ключ `GEMINI_API_KEY_AI_CHAT` только server-side. Браузер ключ не видит и на Google напрямую не ходит (CSP `connect-src 'self'`).
 
 - Модель жёстко `gemini-3.6-flash` (как Funnel review в `AuditCollector.java`). `GEMINI_CONSULT_MODEL` — аварийный override.
-- SDK: `ai` + `@ai-sdk/google`, `streamText` в Node route.
+- SDK: `ai` + `@ai-sdk/google`, `streamText` в Node route. Без `temperature` / `top_p` / `top_k` / `thinking_budget` (PIT-106; Gemini 3.x скоро отдаёт 400).
+- `thinking_level`: анонимный FAQ → `minimal`; после OTP → `low`; ТЗ (телефон в сессии) → `medium`.
 - xAI / Grok Bot / `XAI_API_KEY` **не используются**.
 - Google Search grounding выключен: ответы не должны уезжать за пределы сайта.
 
 Цены и пакеты **не** брать из `src/translations` / `src/lib/servicePages.ts` — production CMS их перебивает.
 
+Язык ответа — по **последнему сообщению посетителя** (иврит / кириллица / длинная латиница), не только по локали шапки сайта. KB и правила подтягиваются на этот язык.
+
+Факты, которых нет на сайте (план возврата, внутренний процесс, партнёрские условия), пишутся вручную в **Consultant Settings → Extra knowledge**. Локализуется en/ru/he, попадает в KB чата как секция «Notes not published on the site», на публичные страницы не выводится. Пакетные цены по-прежнему из Solutions / Services / Audit.
+
+Секция **How we work** всегда вставляется в KB (процесс, «один рабочий день», чат не принимает оплату). Вопрос про сотрудничество **не** запускает чеклист ТЗ.
+
 ## 2. Три режима чата
 
 | Режим | Контакты | Что пишем в БД |
 |---|---|---|
-| Справка (FAQ, пакеты, цены) | не просим, лимит анонимных сообщений | ничего |
-| Каталог (готовый пакет / аудит) | не просим | ничего, отдаём чип на `/order` или `/audit` |
+| Справка (FAQ, пакеты, цены) | не просим, лимит анонимных сообщений | текст вопроса в `consult-question-log`, без имени и email |
+| Каталог (готовый пакет / услуга / аудит) | не просим | ничего; в чат пишется ссылка на страницу, чат не закрывается |
 | Кастомное ТЗ | OTP-email + телефон | `consult-sessions` + `project-briefs` |
 | Техконсультация | OTP-email | `tech-consult-tickets` |
 
-Чат **не оформляет** заказ и не дублирует `/order/*`, `/audit`, контактную форму и оплату.
+Чат **не оформляет** заказ и не дублирует `/order/*`, `/services/*`, `/audit`, контактную форму и оплату. На пакет, услугу или аудит `hand_off` вставляет ссылку в ответ и не закрывает чат. Контактная форма и WhatsApp открываются по-прежнему. Кнопки панели «Заказать сайт» и «Пройти аудит» сами ведут на страницу.
 
 ## 3. Поток
 
@@ -34,7 +41,7 @@
         ▼
 [Vercel Node route]
   system prompt = KB из Payload + bot rules из consultant-settings
-  tools: get_knowledge_base, translate_terms, request_email_verification, identify_client,
+  tools: get_knowledge_base, translate_terms, hand_off, request_email_verification, identify_client,
          escalate_tech, draft_brief, submit_brief
         │
         ├── GEMINI_API_KEY_AI_CHAT → gemini-3.6-flash
@@ -60,14 +67,15 @@ Consultant Settings → **Consultant enabled** = off:
 - TTL 1 час; на холодном старте делается один `LIST`, чтобы рестарты не плодили дубликаты, которые тарифицируются за хранение;
 - в кэш кладётся **только** `systemInstruction`. Описания инструментов остаются в запросе, иначе правка инструмента ломала бы кэш;
 - запрос не может содержать одновременно `cachedContent` и `systemInstruction` — отправляется ровно одно из двух;
-- кэш — оптимизация, а не зависимость: если Gemini отверг хэндл и ни один чанк ещё не отправлен, запрос повторяется с инлайн-промптом, а кэш забывается;
-- `CONSULT_PROMPT_CACHE=0` выключает механизм целиком.
+- **Gemini 3.x** отвергает `cachedContent` вместе с `tools` / `tool_config` на том же GenerateContent (PIT-093). Пока консультант шлёт tools, кэш **не** подключается: в `streamText` идёт инлайн-`system`. `textStream` глотает этот 400 без throw и без токенов, поэтому «retry after reject» не срабатывал;
+- кэш — оптимизация, не зависимость; `CONSULT_PROMPT_CACHE=0` выключает механизм целиком. Вернуть хэндл можно только когда декларации tools лежат внутри cache, не в запросе.
 
 ## 4. Антиспам и временный OTP
 
 Не аккаунты и не Payload-пользователи. Заслон до появления авторизации:
 
 - Turnstile action `consult` + собственный IP-лимит (**не** наследует `AUDIT_INTAKE_LIMITS_OPEN_FOR_QA`).
+- Каждый POST чата/OTP создаёт **новый** Turnstile-виджет на `document.body` (`remove` + `render` + `execute`). Не внутри `.consult` (`transform`) и не `visibility: hidden` — иначе пустой token → JSON 403 → «ассистент временно недоступен» (PIT-094).
 - Анонимная квота пользовательских сообщений (дефолт 5 / 24 ч) — signed cookie + hash IP.
 - Дальше `POST /api/consult/request-otp` → 6 цифр на почту (TTL 10 мин, только hash + pepper), `verify-otp` → httpOnly cookie `consult_verified` (HMAC, ~24 ч).
 - После OTP второй потолок: 30 сообщений / сутки на verified email.
@@ -103,7 +111,8 @@ Pipeline живёт в Docker на VPS (`proxy_network` + Caddy, host-порт *
 
 ## 7. Данные
 
-- `consult-sessions` — только после OTP + телефона + предупреждения. `messages` хранится как **parts** (не строка), есть `handoff` (`bot` в v1). Срок 12 месяцев.
+- `consult-question-log` — каждый анонимный вопрос до OTP: текст, язык, короткий код посетителя (одно подключение, не имя). В админке: Consultant → Chat questions. Полная переписка по-прежнему только в `consult-sessions`.
+- `consult-sessions` — только после OTP + телефона + предупреждения. `messages` хранится как **parts** (не строка), есть `handoff` (`bot` в v1). Срок 12 месяцев. В админке лента — кастомный Field, не Monaco (PIT-096).
 - `project-briefs` — `TZ-{id}`, письмо только на `order@` (копию клиенту не слать), `crmStatus`.
 - `tech-consult-tickets` — `TC-{id}`, ответ клиенту **только email**, треда в виджете нет.
 - В ТЗ и письмах запрещены вложения и любые URL.
@@ -117,4 +126,6 @@ Pipeline живёт в Docker на VPS (`proxy_network` + Caddy, host-порт *
 
 ## 9. Расширение (не v1)
 
-Контракт заложен, фичи выключены: голос (STT/TTS), вложения (R2/CRM, не в ТЗ), вход инженера в ту же ленту (`handoff: bot | queued | human`).
+Контракт заложен, фичи выключены: голос (STT/TTS), вложения (R2/CRM, не в ТЗ).
+
+Wizard / intent router / шаблоны без LLM / вход инженера в ту же ленту (`handoff`, `role: engineer`) — отложено: [[PLAN-deferred]] § Consultant v2. Extra knowledge и карточка How we work уже в v1.

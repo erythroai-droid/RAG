@@ -34,7 +34,8 @@ MCP creates the bucket only. Public serve URL is dashboard work:
 4. Expand the R2 API token to include `erythro-media` Object Read & Write  
    (если миграция падает с `Access Denied` — токен создан только для `erythro-audit-reports`)
 5. CORS on the bucket: allow `PUT` / `GET` from `https://erythro.ai` and admin origins (needed for `clientUploads`).  
-   Config file: `infra/r2-media-cors.json`. Apply / refresh:
+   Config file: `infra/r2-media-cors.json` — Allowed Headers must include **`If-None-Match`** (Payload 3.90+ signed PUT; without it admin shows **Failed to fetch** — PIT-087).  
+   Apply / refresh (Cloudflare API token with **R2 Edit**; S3 object keys alone get `AccessDenied` on PutBucketCors):
    ```bash
    npx wrangler r2 bucket cors set erythro-media --file infra/r2-media-cors.json --force
    ```

@@ -45,6 +45,10 @@ API Catalog, OpenAPI, Markdown negotiation, ACP discovery.
 | Sitemap | `src/app/sitemap.ts` | URL `/about` (и др.) |
 | Layout link | `src/app/(frontend)/layout.tsx` | `<link rel="describedby" href="/llms.txt">`, `alternate` markdown |
 
+### FAQPage (локаль страницы)
+
+Язык вопросов в JSON-LD совпадает с языком видимого FAQ (`en` / `ru` / `he`). Общий FAQ агентства стоит только на главной (`/#faq`). Страницы услуг и `/audit` отдают свой блок. Текст редактируется в админке (группа FAQ у услуги и вкладка FAQ у Audit Page); если список пуст, страница берёт запасной текст из `src/lib/pageFaq.ts`.
+
 Тесты: `tests/int/brandSchema.int.spec.ts`, `tests/int/markdownNegotiation.int.spec.ts`,
 `tests/int/acpDiscovery.int.spec.ts`, `tests/int/securityTxt.int.spec.ts`.
 

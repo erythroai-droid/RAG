@@ -28,6 +28,7 @@ graph TD
         ARCH_X["[[x-oauth2-integration-guide|X (Twitter) OAuth2 PKCE]]"]
         ARCH_EMAIL["[[email-service-cid-analysis|Email Service CID]]"]
         ARCH_LEGAL["[[compliance-legal-architecture|Комплаенс, IS 5568 & GDPR]]"]
+        ARCH_TARGO["[[targo-production-plan|Targo & WhatsApp]]"]
     end
     
     subgraph "02 Design Tokens"
@@ -55,7 +56,7 @@ graph TD
         SKILL_GIT["[[obsidian-git-sync-rule|Obsidian Git Sync]]"]
     end
     
-    subgraph "04 Templates"
+    subgraph "04 Templates & Cases"
         TPL_BRIEF["[[brief-yaml-cms-template|CMS Field Map & Brief]]"]
         TPL_FIELDMAP["[[cms-field-map|CMS Field Map (repo)]]"]
         TPL_SPRING["[[oauth2-spring-config-template|Spring OAuth2 Config]]"]
@@ -65,6 +66,10 @@ graph TD
         TPL_ORD["[[solution-order-template|Шаблон тарифа]]"]
         TPL_SEO["[[seo-metadata-template|Шаблон SEO/Schema]]"]
         TPL_LEG["[[legal-page-template|Шаблон Legal/WCAG]]"]
+        TPL_CLIENT["[[client-brief-design-dev|Клиентский бриф]]"]
+        TPL_AGREE["[[software-development-agreement-israel|Договор на разработку]]"]
+        CASE_AUDIT["[[ai-audit-agent|Кейс: AI Audit]]"]
+        CASE_CONSULT["[[ai-consultant|Кейс: AI Consultant]]"]
     end
     
     subgraph "05 Glossary & FAQ"
@@ -74,10 +79,10 @@ graph TD
         FAQ["[[architectural-faq|Архитектурный FAQ]]"]
     end
 
-    INDEX --> ARCH_BE & ARCH_FE & ARCH_AI & ARCH_OPS & ARCH_AUDIT & ARCH_DEPLOY & ARCH_PLAY & ARCH_AIVIS & ARCH_RAG & ARCH_SPRING & ARCH_GOOGLE & ARCH_X & ARCH_EMAIL & ARCH_LEGAL
+    INDEX --> ARCH_BE & ARCH_FE & ARCH_AI & ARCH_OPS & ARCH_AUDIT & ARCH_DEPLOY & ARCH_PLAY & ARCH_AIVIS & ARCH_RAG & ARCH_SPRING & ARCH_GOOGLE & ARCH_X & ARCH_EMAIL & ARCH_LEGAL & ARCH_TARGO
     INDEX --> TOK_FIGMA & TOK_COL & TOK_TYP & TOK_GEO & TOK_ANI & TOK_HERO & TOK_CMP
     INDEX --> SKILL_PROMPT & SKILL_MCP & SKILL_ACP & SKILL_MD & SKILL_QA & SKILL_L1 & SKILL_CMS & SKILL_IMPORT & SKILL_SPRING & SKILL_EMAIL & SKILL_SEO & SKILL_GIT
-    INDEX --> TPL_BRIEF & TPL_FIELDMAP & TPL_SPRING & TPL_CASE & TPL_CASEMD & TPL_SERV & TPL_ORD & TPL_SEO & TPL_LEG
+    INDEX --> TPL_BRIEF & TPL_FIELDMAP & TPL_SPRING & TPL_CASE & TPL_CASEMD & TPL_SERV & TPL_ORD & TPL_SEO & TPL_LEG & TPL_CLIENT & TPL_AGREE & CASE_AUDIT & CASE_CONSULT
     INDEX --> PIT & RAG & GLOSS & FAQ
 ```
 
@@ -96,6 +101,8 @@ graph TD
 - **[[ai-agent-architecture|ai-agent-architecture.md]]** — MCP (Model Context Protocol), ACP (Agentic Commerce Protocol), `llms.txt`, Markdown Content Negotiation, Schema.org.
 - **[[devops-infra-architecture|devops-infra-architecture.md]]** — Vercel Serverless, Supabase Postgres, Cloudflare WAF/DNS/Rate Limiting, Hostinger SMTP, Docker, GitHub Actions CI/CD.
 - **[[ai-audit-architecture|ai-audit-architecture.md]]** — AI Audit MVP: R2, contact-submissions, `/audit/report/[id]`, n8n/worker без оплаты. Synced from `docs/architecture/ai-audit-architecture.md`.
+- **[[grow-audit-checkout|grow-audit-checkout.md]]** — План оплаты аудита с нуля: Morning (терминал и קבלה), Grow (VAT Exempt, проверка сайта), Make (два сценария), затем сайт. Synced from `docs/architecture/grow-audit-checkout.md`.
+- **[[payplus-audit-checkout|payplus-audit-checkout.md]]** — Legacy PayPlus адаптер оплаты чекаута аудита (Grow используется как основной). Synced from `docs/architecture/payplus-audit-checkout.md`.
 - **[[r2-audit-storage|r2-audit-storage.md]]** — R2 bucket `erythro-audit-reports`, env vars, API token. Synced from `docs/architecture/r2-audit-storage.md`.
 - **[[r2-media-storage|r2-media-storage.md]]** — Payload media on R2 (`erythro-media`), public URL, Blob cutover. Synced from `docs/architecture/r2-media-storage.md`.
 - **[[gemini-consultant|gemini-consultant.md]]** — ИИ-консультант на Gemini Flash + CMS KB. Synced from `docs/architecture/gemini-consultant.md`.
@@ -104,7 +111,15 @@ graph TD
 - **[[ai-token-spend|ai-token-spend.md]]** — Карта AI token spend: COGS/OPEX, ключи, месячный ритуал. Synced from `docs/architecture/ai-token-spend.md`.
 - **[[audit-rate-limiting|audit-rate-limiting.md]]** — Лимитирование повторного аудита (5 дней) и учет IP. Synced from `docs/architecture/audit-rate-limiting.md`.
 - **[[audit-page-cms-schema|audit-page-cms-schema.md]]** — CMS схема и локализация страницы аудита.
-- **[[vps-n8n|vps-n8n.md]]** — Хостинг n8n на VPS за Caddy, пин версии (2.39.6), cron и воркфлоу.
+- **[[google-ads-conversions|google-ads-conversions.md]]** — Порядок подключения конверсий Google Ads (Consent Mode v2 default denied, AnalyticsBootstrap, CSP, серверные триггеры gtag). Synced from `docs/architecture/google-ads-conversions.md`.
+- **[[targo-production-plan|targo-production-plan.md]]** — Производственный план Targo (мультиязычный ассистент для бизнеса, WhatsApp мост, FastAPI ядро, SQLite WAL). Synced from `docs/architecture/targo-production-plan.md`.
+- **[[whatsapp-data-privacy|whatsapp-data-privacy.md]]** — Конфиденциальность и хранение переписки WhatsApp (Закон о защите частной жизни 5741-1981, Поправка №13, роли контролера/держателя базы, правила передачи данных).
+- **[[whatsapp-translator|whatsapp-translator.md]]** — Контур WhatsApp Cloud API ↔ Telegram / PWA оператора (переводчик переписки, Caddy, вебхуки). Synced from `docs/infrastructure/whatsapp-translator.md`.
+- **[[whatsapp-tech-provider|whatsapp-tech-provider.md]]** — Чеклист Tech Provider для онбординга номеров клиентов (Embedded Signup v4, верификация бизнеса в Meta). Synced from `docs/infrastructure/whatsapp-tech-provider.md`.
+- **[[tech-circuit|tech-circuit.md]]** — Инженерный контур техподдержки (`tech.erythro.ai`, тикеты установок, TOTP, SQLite master). Synced from `docs/infrastructure/tech-circuit.md`.
+- **[[backups|backups.md]]** — Регламент и архитектура шифрованных бэкапов SQLite (AES-256-GCM, WAL online backup, ротация). Synced from `docs/infrastructure/backups.md`.
+- **[[b2bridge-checklist|b2bridge-checklist.md]]** — Чеклист дальнейших действий и внедрения Targo / B2Bridge. Synced from `docs/infrastructure/b2bridge-checklist.md`.
+- **[[vps-n8n|vps-n8n.md]]** — Хостинг n8n на VPS за Caddy, пин версии (2.41.4), cron и воркфлоу.
 - **[[n8n-audit-reconcile|n8n-audit-reconcile.md]]** — Реконсиляция зависших аудитов (Vercel Cron + n8n). Synced from `docs/infrastructure/n8n-audit-reconcile.md`.
 - **[[n8n-email-autoresponder|n8n-email-autoresponder.md]]** — n8n email autoresponder для order@ и team@. Synced from `docs/infrastructure/n8n-email-autoresponder.md`.
 - **[[caddy-dns-audit-worker|caddy-dns-audit-worker.md]]** — Caddy reverse proxy и DNS конфигурация для Audit Worker.
@@ -112,6 +127,7 @@ graph TD
 - **[[deployment|deployment.md]]** — Журнал деплоя erythro.ai (Vercel, Blob, миграции, CI, DNS, почта, AI Crawl Control). Synced from `docs/DEPLOYMENT.md`.
 - **[[vps-firewall-cloudflare-access|vps-firewall-cloudflare-access.md]]** — UFW baseline, Cloudflare Access `/admin*`, DMARC quarantine→reject checklist. Synced from `docs/infrastructure/vps-firewall-cloudflare-access.md`.
 - **[[vps-docker-ports|vps-docker-ports.md]]** — Docker publish rules (no `0.0.0.0`). Synced from `docs/infrastructure/vps-docker-ports.md`.
+- **[[supabase-data-api-grants|supabase-data-api-grants.md]]** — С 2026-10-30 новые таблицы `public` без явного GRANT недоступны Data API. На таблицы Payload эти GRANT не ставить. Synced from `docs/infrastructure/supabase-data-api-grants.md`.
 - **[[PLAN-deferred|PLAN-deferred.md]]** — Deferred hardening / perf backlog (DMARC reject ~2026-09-13). Synced from `docs/PLAN-deferred.md`.
 - **[[playbook|playbook.md]]** — Продуктовый playbook и хронология v1 (фазы A–F, i18n, GSAP, CMS). Synced from `docs/PLAYBOOK.md`.
 - **[[ai-visibility|ai-visibility.md]]** — AI visibility pack: llms.txt, MCP, schema, Content Signals, markdown negotiation. Synced from `docs/AI_VISIBILITY.md`.
@@ -128,6 +144,7 @@ graph TD
 
 ### [[03-Agent-Skills/prompt-engineering-rules|📁 03-Agent-Skills (Регламенты AI-агентов)]]
 - **[[prompt-engineering-rules|prompt-engineering-rules.md]]** — Стандарты промптов для кодинг-ассистентов (Antigravity, Cursor, Claude 3.7, GPT-4o), предотвращение галлюцинаций.
+- **[[HANDOFF|context/HANDOFF.md]]** — Протокол эстафеты между Cursor, Claude, Gemini и Grok. Канон: `erythro-ai/docs/context/HANDOFF.md`. Файл последних изменений `NOW.md` в базу не зеркалится.
 - **[[mcp-agent-skill|mcp-agent-skill.md]]** — Спецификация SEP-1960 MCP, Discovery Manifest `/.well-known/mcp`, эндпоинт brand facts.
 - **[[acp-commerce-skill|acp-commerce-skill.md]]** — Спецификация Agentic Commerce Protocol, `/.well-known/acp.json`, capability negotiation, заказы и чекаут.
 - **[[markdown-negotiation-skill|markdown-negotiation-skill.md]]** — Реализация `Accept: text/markdown`, подсчет токенов `x-markdown-tokens`, отдача чистого текста для LLM.
@@ -141,6 +158,9 @@ graph TD
 - **[[obsidian-git-sync-rule|obsidian-git-sync-rule.md]]** — Обязательное правило и протокол синхронизации базы знаний с GitHub репозиторием при любых изменениях (Agent rules + Obsidian Git plugin).
 
 ### [[04-Templates/portfolio-case-template|📁 04-Templates (Шаблоны артефактов)]]
+- **[[client-brief-design-dev|client-brief-design-dev.md]]** — Полный клиентский бриф на разработку и UI/UX дизайн (паспорт проекта, цели, ЦА, функциональные требования, интеграции).
+- **[[software-development-agreement-israel|software-development-agreement-israel.md]]** — Договор на разработку ПО (Израиль / двуязычный EN-RU / Fixed Price / Milestones / IS 5568 / Поправка 13).
+- **[[software-development-agreement-israel-ru|software-development-agreement-israel-ru.md]]** — Договор на разработку ПО (русская редакция для Osek Patur / Eilat).
 - **[[brief-yaml-cms-template|brief-yaml-cms-template.md]]** — Полная матрица соответствия полей между `brief.yaml` и PostgreSQL/Payload CMS.
 - **[[cms-field-map|cms-field-map.md]]** — Field map кейс → Portfolio Projects (из репо). Synced from `docs/cases/CMS_FIELD_MAP.md`.
 - **[[case-study-template|case-study-template.md]]** — Markdown-шаблон кейса с плейсхолдерами. Synced from `docs/cases/case-study-template.md`.
@@ -150,6 +170,10 @@ graph TD
 - **[[solution-order-template|solution-order-template.md]]** — Шаблон тарифного плана заказа (базовая цена, периоды, скидки, аддоны, налоги).
 - **[[seo-metadata-template|seo-metadata-template.md]]** — Шаблоны generateMetadata, OpenGraph, Twitter Cards, Canonical alternates, JSON-LD (Organization, WebSite, FAQPage).
 - **[[legal-page-template|legal-page-template.md]]** — Шаблоны юридических документов: Privacy Policy, Terms of Service, Accessibility Statement (IS 5568 / WCAG 2.1 AA).
+
+### 📁 Cases (Боевые кейсы и внедрения)
+- **[[ai-audit-agent|cases/ai-audit-agent.md]]** — Боевой кейс: ИИ-аудитор сайта на erythro.ai (QA-агент, Playwright, PageSpeed, Gemini, R2, A44 отчёт).
+- **[[ai-consultant|cases/ai-consultant.md]]** — Боевой кейс: ИИ-консультант на erythro.ai (Gemini 3.6 Flash, Vercel AI SDK, live CMS KB).
 
 ### [[05-Glossary-FAQ/pitfalls-troubleshooting|📁 05-Glossary-FAQ (База инцидентов и FAQ)]]
 - **[[pitfalls-troubleshooting|pitfalls-troubleshooting.md]]** — Каталог известных факапов (`PIT-001` – `PIT-064`): симптомы, причины, проверенные решения и правила профилактики. Synced from `docs/PITFALLS.md`.

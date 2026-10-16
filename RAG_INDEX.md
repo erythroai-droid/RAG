@@ -3,7 +3,7 @@
 Manifest for building a retrieval corpus from `docs/`. Use this file as the **ingest map**:
 what to chunk, how to tag, and which questions each source answers.
 
-Last updated: 2026-09-06.
+Last updated: 2026-09-29.
 
 ---
 
@@ -29,20 +29,26 @@ Last updated: 2026-09-06.
 | `docs/AI_VISIBILITY.md` | AI visibility pack (llms.txt, MCP, schema) | One chunk per `##` heading | `ai`, `seo`, `schema`, `robots` |
 | `docs/RAG_INDEX.md` | This map | Single small chunk or skip | `meta`, `rag` |
 | `docs/IMPORT_PROJECT.md` | Pointer to import tool | Skip or one chunk | `portfolio`, `cms`, `import` |
-| `docs/architecture/ai-audit-architecture.md` | AI Audit MVP (R2, worker, no payment) | One chunk per `##` | `audit`, `r2`, `n8n`, `infra` |
+| `docs/architecture/ai-audit-architecture.md` | AI Audit pipeline (R2, worker) | One chunk per `##` | `audit`, `r2`, `n8n`, `infra` |
+| `docs/architecture/grow-audit-checkout.md` | Grow hosted checkout for paid audits | One chunk | `audit`, `grow`, `payment` |
+| `docs/architecture/payplus-audit-checkout.md` | Legacy PayPlus adapter; checkout uses Grow | One chunk | `audit`, `payplus`, `payment` |
 | `docs/architecture/r2-audit-storage.md` | R2 bucket + env for audit reports | One chunk | `r2`, `audit`, `storage` |
 | `docs/architecture/audit-rate-limiting.md` | 5-day audit rate limit & IP tracking | One chunk per `##` | `audit`, `rate-limit`, `anti-spam`, `ip` |
-| `docs/infrastructure/n8n-audit-reconcile.md` | n8n cron reconcile for stuck audits | One chunk | `n8n`, `audit`, `reconcile`, `vps` |
+| `docs/infrastructure/n8n-audit-reconcile.md` | Vercel Cron + n8n backup for stuck audits | One chunk | `n8n`, `audit`, `reconcile`, `cron`, `vps` |
 | `docs/infrastructure/n8n-email-autoresponder.md` | n8n email autoresponder for order@ & team@ | One chunk per `##` | `n8n`, `email`, `autoresponder`, `imap`, `smtp` |
 | `docs/infrastructure/vps-firewall-cloudflare-access.md` | VPS UFW + Cloudflare Access `/admin*` + DMARC quarantine→reject | One chunk per `##` | `security`, `access`, `zero-trust`, `dmarc`, `ufw`, `admin` |
 | `docs/infrastructure/vps-docker-ports.md` | Hostinger VPS Docker publish rules (no 0.0.0.0) | One chunk | `vps`, `docker`, `ufw`, `security` |
+| `docs/infrastructure/whatsapp-translator.md` | WhatsApp Cloud API ↔ Telegram operator loop | One chunk per `##` | `whatsapp`, `telegram`, `translation`, `vps`, `meta` |
+| `docs/infrastructure/whatsapp-tech-provider.md` | Tech Provider checklist for selling the translator | One chunk per `##` | `whatsapp`, `tech-provider`, `sales`, `meta` |
+| `docs/infrastructure/supabase-data-api-grants.md` | Supabase Data API explicit GRANTs from 2026-10-30 | One chunk | `supabase`, `grant`, `data-api`, `migrations` |
 | `docs/architecture/r2-media-storage.md` | Payload media on R2 (bucket, public URL, Blob cutover) | One chunk per `##` | `r2`, `media`, `blob`, `storage` |
 | `docs/PLAN-deferred.md` | Deferred hardening / perf backlog | One chunk (whole file) | `deferred`, `security`, `dmarc`, `access`, `perf` |
 | `scripts/import-project/README.md` | Portfolio folder → CMS import | One chunk per `##` | `portfolio`, `cms`, `import` |
 | `scripts/set-dmarc-reject.mjs` | Raise `_dmarc` to `p=reject` (after quarantine window) | Skip body secrets; one chunk: purpose + env + dry-run | `dmarc`, `dns`, `security` |
 | `scripts/create-cloudflare-access-admin.mjs` | Create Access app for `/admin*` via API token | One chunk: purpose + required scopes | `access`, `cloudflare`, `admin` |
 | `docs/consultant/erythro-knowledge-base.md` | Public AI consultant sales KB (live CMS prices) | One chunk per `##` (or whole file for prompt) | `consultant`, `pricing`, `faq`, `audit` |
-| `docs/architecture/grok-bot-consultant.md` | Site consultant on xAI API + widget | One chunk per `##` | `consultant`, `xai`, `chat` |
+| `docs/architecture/gemini-consultant.md` | Site consultant on Gemini Flash + CMS KB, OTP, Translater | One chunk per `##` | `consultant`, `gemini`, `chat`, `otp` |
+| `docs/architecture/ai-token-spend.md` | AI token spend map: COGS/OPEX, keys, monthly ritual | One chunk per `##` | `finops`, `gemini`, `cursor`, `cogs` |
 
 **Optional later (not docs yet):** `scripts/seed.ts` header comments, `payload.config.ts` plugin block, `.github/workflows/test.yml` — only if docs lag behind code.
 
@@ -98,15 +104,34 @@ Rules:
 | “Email autoresponder / order@ & team@ / n8n / IMAP & SMTP Hostinger / RFC 3834 / duplicate Hostinger Autoreply / form client ack” | `docs/infrastructure/n8n-email-autoresponder.md`; `infra/n8n/workflows/email-autoresponder.json`; `PIT-037`; `PIT-038`; `PIT-040`; `PIT-044`; `src/lib/contactNotification.ts` |
 | “Audit form website check / DNS / SSRF / no n8n workflow” | `docs/architecture/ai-audit-architecture.md` §3.1; `src/lib/checkWebsite.ts`; `PIT-041` |
 | “Free audit button does nothing / check-website 200 / no /api/contact” | `PIT-067`; `src/components/audit/AuditBody.tsx`; `src/app/(frontend)/order/[slug]/OrderClient.tsx` |
-| “n8n audit cron reconciliation / stuck jobs” | `docs/infrastructure/n8n-audit-reconcile.md`; `infra/n8n/workflows/audit-reconcile.json` |
+| “Grow / Meshulam / paid audit / webhook / success page” | `docs/architecture/grow-audit-checkout.md`; `PIT-100`; `src/lib/payments/grow.ts` |
+| “PayPlus / paid audit / webhook / success page” | `docs/architecture/payplus-audit-checkout.md`; `PIT-099`; `src/lib/payments/payplus.ts` |
+| “Funnel review / form only on contacts / modal CTA / chat widget” | `PIT-068`; `AuditCollector` agent browse + Gemini prompt; `A44ReportGenerator` funnel note |
+| “audit cron reconciliation / stuck jobs” | `docs/infrastructure/n8n-audit-reconcile.md`; `vercel.json`; `infra/n8n/workflows/audit-reconcile.json` |
 | “CSP / Cloudflare Insights / beacon.min.js / PageSpeed console” | `next.config.ts` `CONTENT_SECURITY_POLICY`; `PIT-045`; `PIT-043` |
 | “security.txt / RFC 9116 / vulnerability disclosure contact” | `src/app/.well-known/security.txt/route.ts`; `docs/AI_VISIBILITY.md` |
 | “Montblanc 502 Bad Gateway / goods not loading / admin login 502 / port 8080 blocked” | `PIT-060`; `docs/infrastructure/vps-docker-ports.md`; `docs/PITFALLS.md` |
 | “Cloudflare Access /admin / Zero Trust / Payload login gate / subdomain pitfall” | `docs/infrastructure/vps-firewall-cloudflare-access.md` §2; `PIT-064`; `scripts/create-cloudflare-access-admin.mjs` |
+| “Audit Page Pricing / invalid id / nested features array / ON DELETE CASCADE” | `PIT-065`; `src/migrations/20260907_010000_audit_page_pricing_features_fk.ts`; `src/fields/auditPageFields.ts` |
 | “DMARC quarantine / p=reject / order@ reports / _dmarc TXT” | `docs/infrastructure/vps-firewall-cloudflare-access.md` §2b; `docs/PLAN-deferred.md`; `docs/DEPLOYMENT.md` DMARC rows; `scripts/set-dmarc-reject.mjs` |
 | “Hero LCP / CLS / TBT / PSI score jumps / GSAP gate” | `PIT-057`–`PIT-063`; `docs/HERO_MOTION.md`; `docs/PLAN-deferred.md` |
+| “Cold audit vs repeat / PSI warmup / TTFB median” | `PIT-077`; `AuditCollector` `warmupOrigin` + discarded first PSI lab |
 | “R2 media / Blob cutover / pub-…r2.dev / Payload uploads” | `docs/architecture/r2-media-storage.md`; `PIT` media/R2 entries; `docs/PLAN-deferred.md` |
 | “Deferred security / next hardening steps” | `docs/PLAN-deferred.md`; `.cursor/rules/deferred-hardening.mdc` |
+| “Supabase Data API / new table permission denied / GRANT anon” | `docs/infrastructure/supabase-data-api-grants.md`; `.cursor/rules/supabase-data-api-grants.mdc` |
+| “Mobile modal / footer covers dialog / page still scrolls” | `PIT-073`; `src/hooks/useLockBodyScroll.ts` |
+| “Hebrew audit report / scorecard labels jump / bars” | `PIT-074`; `A44ReportGenerator.java` RTL `.chart-label` |
+| “Broken network requests / 13× 4xx / favicon.ico 404” | `PIT-075`; `public/favicon.ico`; `AuditCollector` `failed_network_requests` unique URL+status |
+| “Broken network / 12× 401 /cdn-cgi/challenge-platform / Turnstile” | `PIT-078`; `AuditCollector` `isIgnorableFailedNetwork` |
+| “LinkedIn empty preview / missing og:image / order package share card” | `PIT-079`; `src/lib/ogImages.ts`; `src/app/(frontend)/order/[slug]/page.tsx` |
+| “Free audit blank tab / waiting page instead of confirmation popup” | `PIT-080`; `PIT-069`; `AuditFreeSuccessModal` in `AuditBody.tsx` |
+| “Form submit hangs / sending never ends / no error message” | `PIT-081`; `src/lib/contactSubmit.ts`; `useAuditFieldChecks.ts` |
+| “form virus scan / SQL injection / phishing / IMAP before DB” | `PIT-082`; `src/lib/contactSanitize.ts`; `src/lib/contactSubmissionGuard.ts`; `src/app/api/contact/route.ts`; `docs/infrastructure/n8n-email-autoresponder.md` |
+| “vercel.app indexed / sitemap 5xx / Search Console duplicate” | `PIT-085`; `src/lib/vercelHost.ts`; `src/app/robots.txt/route.ts`; `src/app/sitemap.ts` |
+| “AI consultant / Gemini / widget / live prices / packages / chat OTP” | `docs/consultant/erythro-knowledge-base.md`; `docs/architecture/gemini-consultant.md` |
+| “AI token spend / Gemini bill / Cursor credits / COGS vs OPEX / which API key” | `docs/architecture/ai-token-spend.md`; `docs/architecture/gemini-consultant.md` |
+| “WhatsApp translator / Telegram card / reply language / !! verbatim / photo or file / greeting / Meta token expired / first message to a new number” | `docs/infrastructure/whatsapp-translator.md`; `docs/PLAN-deferred.md` § WhatsApp first outbound |
+| “Sell WhatsApp bot / Tech Provider / Embedded Signup / client number” | `docs/infrastructure/whatsapp-tech-provider.md` |
 
 ---
 
@@ -134,8 +159,9 @@ Rules:
 - [x] Playbook §3 as full v1 implementation plan (2026-08-18); chronology through §9.18.
 - [x] Contact hardening + Cloudflare DNS + e2e pitfalls (PIT-020 update, PIT-022, PIT-023).
 - [x] `docs/AI_VISIBILITY.md` — llms.txt, MCP, schema, security headers (2026-08-22).
-- [x] Cloudflare Access `/admin*` + DMARC quarantine runbook + PIT-064 (2026-09-06).
+- [x] Cloudflare Access `/admin*` + DMARC quarantine runbook + PIT-064 (2026-09-06); DMARC `p=reject` (2026-09-18).
 - [x] R2 media storage + VPS docker ports + PLAN-deferred in corpus (2026-09-06).
+- [x] WhatsApp translator operator loop (2026-09-29).
 - [ ] `docs/ORDER_CMS.md` mirroring portfolio for Solution Plans / order page.
 - [ ] `docs/I18N_RTL.md` consolidating BiDi / HE scrub / phone LTR fixes from commits.
 - [ ] Scalability track (new playbook section when that work starts — not v1).

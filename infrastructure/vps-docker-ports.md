@@ -45,6 +45,7 @@
 | `caddy_proxy` | 80, 443 (и udp/443) | OK — единственный публичный edge |
 | `n8n` | нет | OK — через Caddy |
 | `audit_agent_worker` | нет | OK — через Caddy |
+| `whatsapp_translator` | нет (`8000/tcp` только внутри Docker) | OK — через Caddy, `wa.erythro.ai` |
 | `montblanc_db` | `127.0.0.1:3306` | OK |
 | `montblanc_api` | `0.0.0.0:8080` | **ОТКРЫТ И ОБЯЗАТЕЛЕН** (см. предупреждение ниже) |
 
