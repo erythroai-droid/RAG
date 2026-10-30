@@ -32,6 +32,7 @@ Last updated: 2026-09-29.
 | `docs/architecture/ai-audit-architecture.md` | AI Audit pipeline (R2, worker) | One chunk per `##` | `audit`, `r2`, `n8n`, `infra` |
 | `docs/architecture/grow-audit-checkout.md` | Morning, then Grow, then Make: paid audit checkout | One chunk | `audit`, `morning`, `grow`, `payment` |
 | `docs/architecture/payplus-audit-checkout.md` | Legacy PayPlus adapter; checkout uses Grow | One chunk | `audit`, `payplus`, `payment` |
+| `docs/architecture/audit-report-pro-v2.md` | Pro v2 report (RU/EN/HE): design system, apply/render scripts, PDF rules, handoff | One chunk per `##` | `audit`, `report`, `pdf`, `rtl`, `pro-v2` |
 | `docs/architecture/r2-audit-storage.md` | R2 bucket + env for audit reports | One chunk | `r2`, `audit`, `storage` |
 | `docs/architecture/audit-rate-limiting.md` | 5-day audit rate limit & IP tracking | One chunk per `##` | `audit`, `rate-limit`, `anti-spam`, `ip` |
 | `docs/infrastructure/n8n-audit-reconcile.md` | Vercel Cron + n8n backup for stuck audits | One chunk | `n8n`, `audit`, `reconcile`, `cron`, `vps` |

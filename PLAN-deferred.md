@@ -1,16 +1,15 @@
-# Deferred follow-ups (updated 2026-09-29)
+# Deferred follow-ups (updated 2026-10-19)
 
 Напомнить в следующем сеансе, когда пользователь спросит про безопасность / perf / R2 / admin.
 
 **Критичных blocker сейчас нет** — cutover R2 + UFW baseline + home/portfolio ISR сделаны.
 
-**Временно открыто до платёжного терминала (2026-09-29):** `AUDIT_INTAKE_LIMITS_OPEN_FOR_QA = true` — нет 5-дневного кулдауна Free и нет IP-окна `POST /api/contact`. Turnstile / honeypot / sanitize на месте. Код Grow готов (`docs/architecture/grow-audit-checkout.md`). Вернуть лимиты **после того, как платный терминал реально принимает оплату**: `AUDIT_SKIP_COOLDOWN=0` на Vercel **или** `AUDIT_INTAKE_LIMITS_OPEN_FOR_QA = false`. Боевые `GROW_USER_ID` / `GROW_PAGE_CODE` Grow выдаёт отдельно от открытия счёта.
+**Intake limits restored (2026-10-13):** free-audit cooldown = **7 days** (IP / email / domain); IP window on `POST /api/contact` is on (`AUDIT_INTAKE_LIMITS_OPEN_FOR_QA = false`). Override only via `AUDIT_SKIP_COOLDOWN=1` if needed for QA.
 
 ## Next when there is time
 
 | Priority | Item | Notes |
 |---|---|---|
-| high | Restore audit intake limits | After payment terminal is connected: `AUDIT_SKIP_COOLDOWN=0` or `AUDIT_INTAKE_LIMITS_OPEN_FOR_QA = false` in `src/lib/auditRateLimit.ts` |
 | medium | CSP nonce (drop `'unsafe-inline'`) | **Not critical now** — defense-in-depth only; public prod already without `'unsafe-eval'` (`next.config.ts` adds `'unsafe-eval'` only when `NODE_ENV===development'` — see PIT-066). Needs middleware nonce + wire GA consent / JSON-LD / Turnstile / `next/script`; `style-src` still hard with `experimental.inlineCss`. Admin keeps `'unsafe-eval'` for Payload. |
 | medium | Desktop CLS (~1.1) | Partially addressed: poster LCP without isLg gate, heading min-height + cross-locale slot, useLayoutEffect locale — re-measure after deploy |
 | low | Purge Vercel Blob copies | After admin upload→R2 verified; then drop `BLOB_READ_WRITE_TOKEN` |
@@ -22,8 +21,7 @@
 | later | CF-only UFW 80/443 | Needs orange cloud + Origin Cert for n8n/agent-api |
 | later | ISR remaining frontend pages | services/order/audit still use `getRequestPrefs` / dynamic params (PIT-056) |
 | later | Custom domain `media.erythro.ai` | r2.dev is rate-limited |
-| note | Supabase Data API grants (2026-10-30) | New `public` tables are no longer auto-granted to `anon` / `authenticated` / `service_role`. Erythro uses the `postgres` role via Payload — do not paste those grants onto CMS tables. See `docs/infrastructure/supabase-data-api-grants.md` |
-| later | WhatsApp first message to an unknown number | **Not now.** No such traffic yet. See § WhatsApp first outbound below. |
+| later | Supabase RLS / grants hardening (PIT-110) | **Not urgent** — Data API not used; baseline = empty exposed schemas + revoke `anon`. When back: (1) verify `has_table_privilege('anon',…)` false on `users` + intake; (2) codify revoke into `src/migrations/`; (3) optional `ENABLE ROW LEVEL SECURITY` on sensitive tables without client policies. Never enable PostgREST `public` without RLS. Canon: `docs/architecture/supabase-rls.md`. |
 
 ## Consultant v2 (wizard + grounded facts)
 
@@ -38,18 +36,6 @@
 5. Инженер в ту же ленту: `handoff: queued | human`, пузыри `role: engineer`, флаг `features.humanJoin`. Контракт уже в типах/сессии; в v1 клиент ждёт ответ по email.
 
 Не делать: кормить модель всем сайтом без дерева; «архитектор 24/7» без handoff; ждать, что RAG сам уберёт путаницу.
-
-## WhatsApp first outbound (template)
-
-Канон текущего бота: [`docs/infrastructure/whatsapp-translator.md`](infrastructure/whatsapp-translator.md). Сейчас оператор отвечает только цитатой на карточку уже написавшего клиента. Свободный текст на номер, который сам не писал, Cloud API отклоняет.
-
-Делать, когда появятся первые исходящие на неизвестные номера. Не раньше.
-
-1. В WhatsApp Manager одобрить шаблон (категория **Маркетинг**, отдельные языки HE и RU). Добавить способ оплаты: шаблон в Израиль платный, около $0.0353. Потолок нового номера — 250 уникальных исходящих в сутки.
-2. Номер должен быть в WhatsApp, и человек сам дал согласие на сообщения.
-3. Команда в Telegram: номер клиента и имя шаблона. Бот отправляет шаблон через Cloud API и открывает сессию, чтобы ответ клиента пришёл карточкой, как обычный диалог.
-
-Не делать: свободный текст первым; рассылку без согласия; отдельный номер в приложении WhatsApp на телефоне.
 
 ## Done
 
@@ -66,3 +52,4 @@
 - [x] DMARC `p=reject` after clean Google aggregate reports (2026-09-18)
 - [x] Cloudflare Access `/admin*`: empty subdomain + Allow email → `/admin` 302 to Cloudflare Access (2026-09-06)
 - [x] Consultant: How we work card + reply language from last user message (PIT-097)
+- [x] Restore free-audit intake limits: 7-day cooldown + remaining-time modal (2026-10-13)

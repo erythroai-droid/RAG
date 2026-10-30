@@ -15,13 +15,12 @@
 
 | Service | URL | Notes |
 |---|---|---|
-| n8n | `https://n8n.erythro.ai` | Image pinned `2.41.7`; DNS A (DNS only) → VPS |
+| n8n | `https://n8n.erythro.ai` | Image pinned `2.45.5`; DNS A (DNS only) → VPS |
 | Audit worker | `https://agent-api.erythro.ai` | `GET /health`, `POST /api/run-audit` |
-| WhatsApp translator | `https://wa.erythro.ai` | `GET /health`, `/webhook/*` only. DNS A `wa` (grey cloud) must exist before the certificate is issued. See [`whatsapp-translator.md`](./whatsapp-translator.md) |
 
 Until DNS exists, hit via IP + Host header for smoke tests.
 
-Docker network: `proxy_network` — containers `caddy_proxy`, `n8n`, `audit_agent_worker`, `whatsapp_translator`.
+Docker network: `proxy_network` — containers `caddy_proxy`, `n8n`, `audit_agent_worker`.
 
 ---
 
@@ -38,7 +37,7 @@ Deploy from repo: `py -3 scripts/deploy_vps_audit_stack.py` (needs `VPS_PASSWORD
 
 **Новые контейнеры:** не публиковать порты на `0.0.0.0` — см. [`vps-docker-ports.md`](./vps-docker-ports.md) (PIT-053).
 
-**Image:** `docker.n8n.io/n8nio/n8n:2.41.7` in [`infra/n8n/docker-compose.yml`](../../infra/n8n/docker-compose.yml) (live: `/root/n8n/compose.yaml`). Do **not** use `:latest` — it is not auto-pulled. Security floor from n8n advisories (2026-10-01): `2.41.4` (stable) / `2.42.1` (beta) / `1.123.83` (v1). Stay on the stable patch line. `2.43.0` (2026-10-06) is still a pre-release.
+**Image:** `docker.n8n.io/n8nio/n8n:2.45.5` in [`infra/n8n/docker-compose.yml`](../../infra/n8n/docker-compose.yml) (live: `/root/n8n/compose.yaml`). Do **not** use `:latest` — it is not auto-pulled. Security floor from n8n advisories (2026-10-28): `2.45.5` (stable) / `2.46.1` (beta) / `1.123.89` (v1) / `3.0.1` (v3). Stay on the stable patch line.
 
 See also: [`caddy-dns-audit-worker.md`](./caddy-dns-audit-worker.md), [`n8n-audit-reconcile.md`](./n8n-audit-reconcile.md).
 
@@ -75,4 +74,4 @@ docker exec n8n n8n list:workflow --active=true
 curl -fsS https://n8n.erythro.ai/healthz
 ```
 
-Volume `n8n_data` must stay. Port 5678 must stay unpublished (PIT-053). After 2.39.6 → 2.41.4 (2026-10-01, advisories through GHSA-3qcw-p65v-c7vq) the Email Autoresponder stayed Active; optional Audit reconcile stayed inactive (Vercel Cron is primary). 2.41.4 → 2.41.7 (2026-10-07) stays on that stable line: 2.41.6 keeps the task runner up after an unhandled rejection; 2.41.7 is an API/editor patch. No newer security floor than 2.41.4.
+Volume `n8n_data` must stay. Port 5678 must stay unpublished (PIT-053). After 2.39.6 → 2.41.4 (2026-10-01) and 2.41.4 → 2.41.7 (2026-10-07), Email Autoresponder stayed Active; optional Audit reconcile stayed inactive (Vercel Cron is primary). 2.41.7 → 2.45.5 (2026-10-28, advisories through GHSA-9p7v-45m2-wxgj / GHSA-f2cw-9483-7vcp / GHSA-gx3v-3x3v-f8r5 + 9 medium): migrate DB in place, `N8N_WEBHOOK_URL` replaces deprecated `WEBHOOK_URL`. Schedule Trigger uses durable scheduler by default (cron/hourly unchanged; fixed-interval “every N min” no longer clock-aligned).
