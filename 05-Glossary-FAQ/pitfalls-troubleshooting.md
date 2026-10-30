@@ -1,4 +1,4 @@
-# Pitfalls catalog (Erythro.ai)
+﻿# Pitfalls catalog (Erythro.ai)
 
 RAG-oriented knowledge base of recurring failures. Each entry is a **self-contained chunk**:
 symptom → cause → fix → prevent. Prefer this file when answering “why did X break?” or “how do we avoid Y?”.
@@ -715,6 +715,8 @@ The generic body is **not** in `infra/n8n/workflows/email-autoresponder.json`.
 
 **Prevent:** Never call siteverify from the browser. Reset the widget in `finally` after every submit (tokens are single-use). Mirror Vercel env for Production + Preview.
 
+**Also (ads LP, 2026-10-18):** Forms on `audit-*.erythro.ai` look fine but submit fails / Turnstile empty if those hosts are missing from the **Cloudflare Turnstile widget Domains** list. Server allowlist: `turnstileHostnames()` merges LP hosts; dashboard Domains must still list them or the widget never mints a token.
+
 ---
 
 ## PIT-044 — Form “thank you” is API SMTP, not n8n IMAP
@@ -917,12 +919,12 @@ The generic body is **not** in `infra/n8n/workflows/email-autoresponder.json`.
 
 **Fix:**
 1. Layout SSR defaults (`lang="en"`) + `THEME_BOOTSTRAP_SCRIPT` / `LOCALE_BOOTSTRAP_SCRIPT`.
-2. Home + `/portfolio`: `export const dynamic = 'force-static'` + `revalidate = 60`; `clientHydratePrefs`; no `getRequestPrefs`.
+2. Home + `/portfolio` + `/services/[slug]`: `export const dynamic = 'force-static'` + `revalidate = 60`; `clientHydratePrefs`; no `getRequestPrefs` / no `cookies()` in `generateMetadata`.
 3. `not-found` must not call `cookies()` (client hydrate locale).
 4. Middleware: markdown rewrite + Link header only — **never** set `NEXT_LOCALE`.
 5. CMS reads via `getPayloadLocal()` (`src/lib/payloadStatic.ts`) with `overrideAccess: true` — never `initReq` / `headers()`.
 
-**Verify after deploy:** `Cache-Control` contains `s-maxage=60`, second request `x-vercel-cache: HIT` (or `STALE`), build table shows `○` / ISR for `/` and `/portfolio` (not `ƒ`).
+**Verify after deploy:** `Cache-Control` contains `s-maxage=60`, second request `x-vercel-cache: HIT` (or `STALE`), build table shows `○` / ISR for `/`, `/portfolio`, and `/services/*` (not `ƒ`).
 
 **Prevent:** Never put `cookies()` in shared layout or `not-found`. Never Set-Cookie on cacheable HTML responses. Keep Local API for static pages.
 
@@ -1804,6 +1806,8 @@ After a Payload or storage-plugin bump, diff the generated Drizzle schema agains
 
 **Prevent:** Follow `docs/architecture/google-ads-conversions.md`. Do not paste a second Google tag. Do not count a landing-page view as a purchase. Confirm in Tag Assistant: a «Конверсия» hit and an empty console, then wait hours before treating «Неактивно» as a code bug.
 
+**Organic defer (2026-10-26):** Marketing pages without ad params may delay `gtag.js` / `fbevents` until cookie Accept or the first conversion (`requestAnalyticsScripts`). **Do not** defer on paid query params, ads LP hosts, `/lp/audit/*`, `/audit`, or `/order/*` — those stay eager in head (same Consent Mode denied → grant on Accept). See `needsEagerAdAnalytics` / `AnalyticsBootstrap`.
+
 ---
 
 ## PIT-109 — Portfolio CMS projects 404 on `/portfolio/[slug]` while cards may load
@@ -1824,6 +1828,38 @@ After a Payload or storage-plugin bump, diff the generated Drizzle schema agains
 
 ---
 
+## PIT-112 — Ads audit LP language jumps from cookie / localStorage
+
+**Tags:** `ads`, `i18n`, `audit`, `landing`, `cdn`  
+**Seen:** 2026-10-18 — campaign Final URL on shared `/audit`
+
+**Symptom:** User from an EN campaign lands on the audit page and sees RU (or HE), because `NEXT_LOCALE` / `erythro-locale` from a previous visit wins. Ads Quality Score and form labels mismatch the campaign language.
+
+**Cause:** Main site locale is cookie/storage-driven (and middleware must not `Set-Cookie` — PIT-056). One URL cannot be a hard language lock.
+
+**Fix:** Separate LPs on `audit-en` / `audit-ru` / `audit-he`.erythro.ai → rewrite to `/lp/audit/{locale}` with host/path lock in `LOCALE_BOOTSTRAP_SCRIPT` + `useSitePrefs({ lockedLocale })`. See `docs/architecture/audit-ads-landing.md`.
+
+**Also (2026-10-18 / 2026-10-19):** Brief Hotnet NXDOMAIN on `audit-ru` led to a planned `audit-rus` label — but **`audit-rus` was never published in CF DNS**. Public RU host is **`audit-ru.erythro.ai`** (live). `audit-rus` is middleware alias only. Language switcher must use `AUDIT_LP_HOST_BY_LOCALE` (not invent `rus` in the path).
+
+**Prevent:** Do not point Ads Final URL at `/audit`. Do not “fix” locale by setting `NEXT_LOCALE` in middleware. Prefer `audit-ru` (not `audit-rus`) in Ads.
+
+---
+
+## PIT-111 — `vercel env pull` writes `[SENSITIVE]` and breaks import / revalidate
+
+**Tags:** `vercel`, `env`, `import-project`, `portfolio`  
+**Seen:** 2026-10-17 — `pnpm import:project -- content/imports/rosso-garage --create`
+
+**Symptom:** CLI prints `Database host: (unparseable DATABASE_URL)` / `getaddrinfo ENOTFOUND base`, or revalidate fails with `Failed to parse URL from [SENSITIVE]/api/revalidate…`. Project may still be written if secrets were later filled from `.env`.
+
+**Cause:** Vercel CLI 64+ cannot pull many Production secrets and writes the literal placeholder `[SENSITIVE]` into `.env.production.local`. `dotenv` loads that file first; later `.env` does not override. Hostname `"base"` is the failed parse of `[SENSITIVE]`.
+
+**Fix:** `scripts/import-project/lib/load-env.ts` fills `[SENSITIVE]` from `.env` / `.env.local`, then deletes leftover placeholders so `NEXT_PUBLIC_SITE_URL` falls back to `https://erythro.ai`. Keep real `DATABASE_URL` / `PAYLOAD_SECRET` / R2 keys in `.env`. For live page cache: real `REVALIDATION_TOKEN` or **Save once** in production admin (PIT-109).
+
+**Prevent:** After `vercel env pull`, never trust Production-only secrets in that file alone. Do not commit `.env*`.
+
+---
+
 ## PIT-110 — Supabase default grants expose Payload `public` to `anon` (hash/salt landmine)
 
 **Tags:** `supabase`, `security`, `postgrest`, `payload`, `rls`  
@@ -1840,6 +1876,554 @@ After a Payload or storage-plugin bump, diff the generated Drizzle schema agains
 - Do **not** touch `storage` / `auth` / `service_role`
 
 **Prevent:** Keep PostgREST exposed schemas empty. After new Payload tables, confirm `has_table_privilege('anon','public.<table>','SELECT')` is false. Never enable schema `public` in API settings without RLS.
+
+---
+
+## PIT-113 — Ads Pro-offer email sends but status stays `scheduled` (`Html Result` invalid)
+
+**Tags:** `audit`, `payload`, `html_result`, `team-smtp`, `meta-ads`  
+**Seen:** 2026-10-19 — `POST /api/audit/internal/[id]/pro-offer` and reconcile sweep
+
+**Symptom:** `team@` Pro ₪390 mail arrives (sometimes twice), Vercel logs `The following field is invalid: Audit pipeline > Html Result`, API returns 500. `pro_offer_status` never becomes `sent`.
+
+**Cause:** Same as PIT-035: `payload.update` on `contact-submissions` re-validates existing large `html_result`. Mail is sent first; status write fails afterward → reconcile retries.
+
+**Fix:** Write pro-offer columns via SQL (`patchProOfferFieldsSql` in `src/lib/auditProOffer.ts`), same pattern as `/api/audit/internal/[id]` PATCH. If a row already mailed but stuck on `scheduled`, SQL-set `pro_offer_status='sent'` (+ sent/expires/reminder timestamps).
+
+**Prevent:** Never `payload.update` any field on an audit submission that may already hold HTML; use drizzle SQL for pipeline and funnel status fields.
+
+---
+
+## PIT-114 — Unpaid Pro checkout still gets a report (reconcile queues `pending`)
+
+**Tags:** `audit`, `grow`, `make`, `reconcile`, `payment`  
+**Seen:** 2026-10-19 — customer opens Grow, aborts payment, returns to site; Pro report arrives anyway
+
+**Symptom:** `POST /api/payment/create` makes `paymentStatus=pending` + `auditStatus=new`. Customer never pays. Within ~2 minutes Vercel cron `/api/audit/reconcile` re-queues every stale `new` audit and the worker sends the report.
+
+**Cause:** Reconcile filtered only by `auditStatus` / `updatedAt`, not by payment. Paid checkout looks like a stuck free lead.
+
+**Fix:** `isUnpaidAuditCheckout` + `assertAuditMayRun` in `src/lib/auditPaymentGate.ts`; reconcile skip; `triggerAuditAgent` refuses unpaid; `/api/contact` rejects paid plan slugs; payment create clears `audit_status` until paid; public report 404 while unpaid; admin requeue 409.
+
+**Prevent:** Never auto-queue or serve reports with `paymentStatus` in `pending|failed|refunded`, or with `paymentAmount > 0` unless `paid`. Paid plans only via `/api/payment/create`.
+
+---
+
+## PIT-115 — Hostinger Sent empty after team@ Pro emails (SMTP only)
+
+**Tags:** `email`, `hostinger`, `smtp`, `imap`, `pro-offer`  
+**Seen:** 2026-10-20 — Pro/nudge/reminder sent via `TEAM_SMTP_PASS`, webmail Sent empty
+
+**Symptom:** Clients receive Pro funnel mail from `team@erythro.ai`, but Hostinger **Sent** shows nothing.
+
+**Cause:** Nodemailer SMTP delivers mail; Hostinger does not auto-file SMTP traffic into Sent. Sent fills only from webmail compose or IMAP `APPEND`.
+
+**Fix:** After SMTP success, `appendTeamMailToSent` (`src/lib/teamMailSentAppend.ts`) appends the MIME to `INBOX.Sent` (or `\Sent` special-use). Errors are logged; they must not fail the send.
+
+**Prevent:** Do not look for funnel copies in Sent until IMAP APPEND is deployed. Status of record remains Payload `proOfferStatus` / `proOfferSentAt`.
+
+---
+
+## PIT-116 — GA4 Key Events stay at 0 despite active form submissions and Ads `conversion` hits
+
+**Tags:** `ga4`, `google-ads`, `gtag`, `consent`, `conversions`  
+**Seen:** 2026-10-20 — GA4 property `543568002` (`G-F3BTVWGDRS`), `keyEvents = 0` across 789 sessions and 54 `form_start` events
+
+**Symptom:** GA4 reports `0` Key Events (`qualify_lead`, `close_convert_lead`, `purchase`), and only 1 automatic `form_submit` across months of traffic, even though leads are arriving in Payload CMS / CRM.
+
+**Cause (stack):**
+1. `adsConversion.ts` fired `gtag('event', 'conversion', { send_to: 'AW-18453652197/…' })`. Because `send_to` targeted only Google Ads (`AW-…`), GA4 (`G-F3BTVWGDRS`) never received any lead or purchase event, and AJAX `fetch('/api/contact')` does not reliably trigger GA4 Enhanced Measurement `form_submit`.
+2. Consent Mode race: `gtag('config', 'G-F3BTVWGDRS')` lived only inside `AnalyticsLoader` (`<Script strategy="afterInteractive">` rendered after cookie banner accept). When a user submitted a form with the form's privacy checkbox without clicking the cookie banner first, `setConsentValue(CONSENT_ACCEPTED)` triggered an async React state update while `gtag('event', …)` ran synchronously before `consent update` or `gtag('config', 'G-…')` executed.
+3. Three form surfaces (`/order/free-start` & `/order/enterprise-custom` in `OrderClient.tsx`, `/contacts` in `ContactsBody.tsx`, and `ContactModal.tsx`) had no conversion tracking calls on submit success.
+
+**Fix:** `ensureAnalyticsConsentAndGaConfig()` in `src/lib/adsConversion.ts` synchronously calls `gtag('consent', 'update', { …granted })` and initializes `gtag('config', 'G-F3BTVWGDRS')` (guarded by `window.__ERYTHRO_GA_CONFIGURED__`, shared with `AnalyticsLoader.tsx`). `AnalyticsBootstrap.tsx` enables `url_passthrough: true` and snapshots initial entry `utm_*` params into `window.__ERYTHRO_INITIAL_UTM__` (`readCampaignConfigParams()`) so GA4 receives explicit `campaign_name` / `campaign_source` / `campaign_medium` even when `gclid` is present or consent is accepted later. Added `trackGaLead` (`qualify_lead`, plus `close_convert_lead` for package orders) and `trackGaPurchase` (`purchase` + `close_convert_lead`), wired into `trackFreeAuditLead`, `trackOrderLead`, `trackContactLead`, and `trackAdsPurchase` across all 5 form surfaces and `PaymentReturn.tsx`. Also cleared conflicting account-level `customer.tracking_url_template` in Google Ads (`106-795-7298`) that appended a second `?utm_source=…` onto `ad.finalUrls`.
+
+**Prevent:** Never rely on `send_to: 'AW-…'` or browser-auto `form_submit` to populate GA4 Key Events on AJAX forms. Always pair Ads conversion calls with explicit GA4 Key Event calls (`qualify_lead`, `close_convert_lead`, `purchase`) after synchronous consent + GA4 config initialization.
+
+---
+
+## PIT-117 — Mobile Facebook / Meta Ads bounce (3.1s average duration) and m.facebook.com / referral misattribution
+
+**Tags:** meta-ads, ga4, splash, mobile, bclid, ttribution  
+**Seen:** 2026-10-20 — GA4 showed 15 m.facebook.com / referral sessions with 6.7% engagement and 3.1s duration, while udit-he.erythro.ai had 100% engagement and 50% lead conversion
+
+**Symptom:** Traffic from Facebook mobile In-App Browser (m.facebook.com, l.facebook.com, lm.facebook.com) to /, /audit, and /portfolio/* bounced within ~3 seconds and was bucketed into Organic Social ((referral)) instead of Paid Social (b / paid), and Meta Pixel missed PageView when consent was granted after initial load.
+
+**Cause (stack):**
+1. SplashHost.tsx only skipped the full-screen red <SplashScreen /> overlay on /lp/audit/* (udit-*.erythro.ai). Any ad pointing to /audit, /order/*, or carrying ?fbclid= / ?gclid= still rendered the full-screen SplashScreen overlay while JS bundles hydrated + animated for 1.5–3.5s in mobile WebViews.
+2. Meta Ads creatives had url_tags: None, so mobile clicks arrived with only ?fbclid=... and no utm_source / utm_medium.
+3. AnalyticsBootstrap.tsx calls bq('consent', 'revoke') before bq('track', 'PageView'), and AnalyticsLoader.tsx did not re-fire bq('track', 'PageView') after bq('consent', 'grant').
+
+**Fix:**
+1. shouldSkipSplashSurface() in src/lib/splash.ts (used by SplashHost.tsx) now skips <SplashScreen /> on /audit, /order/*, /lp/audit/*, udit-*.erythro.ai, and any URL with bclid, gclid, gbraid, wbraid, or utm_* query parameters.
+2. AnalyticsBootstrap.tsx and 
+eadCampaignConfigParams() in src/lib/adsConversion.ts automatically fall back to campaign_source: 'fb', campaign_medium: 'paid' when bclid is present without explicit utm_source, and google / cpc when gclid / gbraid / wbraid is present.
+3. AnalyticsLoader.tsx and ensureAnalyticsConsentAndGaConfig() fire bq('track', 'PageView') once (window.__ERYTHRO_META_PAGEVIEW_SENT__) immediately after bq('consent', 'grant').
+
+**Prevent:** Never show <SplashScreen /> on conversion routes (/audit, /order/*) or paid ad clicks (bclid/gclid/utm_*), and always include bclid/gclid attribution fallbacks in 
+eadCampaignConfigParams().
+
+---
+
+## PIT-118 — GSC sitemap / canonical conflicts (`/order/audit-manual`, `/portfolio/next-project`, `/order/ai-business-card`) and dev-host GA4 pollution
+
+**Tags:** `gsc`, `sitemap`, `seo`, `canonical`, `redirects`, `ga4`  
+**Seen:** 2026-10-20 — GSC URL Inspection & GA4 hostname audit (`properties/543568002`)
+
+**Symptom:**
+1. `/order/audit-manual` was listed in `sitemap.xml` even though it redirected (`307`) to `/audit` (`Page with redirect` in GSC).
+2. Draft placeholder `/portfolio/next-project` was listed in `sitemap.xml` and indexed in Google (`Submitted and indexed`).
+3. `/order/ai-smart-card` remained `Discovered - currently not indexed` while `/order/ai-business-card` stayed indexed (`Duplicate, Google chose different canonical than user`), because the CMS `Header` submenu still linked to `/order/ai-business-card` and `/order/ai-business-card` returned `200 OK` via `ORDER_SLUG_ALIASES`.
+4. Legacy `/portfolio/Interior` returned `404` despite active incoming views.
+5. `localhost`, `172.24.80.1`, and `*.vercel.app` accounted for ~19% of all GA4 events (`1,704` events across `100` dev/preview sessions).
+
+**Fix:**
+1. Added `isNonSitemapOrderSlug()` in `src/lib/orderPlans.ts` and `isHiddenPortfolioSlug()` (`next-project`) in `src/lib/portfolioProjects.ts`; filtered them out of `sitemap.xml`, `sitemapEntries.ts`, and `cmsPages.ts` (`v11` / `v4` cache bump).
+2. Added `sanitizeOrderHref()` in `src/lib/copyHygiene.ts` to rewrite `/order/ai-business-card` → `/order/ai-smart-card` in `Header` submenus and solution cards, plus `308` permanent redirects in `next.config.ts` and `src/app/(frontend)/order/[slug]/page.tsx` for `/order/ai-business-card` → `/order/ai-smart-card`, `/order/audit-manual` → `/audit`, `/portfolio/Interior` & `/portfolio/interior` → `/portfolio/pro-interior`, and `/portfolio/next-project` → `/portfolio`.
+3. Added `isProductionAnalyticsHost()` in `src/lib/vercelHost.ts` and guarded `AnalyticsBootstrap.tsx` / `AnalyticsLoader.tsx` so live GA4 / Google Ads / Meta Pixel hits only fire on `erythro.ai` and `*.erythro.ai`. Also upgraded GA4 Data Retention to `FOURTEEN_MONTHS` via GA4 Admin API.
+
+**Prevent:** Never include contact-only order plans (`checkoutMode === 'contact'`) or CMS placeholder slugs in `sitemap.xml`; always pair slug aliases with a `308` redirect + internal link hygiene; guard analytics bootstrap to canonical production hostnames.
+
+---
+
+## PIT-119 — Order plan «Далее» on AI-визитка jumps to Бесплатный старт
+
+**Tags:** `order`, `nav`, `slug`, `payload`, `cms`  
+**Seen:** 2026-10-20 — `/order/ai-smart-card` ProjectNav
+
+**Symptom:** On `/order/ai-smart-card`, **Далее** goes to `/order/free-start` and **Назад** to `/order/enterprise-custom` (circular wrap as if Smart Card were the last solution plan). Expected: prev = Free Start, next = Business Automation.
+
+**Cause:** CMS `solution-plans` row for Smart Card had slug `"ai-smart-card "` (trailing space). `mapOrderFromPlanDoc` kept the spaced slug; `extraStatic` then appended a clean static `ai-smart-card` because `cmsSlugs` only had the spaced key. `/order/ai-smart-card` resolved to that duplicate at the **end** of the nav list → wrap to `free-start`. Same class of bug as portfolio trailing spaces (PIT-109). Null solution slugs (`free-start`, `business-automation`, `enterprise-custom`) were masked by index fallback until order drifted.
+
+**Fix:**
+1. Trim slug in `mapOrderFromPlanDoc` + `getOrderPlanBySlug`; cache key `order-plans-v9-trim-slug`.
+2. `beforeValidate` on `solution-plans` trims `slug` on write.
+3. Prod DB: set missing/ spaced slugs (`free-start`, `ai-smart-card`, `business-automation`, `enterprise-custom`).
+4. Revalidate `payload-content` (or redeploy) so Vercel Data Cache drops the spaced list.
+
+**Prevent:** Always trim order-plan slugs on read and write. After CMS slug edits from scripts/SQL, revalidate live — local `revalidateTag` does not reach Vercel.
+
+---
+
+## PIT-120 — Ads traffic on `/audit` must land on dedicated language LPs
+
+**Tags:** `ads`, `middleware`, `audit`, `utm`, `landing`  
+**Seen:** 2026-10-20 — Google/Meta Final URL still hitting `https://erythro.ai/audit?…`
+
+**Symptom:** Paid clicks open the main-site `/audit` (cookie/splash/locale hop) instead of the fast dedicated LP (`audit-en|ru|he.erythro.ai`). Bounce and mis-locale; PIT-112 Final URL guidance alone is not enough when old ads or shared links still point at `/audit`.
+
+**Cause:** Campaign tags (`utm_campaign` with `_ru`/`_en`/`_he`, or `lang=`) arrive on the apex `/audit` path. Without a middleware hop, the visitor stays on the heavy main audit page.
+
+**Fix:** In `src/middleware.ts`, when pathname is `/audit` and campaign/lang resolves to `ru|en|he`, **307** to `https://audit-{locale}.erythro.ai/` preserving the query string; set `X-Robots-Tag: noindex, nofollow`. Prefer Final URL = dedicated host (PIT-112); this redirect is the safety net.
+
+**Prevent:** Keep ads Final URLs on `audit-{locale}.erythro.ai`. Do not remove the middleware redirect while legacy `/audit?utm_…` links exist.
+
+---
+
+## PIT-121 — Pro-offer email: logo missing (broken image) in Gmail/Outlook
+
+**Symptom:** Pro/nudge email header shows broken-image icons instead of the logo; `https://erythro.ai/images/logo/letterhead-full.svg` returns 200 `image/svg+xml`.
+
+**Cause:** Gmail and Outlook do not render SVG in `<img>`. Email used `letterhead-full.svg` + `email-header-plate.svg`.
+
+**Fix:** `src/lib/auditProOffer.ts` now uses `public/images/logo/letterhead-full-email.png` (354px, 2x, white baked in) and `email-header-plate.png`. Never use SVG for email images.
+
+---
+
+## PIT-122 — n8n autoresponder replies to DMARC aggregate reports → Microsoft `550 5.4.1`
+
+**Tags:** `n8n`, `email`, `autoresponder`, `dmarc`, `hostinger`  
+**Seen:** 2026-10-21 — `order@erythro.ai` → `dmarcreport@microsoft.com`
+
+**Symptom:** Hostinger NDR after a Microsoft DMARC aggregate lands in `order@`: *Recipient address rejected: Access denied* (`550 5.4.1`) while communicating with `microsoft-com.mail.protection.outlook.com`. Message deleted from queue. The XML report itself was already delivered.
+
+**Cause:** `rua=mailto:order@erythro.ai` receives reports From `dmarcreport@microsoft.com`. That mailbox is outbound-only. n8n `Process & Sign Autoresponder` skipped `no-reply` / `mailer-daemon` / `bounce` but not `dmarcreport@`, and DMARC subjects lack `Re:` so thread detection did not fire → branded auto-reply → Microsoft rejects → Hostinger NDR noise.
+
+**Fix:** In `infra/n8n/workflows/email-autoresponder.json` skip:
+1. `dmarcreport@` / `dmarcreportfeedback@` in the automated-sender regex;
+2. local-part `dmarc` / `rua` / `ruf` (and `dmarc-report` variants) → `report_sender`;
+3. subject `Report Domain:` or `DMARC … report` → `dmarc_report_mail`.
+Redeploy the live workflow (`scripts/deploy_n8n_email_autoresponder.py` or Import from File).
+
+**Prevent:** Any mailbox used as DMARC `rua`/`ruf` must treat report senders as automated — never auto-reply to them.
+
+## PIT-123 — Duplicate team@ Pro offer: worker timer + Vercel cron + n8n walker race
+
+**Tags:** `email`, `pro-offer`, `race`, `vercel-cron`, `audit-agent`  
+**Seen:** 2026-10-23 — submission 202, `pizza280784@gmail.com` (2 identical «הצעה מיוחדת עבור …» mails, 03:06 and 03:07 UTC; two copies in Hostinger Sent)
+
+**Symptom:** Two identical Pro-offer emails for one free audit. `contact_submissions` shows a single row with `pro_offer_status = sent`.
+
+**Cause:** `trySendAuditProOffer` (and nudge / reminder / paid_dev) did read-status → SMTP + IMAP APPEND → write status. The status stayed `scheduled` for the whole send (5–16 s). The audit-agent `setTimeout` (+15m) and Vercel cron `/api/audit/reconcile` (every 2 min, fires at `:50`) both fire right after `pro_offer_due_at`. Vercel logs: cron `GET /api/audit/reconcile` at 03:06:50 (20.8 s) and agent `POST /api/audit/internal/202/pro-offer` at 03:06:51 — both saw `scheduled`. ~5–13% of sends were exposed (send time / cron interval); submission 201 escaped by chance.
+
+**Fix:** Atomic claim before SMTP — `UPDATE contact_submissions SET pro_offer_lock_at = now() WHERE id = … AND <status guard per kind> AND (pro_offer_lock_at IS NULL OR pro_offer_lock_at < now() - 10 min) RETURNING id` (`claimProOfferSend`, migration `20261023_120000`). Lock is cleared in the same SQL as the final status write, released on SMTP failure, and expires after 10 min if the process dies. The status guard is part of the claim so a caller with a stale read cannot claim after another finished. Also: no 465→587 retry after a failure at `DATA` (message may already be accepted — retry would send a second copy).
+
+**Prevent:** Any "check state, then send, then mark" email path must claim the row atomically in SQL first. Never rely on a single timer — several triggers (timer, cron, walker) are by design. Test with concurrent callers (`tests/int/auditProOfferClaim.int.spec.ts`).
+
+## PIT-124 — QA Auditor false negative on custom AI chat / consultant widgets
+
+**Tags:** `qa-auditor`, `playwright`, `lead-capture`, `chat-widget`, `ai-consultant`  
+**Seen:** 2026-10-25 — erythro.ai audit missed active custom AI consultant (`ErythroConsultant` / `.chat-launcher`)
+
+**Symptom:** Audited site has an active AI consultant or custom chat widget, but the audit report shows `Живой чат — нет` / `hasChatWidget: false`, penalizing lead capture and recommending adding a live chat.
+
+**Cause:** Chat detection in `AuditCollector.java` checked only known 3rd-party SaaS iframe URLs (`tawk`, `crisp`, `intercom`, `zendesk`, `jivosite`, `livechat`) and generic `.chat-widget` / `.chatbot` classes. Custom React/Next.js widgets often use `.chat-launcher`, `.consultant-widget`, or lazy-mount on clicking a button with `aria-label="ИИ консультант"`.
+
+**Fix:** In `AuditCollector.java` (both `lead_capture` and `AGENT_PAGE_SNAPSHOT_SCRIPT`), expand `chatSelectors` to include:
+- `[class*="chat-launcher"]`, `[id*="chat-launcher"]`, `[class*="chat-trigger"]`, `[class*="chat-button"]`, `[class*="consultant"]`, `[id*="consultant"]`, `[class*="assistant"]`, `[id*="assistant"]`, `[class*="ai-chat"]`, `[id*="ai-chat"]`, `[data-chat]`, `[data-chatbot]`, `[data-consultant]`
+
+And add multilingual semantic scanning of `aria-label`, `title`, and `innerText` on interactive elements (`button, a, [role="button"]`) matching:
+`/(?:ai[- ]?(?:chat|assistant|consultant)|chat[- ]?(?:bot|widget|launcher)|(?:ии|ai)[- ]?(?:чат|консультант|ассистент)|(?:чат|онлайн[- ]?чат)|יועץ[- ]?ai|צ['׳]אט)/i`
+
+**Prevent:** Whenever new interactive contact launchers or custom AI widgets are added to the site design, verify that the QA auditor's DOM selector and keyword patterns recognize them.
+
+---
+
+## PIT-125 — QA Auditor false positives on browser/third-party console and runtime noise
+
+**Tags:** `qa-auditor`, `playwright`, `console-logs`, `pageerror`, `turnstile`, `csp`  
+**Seen:** 2026-10-25 — erythro.ai audit flagged 1 critical PageError (React #418 hydration mismatch) and 71 console noise messages, penalizing security/lead score and generating false critical alerts.
+
+**Symptom:** Audit report flags critical JavaScript crashes (`JavaScript падает в браузере и блокирует кнопки`, `PageError в рантайме`) and numerous console errors/warnings, although forms, interactive buttons, and all 10/10 funnel pages work properly in reality.
+
+**Cause:** 
+1. Cloudflare Turnstile inside its isolated sandbox iframe (`challenges.cloudflare.com`) tests browser environment capabilities by sending internal probes: `data:,` CSP reports, WebGPU/WebGL adapter queries (`powerPreference ignored`, `No available adapters`, `SwiftShader fallback`), audio/video decoder capability probes, and cross-origin `postMessage` origin checks.
+2. Next.js / PerformanceObserver emits non-fatal deprecation notices (`Deprecated API for given entry type`).
+3. Chromium / Edge emits subset font decompression warnings (`OTS parsing error: Size of decompressed WOFF 2.0 is less than compressed size`) and lazy-load notices (`[Intervention] Images loaded lazily`).
+4. Auditor's own internal script injection (e.g. `axe-core` from cdnjs) is blocked when the audited site enforces strict CSP `script-src`.
+5. Automated multi-locale emulation (forcing cookies/localStorage and reloading) triggers React #418 client hydration mismatch, which React automatically recovers from via client rendering.
+
+**Fix:** In `AuditCollector.java`, implement `isIgnorableConsoleMessage(text, location, type)` and `isIgnorablePageError(error)` to ignore:
+- Turnstile iframe sandbox messages (`challenges.cloudflare.com`, `turnstile`, `/challenge-platform/`, `data:,` CSP).
+- WebGPU / WebGL headless adapter fallback warnings (`powerPreference`, `no available adapters`, `swiftshader`).
+- Non-fatal deprecation logs (`Deprecated API for given entry type`).
+- WOFF/WOFF2 font subset OTS parsing notices.
+- Chromium browser interventions (`Images loaded lazily`).
+- Injected test scripts blocked by site CSP (`axe-core`, `cdnjs.cloudflare.com`).
+- Non-fatal React hydration recoveries (`React error #418`, `#423`, `#425`, `Hydration failed`).
+
+**Prevent:** Filter out sandbox/extension/browser-intervention noise in Playwright listeners before counting them towards runtime penalties or generating Top-3 executive vulnerability findings.
+
+---
+
+## PIT-126 — Facebook `?fbclid=` leaves a solid-red orphaned splash (portfolio / home “won’t open”)
+
+**Tags:** `meta-ads`, `splash`, `fbclid`, `hydration`, `isr`, `portfolio`  
+**Seen:** 2026-10-25 — Meta lead rollback; `https://erythro.ai/portfolio/rosso-garage?fbclid=…` shows only the red brand plate forever
+
+**Symptom:** Paid Facebook clicks (and any URL with `fbclid` / `gclid` / `utm_*`) appear to “not open”: HTTP 200, content in the accessibility tree, but the viewport stays solid red. Meta Quality / lead delivery rolls back. Reproducible in a normal browser with the same query string.
+
+**Cause (stack):**
+1. Root layout is ISR-static (`revalidate = 60`) and SSR’s `SplashHost` without the request query → `shouldSkipSplashSurface(pathname)` is `false` → full-screen `.splash-bg` is in the HTML.
+2. On the client, `fbclid` makes `skipSplash=true` → host returns `null`. Hydration mismatch can leave the SSR plate on `<body>` with **no React fiber** (orphan). GSAP never owns it; `opacity` stays `1`.
+3. PIT-117 added skip-by-query logic, but `SplashHost` only passed `pathname` (not `useSearchParams()`), and there was no pre-paint hide / orphan sweep — so Meta in-app browsers still hit the stuck plate.
+
+**Fix:**
+1. `SplashHost` reads `useSearchParams()` (inside `Suspense`) and passes `?…` into `shouldSkipSplashSurface`.
+2. `SPLASH_SKIP_BOOTSTRAP_SCRIPT` in the layout sets `html[data-erythro-skip-splash]` + `window.__erythroSplashDone` before paint; CSS hides `.splash-bg` under that flag.
+3. On skip, `sweepOrphanedSplashPlates()` removes any leftover `.splash-bg` nodes.
+
+**Prevent:** Never SSR-decide splash skip from pathname alone when paid-click query params matter. Keep the bootstrap + CSS hide + React sweep in sync with `shouldSkipSplashSurface`. After splash/skip changes, open `/portfolio/<slug>?fbclid=test` and confirm no `.splash-bg` remains.
+
+---
+
+## PIT-133 — Flat R2 media: `_objectkey = filename` doubles the public URL
+
+**Tags:** `r2`, `media`, `payload`, `storage-s3`
+**Seen:** 2026-10-26 — service header strips after SQL compress to WebP
+
+**Symptom:** Hero `<img src>` becomes `https://…r2.dev/header_14.webp/header_14.webp` (404, `naturalWidth: 0`). DB `media.url` looks correct.
+
+**Cause:** `@payloadcms/plugin-cloud-storage` afterRead builds the folder as `prefix + _objectKey`, then `generateFileURL` appends `filename`. Flat keys in this project historically keep `_objectkey` NULL. Setting `_objectkey` to `header_14.webp` made the folder equal the filename → doubled path.
+
+**Fix:** `UPDATE media SET _objectkey = NULL` for those rows. Compress script must not write `_objectkey` for flat keys. Harden `generateFileURL` so `prefix === filename` does not double.
+
+**Prevent:** Never set `_objectkey` to the file basename on flat R2 media. After SQL media edits, revalidate `site-content` (Save in admin or `/api/revalidate`).
+
+---
+
+## PIT-134 — Audit report CTA opens order page in the wrong language
+
+**Tags:** `audit`, `report`, `i18n`, `he`, `order`, `cta`
+**Seen:** 2026-10-26 — HE HTML sample → «Audit Pro» opened `/order/audit-pro` in Russian
+
+**Symptom:** From a Hebrew (or English) HTML report, checkout CTAs land on the order page in another locale (often RU from cookie / prefs).
+
+**Cause:** Links were bare `https://erythro.ai/order/audit-pro` (and diagnostic). `/order/[slug]` prefers `?lang=` then cookie; without `?lang=` the visitor's existing locale wins.
+
+**Fix:** Always append `?lang=he|en|ru` matching the report language — samples, v2 templates, `render-v2-reports.mjs` (`orderCheckoutUrl`), and `AuditReportI18n.unlockProUrl(lang)`.
+
+**Prevent:** Never hardcode order checkout URLs without `?lang=` in report HTML/generators. Redeploy audit-agent after Java/template changes so live client reports pick it up.
+
+---
+
+
+## PIT-146 — English "stub" and an "in head" claim inside RU/HE text of the GA4 / Consent Mode check
+
+**Tags:** `audit`, `i18n`, `ga4`, `consent-mode`, `report-text`
+**Seen:** 3 times — myblindspot.eu RU, report 238 (sirton.co.il HE), report 240 (bigcars.co.il HE); logged as MI-003 in `docs/audit/minor-issues.md`
+
+**Symptom:** The "GA4 / dataLayer readiness" row read "dataLayer + consent stub (Consent Mode default) (GA4 G- ID נמצא)" and in the recommendation "Consent Mode stub כבר ב-<head>" — English words inside RU/HE text, and a claim that the default sits in `<head>` even when it comes from an app bundle or a consent plugin (AUD-231).
+
+**Cause:** The RU/HE strings in `AuditCollector` (check row), `A44Recommendations.ga4`, `ReportFindingsCatalog` (GA4 finding) and `ReportScopeOfWork` were translated word by word from the English "consent stub" / "stub only".
+
+**Fix:** Localized wording without "stub": "Consent Mode по умолчанию" / "ברירת מחדל של Consent Mode"; the good state no longer says "in <head>" (the recommendation to add it still says <head>); "stub only" → "G- ID не найден" / "no G- ID" / "לא נמצא G- ID". Generated `audit_template_*` copies are not edited by hand — they refresh on the next render.
+
+**Prevent:** No English technical slang in RU/HE strings unless it is a name (Consent Mode, dataLayer). A "found" message must not assert where the code lives unless the collector measured it. Redeploy the VPS audit worker after Java text changes; samples on the site refresh only when rebuilt.
+
+---
+
+## PIT-145 — Pro hid the open sign-up behind another lead form (start form + /whitepaper)
+
+**Tags:** `audit`, `diagnostic`, `pro`, `lead-capture`, `render-v2`
+**Seen:** 2026-10-27 — myblindspot.eu, Diagnostic vs Pro RU (local runs on the worker's code)
+
+**Symptom:** Both tiers submitted the homepage start form and reached `/signup?domain=…` (name, email, password, no anti-spam, no OAuth). Diagnostic (5 pages) reported it: finding "Форма регистрации после формы запуска открыта для ботов", "Форма запуска → регистрация" in "Путь к заявке". Pro (10 pages) also crawled `/whitepaper`, a real email form without anti-spam, and said nothing about the sign-up: only "Лид-формы открыты для ботов", lead check "На главной форм нет". The dearer tier reported less. The checklist also had two identical rows "Страница воронки · /signup" (`/signup` and `/signup?next=…`).
+
+**Cause:** PIT-144 gated the step behind the start form on "no other lead form": `entryOnly = effectiveForms == 0 && …` in the lead check, `entryFormOnly` for the findings context (`ReportFindingsCatalog`), `entryForm = !hasForm && …` in `leadPathFromData`. Any lead form anywhere on the funnel switched the whole start-form branch off. Funnel page rows were labelled by path only.
+
+**Fix:** The step is read whenever the homepage has a start form (`entryStepSeen` / `entryStep` gated on `entryFormsCount > 0`), next to the other forms: the lead check appends the step detail and takes the worse status (`statusRank`), `rec_variant` follows the worse one; the start-form findings no longer require `entryFormOnly` (the lead score is unchanged); "Путь к заявке" shows both channels ("Форма на странице", "Форма запуска → регистрация"), names both in the verdict and takes the weaker anti-spam. "На главной лид-формы нет (только форма запуска)". Funnel rows whose path repeats show their query.
+
+**Prevent:** A branch that adds information must not be switched off by an unrelated signal. When a paid tier crawls more pages, it must report at least what the cheaper tier reports — compare Diagnostic and Pro on the same site after lead-capture changes.
+
+---
+
+## PIT-144 — Free calls a "check your site" URL field an unprotected lead form; consent stub missed on SPAs
+
+**Tags:** `audit`, `free`, `lead-capture`, `ga4`, `render-v2`
+**Seen:** 2026-10-27 — AUD-231 (myblindspot.eu, Lovable/Vite SPA, Free RU)
+
+**Symptom:** Top-1 and Step 1 "Lead forms are open to bots — Critical" for the site's only form: one URL field + submit (`Email: no, phone: no, submit: yes`). Its contact is asked on the next step (sign-up with name and email), which Free never opens. GA4 "consent stub incomplete" while `window.dataLayer` held a full `consent default` (all four keys denied).
+
+**Cause:** The homepage form scan (`LEAD_AND_RTL_SCRIPT`) skipped only search forms and counted any other form as a lead form; the contact-field rule existed only in the agent snapshot (Diagnostic/Pro). `gtagConsentStub` looked for `consent` in inline scripts only; a bundled app queues it from its JS. In render, the agent's homepage snapshot `formsCount` also counted the start form as an on-page form.
+
+**Fix:** A form with one visible URL/site field and no email/phone/textarea is an entry form: counted in `entryFormsCount`, excluded from `formsCount`. The lead check becomes status `na` ("Не проверено в Free" / "Не проверено"), `rec_variant=entry`, no "no form" / "unprotected" findings, no lead-form plan step; the scale counts it as a path (+25, +5). Free states that it does not submit the form or open the sign-up step and that the full check is in Diagnostic and Pro ("Путь к заявке" verdict and the checklist note). render uses `leadFormsCount` from agent snapshots when present. Consent counts `['consent','default',…]` queued in `window.dataLayer`.
+
+**Prevent:** A finding about a step the audit does not open must say "not checked", never pass or fail. Test lead checks on a start-form funnel (URL → sign-up), not only on contact-form sites.
+
+**Follow-up (paid tiers go past the start form):** Free promised the full check in Diagnostic and Pro, but they also stopped at the form. Now, with `AUDIT_TIER=DIAGNOSTIC` or `PRO` (never Free, never the local all-tiers run, whose crawl also feeds Free), the agent browse fills the homepage start form with the site's own origin and submits it once (`ENTRY_FORM_SUBMIT_SCRIPT`), then only observes the page that opens (`ENTRY_STEP_SCRIPT` → `agent_browse.entry_step`): `kind` signup / signin / contact / oauth / started, the name/email/phone/password fields, anti-spam (Turnstile, reCAPTCHA, hCaptcha, honeypot) and OAuth buttons (Google / Apple count as protection). It never types credentials or creates an account. Lead check (`entryStepStatus`): protected contact step = good; sign-up/sign-in without protection = warn (email confirmation is not visible); plain contact form without protection = bad; service started without sign-up = bad (warn if the start form itself is protected); unrecognised step = `na` as before. Findings "Форма регистрации после формы запуска открыта для ботов" / "Форма запуска работает для ботов: сервис стартует без регистрации", `rec_variant` entry_protected / entry_unprotected / entry_started; the "Путь к заявке" block shows the step, its path and a real status (Free still reads "не проверено в Free"). `isEntryForm` is one shared JS snippet (`IS_ENTRY_FORM_JS`) for the locale probe, the agent snapshot (now also `entryFormsCount`) and the submit. Checked on myblindspot.eu: `/signup?domain=myblindspot.eu`, name + email + password, no anti-spam, no OAuth → Diagnostic/Pro "Требует внимания".
+
+**Local check pitfall:** on Windows the checkout has CRLF templates, so `render-v2-reports.mjs` fails with "anchor end not found" on `    </div>\n  </section>`; convert the scratch copy to LF. Java in a temp dir under a non-ASCII user path fails with "Unable to establish loopback connection": pass `-Djdk.net.unixdomain.tmpdir=<ASCII dir>`.
+
+---
+
+## PIT-143 — Diagnostic/Pro treat the en+ru+he probes as the site's languages
+
+**Tags:** `audit`, `diagnostic`, `pro`, `locales`, `agent-browse`, `render-v2`
+**Seen:** 2026-10-27 — manual Diagnostic + Pro runs for gillemitzvot.co.il (Hebrew-only WordPress)
+
+**Symptom:** axe ×3 (6 vs 2), "Locale EN/RU · needs attention", "three languages" protocol, L1 "sitemap 0", "robots.txt: 200" for HTML, homepage crawled twice (www + apex), raw Playwright timeout stack in the report, "broken pages" step with the headers snippet, dead `#diag-speed` / `#action-lead`.
+
+**Cause:** Paid tiers probe `LOCALES=en,ru,he`; `LocalePresence.forReport` dropped absent locales only for RTL. AI/L1 used the typed origin. URL keys kept the typed host. Raw error text stored. "broken" classified as `sec`. Links built before anchors are known.
+
+**Fix:** Drop any probed locale the site does not serve; axe = distinct rules on served locales; AI/L1 on `site_origin`; URL keys without `www.`; timeout → `timeout_45s` + plain sentence; `funnel` pillar with its own snippet; final pass repoints dead `#action-*/#diag-*` links; protocol counts from `locales_audited`.
+
+**Prevent:** Never count or report a probed locale before checking the site serves it. Test paid tiers on a single-language site.
+
+---
+
+## PIT-142 — "No sitemap" on a www URL and an "hreflang & OG" step for a Hebrew-only site
+
+**Tags:** `audit`, `seo`, `sitemap`, `hreflang`, `render-v2`
+**Seen:** 2026-10-27 — AUD-229 (gillemitzvot.co.il, WordPress + Yoast, Free HE)
+
+**Symptom:** SEO 74 with "no sitemap" (−10) although the site has a Yoast sitemap. Plan step 3 "hreflang и OpenGraph" for a site in Hebrew only with every OG tag present.
+
+**Cause:** (1) robots.txt and sitemap were fetched at the typed origin `www.` only; there `/sitemap.xml` is 404 (Yoast redirects only on the apex where the homepage lands) and `/sitemap_index.xml` was never tried. (2) "Multilingual" meant "audited in several locales" (`LOCALES=en,ru,he`), not "the site serves several languages". (3) The SEO filler step had one fixed title whatever pulled the scale down. (4) The "multilingual funnel" top-3 pad claims "locales work" for any site.
+
+**Fix:** robots/sitemap use the origin the homepage lands on, then the typed one, and try `/sitemap.xml`, `/sitemap_index.xml`, `/wp-sitemap.xml`, `/sitemap-index.xml`. The DOM scan records `seo_assets.siteLanguages` / `languageSwitcher` (html lang, hreflang, switcher links incl. `/il/he/`, `?lang=`, subdomains, and button switchers with ≥2 language labels). hreflang costs points and shows as a gap only when the site has >1 language. `seoCausesFromData()` picks the SEO step by cause or drops it. The multilingual pad is skipped for single-language sites.
+
+**Prevent:** Never treat the requested audit locales as the site's languages. Check HTTP resources at the landed origin. Every filler step must say which signal it fixes.
+
+---
+
+## PIT-141 — Report snippets named our own Next.js files; detector allowed several CMS at once
+
+**Tags:** `audit`, `report`, `render-v2`, `tech-detect`
+**Seen:** 2026-10-27 — AUD-226 review (OpenCart site got `next.config.mjs:15-32`, `src/components/Footer.tsx:55-80`)
+
+**Symptom:** Every action-plan code box was titled with a file and line range from the erythro.ai repo, and the code was Next.js/React. A client on OpenCart, WordPress or Wix has none of those files. The detector could list Shopify, Squarespace and Webflow side by side.
+
+**Cause:** `ACTION_CODE_SOLUTIONS` was written against our own codebase. Platform rules were independent booleans with no notion that a site runs one CMS.
+
+**Fix:** Snippets are platform-neutral and titled with a neutral place (`where`), never a file or line. Platform rules return a score (4 meta generator, 3 runtime / platform-only markup, 2 own asset or CDN); Java `pickPlatform` keeps the single best score and shows none on a tie. Added OpenCart, Magento, PrestaShop, WooCommerce/Elementor (only under WordPress).
+
+**Prevent:** Automated reports never name the client's files: file-level analysis is manual-audit only, in every tier. New platform rules need a host, runtime or generator marker and go into `platformRules`.
+
+---
+
+## PIT-140 — Audit flags "Disallow: / for AI bots", Shopify+Squarespace+Webflow and drops the lead step
+
+**Tags:** `audit`, `report`, `render-v2`, `robots`, `tech-detect`, `free`
+**Seen:** 2026-10-27 — AUD-226 (bliainara.co.il, OpenCart, Free HE)
+
+**Symptom:** (1) Top-3 said "robots Disallow: / לבוטי AI", while robots.txt was `User-agent: *` + empty `Disallow:`. (2) "Detected technologies" listed Shopify, Squarespace and Webflow at once. (3) The action plan had 3 steps; lead capture (scale 45, no form, WhatsApp only) had none. (4) The lead check was "Критично" while the "Путь к заявке" block said "Требует внимания", and its recommendation read "if no form … / if a form …". (5) The AI step's fix offered /llms.txt the site already had and pointed at `public/robots.txt:1-8`.
+
+**Cause:** (1) `robotsHasDisallowRoot` treated an empty `Disallow:` as a root block; RFC 9309 says it allows everything. (2) Platform rules matched the bare words `shopify` / `squarespace` / `webflow` anywhere in HTML+JS; Font Awesome ships `.fa-shopify` etc. (3) PIT-138 dropped the Turnstile filler step when there was no form (`contradicted.lead = isProtected || !hasForm`) instead of swapping it for "add a lead form". (4) Java lead status was `bad` for any `formsCount == 0` and the recommendation was keyed on status only. (5) The catalog fix text was a fixed list; snippets used Next.js paths.
+
+**Fix:** Empty `Disallow:` counts as allow-root; root block is `Disallow: /` or `/*`. Platform rules need a host or runtime marker (`cdn.shopify.com`, `myshopify.com`, `squarespace.com`, `sqsp.net`, `html[data-wf-site]`, `website-files.com`). Without a form the lead filler becomes "Добавить лид-форму…" with the `lead_form` snippet. No form + messenger/chat → `warn`; the row carries `rec_variant` (`no_form` / `unprotected` / `form_fields`) for a single-case recommendation. The AI fix names the gaps found; the robots snippet points at `/robots.txt`.
+
+**Prevent:** Detector rules never match a bare product name. A filler step contradicted by data is replaced by the step that fits the data, not removed. Check robots parsing against an empty `Disallow:`.
+
+---
+
+## PIT-139 — Free checklist showed another client's checks (or nothing)
+
+**Tags:** `audit`, `report`, `render-v2`, `free`, `privacy`
+**Seen:** 2026-10-27 — AUD-218 empty checklist; code review showed the leak path
+
+**Symptom:** Free report checklist was empty under "Результаты: 5 из 28". In other runs it could list 5 checks of a **different site**: the last Pro audit in the worker container.
+
+**Cause:** Java FREE rendered only `freeLockedChecksSection`, so its HTML had no `check-card`. `renderReport` then walked candidates down to `reports/pro/a44-audit-report_<lang>.html`. The worker runs one tier per audit (`AUDIT_TIER` in `runQaAuditor.js`), and `reports/` lives in the container with no volume, so that Pro file belonged to whichever client ran Pro last. With no Pro file (fresh container) the list was empty.
+
+**Fix:** Java FREE appends hidden `free-check-data` cards built from `view.checkRows` with `rec-body`. `renderReport` reads only its own tier's files, and only ones not older than this run's `audit_data.json`. `pickFreeChecks` lets GA4 through, so Free has its 5 checks.
+
+**Prevent:** The renderer never reads another tier's or another run's Java HTML. Test single-tier runs (`AUDIT_TIER=free`) in a folder that holds another site's Pro report.
+
+---
+
+## PIT-138 — Free report contradicts itself: "no form" in top-3, "lead path OK" below
+
+**Tags:** `audit`, `report`, `render-v2`, `free`
+**Seen:** 2026-10-27 — AUD-218 (theme.madsparrow.me, Free RU)
+
+**Symptom:** Top-3 and Step 1 said "На сайте нет формы захвата заявок", while "Путь к заявке" said "Исправен — форма и мессенджеры работают", "1/1", "Антиспам OK". Step 1 was tagged "Скорость" and showed the LCP preload snippet from our own Next.js repo. AI steps were also tagged "Скорость". A Turnstile step sat next to detected reCAPTCHA. The funnel lock card was printed twice, and the checklist was empty under "Результаты: 5 из 28".
+
+**Cause:** (1) The "Путь к заявке" block (channels, steps, verdict, badge) was static template copy for every tier. (2) `classifyActionPillar` had no keywords for "ИИ", "формы", "заявок", RTL, OG, robots, so those findings fell through to `speed`, and the Free branch used `ACTION_CODE_SOLUTIONS[pillar] || speed`. (3) Filler steps were added whenever a pillar had a code snippet (`issues.length > 0 || ACTION_CODE_SOLUTIONS[pKey]`). (4) The template already ships the funnel lock card, and the render appended a second one. (5) The Java "no form" finding ignored messengers and chat. (6) Empty checklist: see PIT-139.
+
+**Fix:** `leadPathFromData()` builds the block from `lead_capture` + `agent_browse` (Free: homepage, Diagnostic: 5 pages, Pro: all). The classifier covers every `ReportFindingsCatalog` title, plus `solutionFor()` and a new `lead_form` snippet. Filler steps need a failing check or a weak scale, and are dropped when the data contradicts them. The funnel lock card is replaced, not appended. Java: "no form" fires only without a form *and* without an instant channel, and top-3 holds one AI finding. An empty checklist says so honestly instead of "5 из 28".
+
+**Prevent:** Never ship verdict text in a template; every status line comes from `audit_data`. A new finding title in the catalog must hit a keyword in `classifyActionPillar` (run the title list through it).
+
+---
+
+## PIT-137 — Admin re-queue resent client report email (+ reset pro-offer)
+
+**Tags:** `audit`, `email`, `requeue`, `pro-offer`
+**Seen:** 2026-10-26 — `adi_g@maabarot.com` (AUD-209) got two report emails ~22:18 and ~23:16
+
+**Symptom:** Second client “report ready” mail after an admin re-queue; pro-offer could be re-scheduled even after already sent.
+
+**Cause:** Worker treated every successful run as a fresh funnel: `notifyClient` defaulted true, and `scheduleProOfferEmail` always reset `proOfferStatus` → `scheduled`.
+
+**Fix:** Admin `/api/audit/admin/requeue` sends `notifyClient: false`. Worker skips SMTP when false. `scheduleProOfferEmail` no-ops if status is not `none`/`skipped`. After a mistaken reset, set `pro_offer_status='sent'` when `pro_offer_sent_at` is already set.
+
+**Prevent:** Never re-queue with client notify for polish-only re-renders. Persist `detectedTechnologies` into `audit_summary` on every run (chips in HTML ≠ empty CMS summary).
+
+---
+
+## PIT-136 — Cleaning WIP Java dropped the v2 report pipeline (old A4-4 shipped)
+
+**Tags:** udit, 
+eport, pro-v2, deploy, multi-agent
+**Seen:** 2026-10-26 — after VPS redeploy for PIT-135, client report HTML was the old A4-4 template again
+
+**Symptom:** Live free/diagnostic/pro udit-report_*.html looks like legacy A44 layout (no modern v2 sections / polish).
+
+**Cause:** Local uncommitted WIP had generateV2Reports + PRO 44-audit-report_* naming. Aligning Java to HEAD for a clean deploy removed that wiring. Worker then wrote A44 straight to udit-report_*.html and never ran 
+ender-v2-reports.mjs / RenderV2Pdf.
+
+**Fix:** Restore from lab: PRO → 44-audit-report_*; after A44 export call AuditCollector.generateV2Reports → 
+ode scripts/render-v2-reports.mjs + RenderV2Pdf. Keep pply-v2-polish.cjs in the image.
+
+**Prevent:** Do not strip generateV2Reports / 44- naming when cleaning unrelated WIP. Smoke: after redeploy, open a fresh report and confirm v2 markup (not A4-4 chrome).
+
+---
+
+## PIT-135 — Audit report “Detected technologies” was a hardcoded Erythro demo stack
+
+**Tags:** `audit`, `report`, `pro-v2`, `fingerprint`, `technologies`
+**Seen:** 2026-10-26 — every free/diagnostic/pro HTML showed Next.js / React / Cloudflare / Turnstile / GA4 / WhatsApp / Telegram / JSON-LD regardless of client site
+
+**Symptom:** Client audit reports claim technologies that belong to erythro.ai, not the audited origin.
+
+**Cause:** `render-v2-reports.mjs` used a constant `DETECTED_TECH`; templates shipped the same chips. No `detected_technologies` field was written to `audit_data.json`.
+
+**Fix:** `AuditCollector` runs a homepage DOM fingerprint + merges `technology_headers` / lead messengers into `detected_technologies`. Renderer fills chips from that array only (empty → localized “none detected”). Never reintroduce a demo list.
+
+**Prevent:** Any new tech chip must come from collector signals. Redeploy audit-agent after Java/script changes; re-run an audit to refresh samples.
+
+---
+## PIT-127 — Pro v2 report HTML silently overwritten: all design disappears
+
+**Tags:** `audit`, `report`, `pro-v2`, `multi-agent`, `overwrite`
+**Seen:** 2026-10-25 — twice in one evening every v2 copy (RU/EN/HE, five locations) lost its CSS polish, "Шаг N" badges and sorted actions
+
+**Symptom:** The report looks like the old version again (P1 priority badges, no accordion styling, hover effects gone), although edits were made and verified minutes earlier.
+
+**Cause:** The v2 HTML exists in ~15 copies that other agents/processes also write (dev-lab `templates/` + `reports/pro-v2/`, project `public/samples/audit/`, worker `reports/pro-v2/`). A copy step from another session replaced all of them with its own version.
+
+**Fix:** All design work lives in `services/audit-agent/QA_Auditor/scripts/apply-v2-polish.cjs` (mirror in dev-lab `QA_Auditor/scripts/`): idempotent CSS block between `v2-polish:start/end` markers + markup tweaks. Re-run it, then `render-v2-pdf.cjs`.
+
+**Prevent:** Never hand-edit a single v2 copy. Change the script, run it on every copy, regenerate the PDFs. Long-term: make the generator emit v2 so no patching is needed.
+
+---
+
+## PIT-128 — Chromium print: `box-decoration-break: clone` and fixed-height flex corrupt PDF pages
+
+**Tags:** `pdf`, `playwright`, `print-css`, `fragmentation`, `chromium`
+**Seen:** 2026-10-26 — Pro v2 PDF
+
+**Symptom:** In the PDF the last items of one section are painted over the first block of the next section (overlap), or the third card of a section disappears entirely.
+
+**Cause:** (1) `box-decoration-break: clone` on a section card that contains `<details>`/grid children mis-sizes the last fragment. (2) A fixed `height` on a flex container that must fragment across pages drops the overflowing child.
+
+**Fix:** Long sections (top-3, actions, checklist) print frameless (transparent card, items are cards themselves). Fill a page with per-card `min-height` (top-3: 71mm) instead of fixed container height. Keep short sections whole with `break-inside: avoid`.
+
+**Prevent:** After any print-CSS change render the PDF and look at every page (pdf.js in Playwright works without poppler). Margins at a fragmentation break are truncated — put spacing inside blocks or use borders.
+
+---
+
+## PIT-129 — PDF: only one accordion open, white page margins, locked output files
+
+**Tags:** `pdf`, `details`, `playwright`, `windows`
+**Seen:** 2026-10-25/26
+
+**Symptom:** (a) Checklist prints with only the last item expanded. (b) White strips around the grey page background. (c) `RenderV2Pdf.java` aborts: "file is used by another process"; the PDF in the viewer stays old.
+
+**Cause:** (a) `<details name="audit-checklist">` is an exclusive group — opening all closes the others. (b) Chrome never paints `@page` margins. (c) Windows locks a PDF open in a viewer.
+
+**Fix:** (a) Remove the `name` attribute and open all (`render-v2-pdf.cjs` + `matchMedia('print')` handler in the HTML). (b) `@page{margin:0}` and rebuild 10mm/8mm spacing with a wrapper table whose `thead`/`tfoot` repeat per page (reset inherited `td` styles: `text-transform`, `text-align`, `font`). (c) `render-v2-pdf.cjs` writes `*.new.pdf` next to a locked target and prints which file was locked.
+
+**Prevent:** Close the viewer before regenerating; if the user "sees no changes" in a PDF, check for a `.new.pdf` or a lock first.
+
+---
+
+## PIT-130 — Local QA Auditor run fails: `Unable to establish loopback connection` (JDK 17 and 21)
+
+**Tags:** `qa-auditor`, `java`, `windows`, `httpclient`, `loopback`
+**Seen:** 2026-10-25 — dev machine (Windows 11 build 26300)
+
+**Symptom:** `mvn compile exec:java` crashes after the Playwright steps at "TTFB, security headers, robots.txt" with `java.io.IOException: Unable to establish loopback connection: Invalid argument: connect`. A 6-line Java `HttpClient` probe fails the same way, also with `-Djava.net.preferIPv4Stack=true`, `useFastTcpLoopback=false` and JDK 21.
+
+**Cause:** On Windows the JDK selector wake-up pipe (`PipeImpl`) is a Unix-domain socket created in the user temp folder. The temp path here contains Cyrillic (`C:UsersВадимAppDataLocalTemp`), and `connect` on that socket path fails with `Invalid argument`. Not the sandbox (same error outside it), not the site.
+
+**Fix (2026-10-26, confirmed):** point the JDK at an ASCII-only folder for that socket:
+
+```bash
+MAVEN_OPTS="-Djdk.net.unixdomain.tmpdir=C:/agents/website-auditor/tmp" mvn -q compile exec:java
+```
+
+The full Pro run (10 funnel URLs, 3 locales, PSI, Gemini) then completes locally. VPS / GitHub Actions remain an option.
+
+**Prevent:** Any Java tool on a machine whose user folder is not ASCII needs `-Djdk.net.unixdomain.tmpdir=<ascii path>`. Test with the minimal `HttpClient` probe before blaming the auditor code.
+
+---
+
+## PIT-131 — Idempotent text patches: replacement that contains its own source text
+
+**Tags:** `scripts`, `i18n`, `he`, `idempotency`
+**Seen:** 2026-10-26 — Hebrew checklist title became "שיקוף שיקוף שיקוף … RTL ופריסה לישראל"
+
+**Symptom:** A heading repeats a word dozens of times after the polish script was re-run.
+
+**Cause:** The patch replaced `RTL ופריסה…` with `שיקוף RTL ופריסה…`; the result still contains the search text, so every run prepended one more `שיקוף`.
+
+**Fix:** In `apply-v2-polish.cjs`, a fix whose result contains its source is normalised first (`result → source`) and then applied once; the damaged title is repaired by regex.
+
+**Prevent:** Re-run a patch script twice and diff the output; replacement text must not contain the search text.
+
+---
 
 ## Checklist before merging CMS / schema PRs
 
@@ -1879,6 +2463,9 @@ After a Payload or storage-plugin bump, diff the generated Drizzle schema agains
 - [ ] Audit order/form intake must POST structured website / auditLanguage / planSlug (PIT-030)
 - [ ] No hardcoded API keys / `AIza…` in source; secrets only via env (PIT-039)
 - [ ] n8n IMAP autoresponder: Hostinger Autoreply/Vacation must be Off (PIT-040)
+- [ ] Ads `/audit?utm_…`: middleware 307 → `audit-{en|ru|he}.erythro.ai` (PIT-120)
+- [ ] Commercial email senders: atomic SQL claim before SMTP (PIT-123)
+- [ ] n8n IMAP autoresponder: skip DMARC/`dmarcreport@` / `rua`/`ruf` senders (PIT-122)
 - [ ] User-supplied website check: DNS + public IP only, never HTTP-fetch the URL (PIT-041)
 - [ ] Rounded pill inputs: clip autofill or set input radius + `:-webkit-autofill` override (PIT-042)
 - [ ] Turnstile: CSP `frame-src` + `worker-src blob:` + sitekey `NEXT_PUBLIC_` (or `TURNSTILE_SITE_KEY` map); prod hostnames without localhost (PIT-043)
@@ -1899,7 +2486,7 @@ After a Payload or storage-plugin bump, diff the generated Drizzle schema agains
 - [ ] Funnel review: CTA-opened modal forms and chat/WhatsApp count as a lead path; disclose the method in the Pro block (PIT-068)
 - [ ] Form-mail “not arriving”: check Hostinger INBOX (not Unread); `team@` password is not `SMTP_PASS` (PIT-054)
 - [ ] Contact honeypot must not be named company/website/email — mobile autofill silent-drops leads (PIT-055)
-- [ ] Shared frontend layout / not-found must not call `cookies()`; middleware must not Set-Cookie on HTML; use `force-static` + `getPayloadLocal` for ISR HIT (PIT-056)
+- [ ] Shared frontend layout / not-found must not call `cookies()`; middleware must not Set-Cookie on HTML; use `force-static` + `getPayloadLocal` for ISR HIT; `/services/[slug]` metadata must not read cookies (PIT-056)
 - [ ] Hero LCP media: CSS `lg:block` poster in SSR HTML, not `useState(isLg)` gate (PIT-057)
 - [ ] Absolute CDN hero stills: preload + `<img>` direct URL, skip `/_next/image` when bytes unchanged (PIT-058)
 - [ ] Home hero: no static import of HeroMotionText/GSAP before LCP (PIT-059)
@@ -1934,9 +2521,29 @@ After a Payload or storage-plugin bump, diff the generated Drizzle schema agains
 - [ ] Consult Sessions transcript: custom Field/Cell, not Payload JSON/Monaco (PIT-096)
 - [ ] Consultant: reply language from last user message; How we work card; do not start ТЗ on collaboration (PIT-097)
 - [ ] PayPlus: paid only after IPN amount + `submission:` id; success page is not proof; no unpaid fallback (PIT-099)
+- [ ] Audit reconcile: never queue `paymentStatus` pending/failed or amount>0 unless paid (PIT-114)
 - [ ] Grow: paid only after `getTransactionInfo` status `2` + amount + process token; success `response=success` is not proof; still call `approveTransaction` (PIT-100)
 - [ ] Payload / storage-plugin bump: compare the generated schema with prod columns for every collection; smoke `/api/media` on the preview; after a DB fix revalidate `site-content` (PIT-104)
 - [ ] Gemini 3.x: no `temperature` / `top_p` / `top_k` / `thinking_budget` on GenerateContent or `streamText` (PIT-106)
 - [ ] Audit report links: always `/audit/report/[id]?k=…`; never bare id (PIT-107)
 - [ ] Supabase: `anon` must not SELECT Payload `public` tables; keep REST schemas empty (PIT-110)
-
+- [ ] After `vercel env pull`: `[SENSITIVE]` placeholders — fill from `.env` or Save in admin to revalidate (PIT-111)
+- [ ] Ads free-audit Final URL: `audit-en` / `audit-ru` / `audit-he`.erythro.ai, not `/audit` (PIT-112; not `audit-rus` — NXDOMAIN)
+- [ ] GA4 conversions on AJAX forms: always fire explicit `qualify_lead` / `close_convert_lead` / `purchase` (`send_to: G-…`) after synchronous consent + GA4 config init (`ensureAnalyticsConsentAndGaConfig`), not just `send_to: AW-…` (PIT-116)
+- [ ] Splash only on `/`; skip all inner routes + paid ad clicks (`fbclid` / `gclid` / `utm_*`) / `/audit` / `/order/*` via `useSearchParams` + pre-paint bootstrap (`shouldSkipSplashSurface`, PIT-117 / PIT-126) and auto-attribute `fb / paid` or `google / cpc`
+- [ ] Sitemap & canonicals: exclude `checkoutMode === 'contact'` (`audit-manual`) and placeholder portfolio slugs (`next-project`) from `sitemap.xml`, 308-redirect legacy aliases (`/order/ai-business-card` → `/order/ai-smart-card`, `/portfolio/Interior` → `/portfolio/pro-interior`), and restrict GA4/Ads/Meta beacons to `erythro.ai` / `*.erythro.ai` (`isProductionAnalyticsHost`, PIT-118)
+- [ ] Solution-plan slugs: trim on read/write; no trailing spaces or null slugs — else order ProjectNav wraps to Free Start (PIT-119)
+- [ ] Email images: PNG/JPG only, never SVG (Gmail/Outlook show broken image) (PIT-121)
+- [ ] Pro v2 report: change `apply-v2-polish.cjs`, never hand-edit one copy; re-run it + `render-v2-pdf.cjs` after any overwrite (PIT-127)
+- [ ] PDF print CSS: no `box-decoration-break: clone`, no fixed-height flex over page breaks; look at every PDF page (PIT-128)
+- [ ] PDF: open all `<details>` (drop `name`), `@page{margin:0}` + wrapper table, watch for locked files / `.new.pdf` (PIT-129)
+- [ ] Local QA Auditor on Windows with a non-ASCII user folder: run with `MAVEN_OPTS=-Djdk.net.unixdomain.tmpdir=<ascii path>` (PIT-130)
+- [ ] Patch scripts must be idempotent: replacement must not contain the search text (PIT-131)
+- [ ] Free report navigation anchors: non-action pillars must anchor to open checklist details (`#diag-*`) or `#locked-checks`, never nonexistent `#action-*` cards (PIT-132)
+- [ ] Flat R2 media keys: keep `media._objectkey` NULL; never set it to the filename or Payload afterRead builds `file.webp/file.webp` (PIT-133)
+- [ ] Audit report order CTAs: always `?lang=` matching report locale (PIT-134)
+- [ ] Detected technologies: only from `audit_data.detected_technologies`; never a hardcoded demo stack (PIT-135)
+- [ ] Audit report status blocks ("Путь к заявке", verdicts, badges) only from audit_data; new catalog titles must classify in `classifyActionPillar` (PIT-138)
+- [ ] render-v2 reads only its own tier's Java HTML from this run; never fall back to another tier's file (PIT-139)
+- [ ] Lead check: a start form (URL field → sign-up) is `na` "not checked" in Free; Diagnostic/Pro submit it once with the site origin and judge the step that opens, never typing credentials (PIT-144)
+- [ ] Start form next to other lead forms: Diagnostic/Pro still judge the step behind it and report both; a paid tier never reports less than a cheaper one (PIT-145)
