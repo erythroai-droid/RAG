@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
-  "updatedAt": "2026-11-12T10:40:23.610Z",
-  "totalReferences": 1,
+  "updatedAt": "2026-11-12T10:51:31.972Z",
+  "totalReferences": 2,
   "references": [
     {
       "id": "example-minimal-clean",
@@ -29,6 +29,41 @@
       "mobilePreviewImage": "example-minimal-clean-mobile.jpg",
       "noteFile": "References/example-minimal-clean.md",
       "createdAt": "2026-11-12T10:40:23.533Z"
+    },
+    {
+      "id": "pear-no",
+      "slug": "pear-no",
+      "title": "Pear NO",
+      "url": "https://pear.no/",
+      "type": "website",
+      "tags": [
+        "dark-mode",
+        "bento",
+        "grid",
+        "rounded",
+        "soft-shadows",
+        "tight-typography",
+        "landing",
+        "minimal",
+        "editorial",
+        "typography",
+        "webgl",
+        "agency",
+        "scrollytelling",
+        "revenue-share"
+      ],
+      "stack": [
+        "react",
+        "lightningcss",
+        "webgl",
+        "shaders"
+      ],
+      "mood": "Editorial neoclassical minimalism, high-craft typography and scrollytelling",
+      "summary": "Pear makes you appear. Data-driven SEO, tailored software and revenue-share partnerships. Grow your traffic and outrun your competitors.",
+      "previewImage": "pear-no-desktop.jpg",
+      "mobilePreviewImage": "pear-no-mobile.jpg",
+      "noteFile": "References/pear-no.md",
+      "createdAt": "2026-11-12T10:51:31.964Z"
     }
   ]
 }
