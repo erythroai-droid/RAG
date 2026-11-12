@@ -1,138 +1,340 @@
 ---
-title: "Mustang 6663 RT"
+title: "MUSTANG 6663 RT"
 slug: "mustang-6663rt"
 type: website
 source: "https://mustang-ashy.vercel.app/"
-date: 2026-11-12
-tags: ["dark-mode", "bento", "grid", "rounded", "soft-shadows", "landing", "automotive", "dark-brutalist", "scroll-driven", "gsap", "frames", "luxury", "specs", "canvas", "nextjs15"]
-stack: ["nextjs15", "react19", "gsap", "scrolltrigger", "typescript", "tailwind-css"]
-mood: "Dark brutalist luxury automotive landing with scroll-scrubbed canvas sheet lift, telemetric cards, dynamic finish re-grading, and AI consultant"
-preview: "Assets/Assets/mustang-6663rt/desktop.jpg"
-mobilePreview: "Assets/Assets/mustang-6663rt/mobile.jpg"
+repo: "C:\\dev\\Mustang_6663RT"
+date: 2026-11-13
+tags: ["automotive", "dark-brutalist", "scroll-driven", "gsap", "canvas-assembly", "frame-sequence", "luxury", "specs-counter", "video-bg", "i18n-rtl", "ai-chat", "nextjs15", "react19", "tailwind", "landing"]
+stack: ["nextjs-15", "react-19", "gsap", "scrolltrigger", "lenis", "typescript", "tailwind-css", "canvas", "fontsource"]
+mood: "Dark brutalist luxury automotive fastback, sheet-lift scroll scrub on HTML5 Canvas, high-contrast typography (Anton + Instrument Serif italic), telemetric salt flat video layer, dynamic CSS filter color regrading, and embedded AI consultant"
+preview: "Assets/mustang-6663rt/01-hero-revealed.jpg"
+mobilePreview: "Assets/mustang-6663rt/mobile-01-hero.jpg"
 ---
 
-# 🎨 Референс: Mustang 6663 RT
+# 🏎️ Референс: MUSTANG 6663 RT
 
-> **Vibe & Mood:** Dark brutalist luxury automotive landing with scroll-scrubbed canvas sheet lift, telemetric cards, dynamic finish re-grading, and AI consultant  
-> **Источник:** [https://mustang-ashy.vercel.app/](https://mustang-ashy.vercel.app/)  
-> **Связи базы знаний:** [[foundations-colors|Цвета и Темы]] · [[foundations-typography|Типографика]] · [[foundations-geometry|Сетки и Отступы]] · [[foundations-animations|Анимации]]
+> **Vibe & Mood:** Темный бруталистский премиум-ленд маслкара ручной сборки. Скролл-скраббинг сдергивания защитного чехла на HTML5 Canvas (121 кадр), строгая контрастная типографика (монументальный гротеск Anton + изящный курсивный Instrument Serif), кинематографичное фоновое видео дрифта по солончаку с телеметрическими плашками, мгновенная смена расцветки кузовных полос через CSS Filter-грейдинг и интерактивный AI-консультант.  
+> **Источник (Live):** [https://mustang-ashy.vercel.app/](https://mustang-ashy.vercel.app/)  
+> **Исходный код проекта:** `C:\dev\Mustang_6663RT`  
+> **Связи базы знаний:** [[foundations-colors|Цвета и Темы]] · [[foundations-typography|Типографика]] · [[foundations-geometry|Сетки и Отступы]] · [[foundations-animations|GSAP и Анимации]]
 
 ---
 
 ## 📸 1. Визуальный слой (Visual Preview)
 
-![[Assets/mustang-6663rt/desktop.jpg]]
+### Десктопная версия: Главы интерфейса (Desktop Chapters)
 
-> **Мобильная версия:**
-> ![[Assets/mustang-6663rt/mobile.jpg]]
+#### 01. Hero & Сдергивание чехла («Sheet comes off · The cold metal remains»)
+Полноэкранный пиннинг через GSAP ScrollTrigger (`500vh` трек). По мере прокрутки 121 кадр на холсте высокого разрешения (DPR до 2x) плавно сдергивает ткань с кузова, затем в центре экрана из контура проявляется и заливается титан-белым логотип `MUSTANG`. Статусные плашки: номер шасси `001/066` и точный таймкод `00:05.00`.
+![[Assets/mustang-6663rt/01-hero-revealed.jpg]]
+*Исходный закрытый кадр прелоадера:*
+![[Assets/mustang-6663rt/01-hero.jpg]]
+
+---
+
+#### 02. Спецификации и динамика («Numbers we / never rounded»)
+Секция технических характеристик с живым счетчиком значений (CountUp с поддержкой локализованных десятичных знаков): 780 л.с., 3.4 сек до 100 км/ч, 298 км/ч «максималка» и 850 Нм момента. Минималистичные разделители и моноширинная верстка цифр.
+![[Assets/mustang-6663rt/02-specs.jpg]]
+
+---
+
+#### 03. Заезд по солончаку (Salt Flat Drive & Telemetry)
+Фоновое зацикленное видео скоростного заезда (`public/video/v2.mp4`) с гигантским полупрозрачным вотермарком `MUSTANG` на всю ширину экрана. Поверх видео при скролле каскадом проезжают карточки телеметрии шасси и активной аэродинамики.
+![[Assets/mustang-6663rt/03-drive.jpg]]
+
+---
+
+#### 04. Макро-галерея деталей (Crafted to the Millimeter)
+Инновационная оптимизация: одна мастер-фотография высокого разрешения динамически трансформируется через `object-position` и `scale`, фокусируя внимание зрителя на заднем колесе (2.6x), фонарях (1.6x), бортовом номере «6663 RT» (2.1x) и ночном световом силуэте (1.0x).
+![[Assets/mustang-6663rt/04-detail.jpg]]
+
+---
+
+#### 05. Конфигуратор полос кузова (Stripe Package Selector)
+Мгновенное переключение ливреи без повторной загрузки 4 тяжелых картинок: CSS-фильтры (`hue-rotate`, `saturate`, `brightness`, `contrast`) на лету перекрашивают акцентные полосы на оригинальном рендере: Gold (`#C9A24E`), Red (`#C8321E`), Silver (`#B9BCC2`) и Black (`#3A3A3A`).
+![[Assets/mustang-6663rt/05-finish.jpg]]
+
+---
+
+#### 06. Финал заезда («Unbreakable / Bred in Detroit»)
+Атмосферный кинематографичный видеоряд (`v3.mp4`) с уходящими вдаль габаритными огнями в ночной пустыне и историческим манифестом маслкара.
+![[Assets/mustang-6663rt/06-outro.jpg]]
+
+---
+
+#### 07. Аллокация, бронирование и AI Консультант («Reserve your chassis»)
+Счетчик оставшихся машин лимитированной серии (41 из 66 доступно), прогресс-бар квоты, модальное окно бронирования, мультиязычный переключатель (EN / RU / HE / AR с честным RTL) и плавающий диалоговый виджет AI Consultant с заготовленными сценариями вопросов и ответов.
+![[Assets/mustang-6663rt/07-reserve.jpg]]
+
+---
+
+### Мобильная версия (Mobile Walkthrough, 390×844)
+
+| 01. Hero & Canvas | 02. Specs Numbers | 03. Salt Flat Drive |
+| :---: | :---: | :---: |
+| ![[Assets/mustang-6663rt/mobile-01-hero.jpg]] | ![[Assets/mustang-6663rt/mobile-02-specs.jpg]] | ![[Assets/mustang-6663rt/mobile-03-drive.jpg]] |
+
+| 04. Stripe Finishes | 05. Allocation & AI Chat | Полный экран |
+| :---: | :---: | :---: |
+| ![[Assets/mustang-6663rt/mobile-04-finish.jpg]] | ![[Assets/mustang-6663rt/mobile-05-reserve.jpg]] | ![[Assets/mustang-6663rt/mobile.jpg]] |
 
 ---
 
 ## 🎯 2. Дизайн-токены (Design Tokens)
 
 ### Цветовая палитра
-| Роль | HEX | Назначение / Примечание |
+Палитра выстроена на строгой монохромной базе глубокого темного чугуна (`#050505`), теплого антибликового белого (`#F2EFE9`), благородного металлического золота сусального листа (`#D4A24C`) и сигнального стоп-красного (`#E2391D`).
+
+| Роль токена | CSS переменная / HEX | Назначение / Примечание |
 | :--- | :--- | :--- |
-| **Background Main** | `#050505` | Основная подложка страницы |
-| **Surface / Card** | `#111111` | Карточки, bento-модули, всплывающие окна |
-| **Text Primary** | `#F2EFE9` | Основные заголовки, максимальный контраст |
-| **Text Muted** | `#D4A24C` | Вторичный текст, подзаголовки, описания |
-| **Border / Divider** | `#FFFFFF` | Границы элементов, тонкие разделители 1px |
-| **Accent / Action** | `#E2391D` | Кнопки, бейджи, свечение, фокус |
+| **Background Deep** | `var(--bg)`: `#050505` | Основной фон всего сайта, отсутствие паразитной засветки |
+| **Surface Panel** | `var(--panel)`: `#0B0B0B` | Непрозрачные плашки поверх видео, модальные окна, карточки |
+| **Text Primary** | `var(--fg)`: `#F2EFE9` | Теплый молочно-белый контрастный цвет заголовков и цен |
+| **Text Muted** | `var(--mute)`: `rgba(242, 239, 233, 0.58)` | Вторичные подписи, описания характеристик, лейблы |
+| **Text Dim** | `var(--dim)`: `rgba(242, 239, 233, 0.34)` | Таймкоды, индексы спецификаций, мелкие маркеры |
+| **Divider Hairline** | `var(--line)`: `rgba(255, 255, 255, 0.14)` | Тонкие 1px границы кнопок, карточек и разделителей секций |
+| **Divider Subtle** | `var(--line2)`: `rgba(255, 255, 255, 0.07)` | Фоновые направляющие сетки |
+| **Accent Gold** | `var(--accent)`: `#D4A24C` | Золотой металл: полосы ливреи, курсивные акценты `<em>` в заголовках, суп-индексы |
+| **Accent Red** | `var(--red)`: `#E2391D` | Ярко-красный стоп-сигнал: пульсирующие точки статуса (`.dot`), полоса прогресса скролла |
 
-> **Все обнаруженные оттенки:** `#050505` `#111111` `#000000` `#0A0A0A` `#F2EFE9` `#E2391D` `#0B0B0B` `#FFFFFF` `#D4A24C`
-
-### Типографика
-* **Заголовочный шрифт (Heading):** `Inter`
-* **Основной шрифт (Body):** `Anton`
-* **Отрицательный кернинг (Letter Spacing):** `5.4px`
-* **Шкала размеров:** `15px`, `16px`, `17.28px`, `18px`, `34.56px`, `158.4px`, `164.736px`, `244.8px`
-* **Начертания (Weights):** `400`, `600`, `500`, `300`, `700`
-
-### Геометрия и Отступы
-* **Скругления (Border Radius):** `3px` (вспомогательные: `40px`, `50%`, `23px`, `2px`)
-* **Контейнеры (Max Width):** `1440px`, `430px`, `420px`, `1100px`
-* **Базовый шаг отступов (Paddings/Gaps):** `20px 60.48px`, `6px 2px`, `11px 22px`, `0px 18px`
-* **Тени и размытия:** `rgb(226, 57, 29) 0px 0px 12px 0px`
+> **HEX-сводка токенов:** `#050505` · `#0B0B0B` · `#F2EFE9` · `#D4A24C` · `#E2391D` · `rgba(255,255,255,0.14)`
 
 ---
 
-## 🧠 3. Семантический анализ (Analysis for AI Agents)
+### Типографическая система (Typography System)
+Архитектура шрифтов использует намеренный стилистический контраст: тяжелый плотный американский плакатный гротеск дополняется утонченной итальянской курсивной антиквой.
 
-### Сетка и композиция (Grid & Composition)
-Интерфейс построен на модульной **Bento-сетке (CSS Grid)**. Высокая плотность информации сбалансирована щедрыми вертикальными отступами (секционные паддинги 96–128px), что дает ощущение «дорогого воздуха» и премиального технологичного продукта. Основной фокус концентрируется по центру с плавным расширением до полноразмерных карточек.
+* **Display Heading Font:** `Anton`, `Oswald`, `Impact`, sans-serif (`--f-display`)
+  - Всегда `text-transform: uppercase`, экстремально плотный межстрочный интервал (`line-height: 0.92`), плотный кернинг (`letter-spacing: -0.005em` до `-0.01em`).
+* **Italic Serif Accent Font:** `Instrument Serif`, `Cormorant Garamond`, Georgia, serif (`--f-serif`)
+  - Применяется внутри заглавий через тег `<em>word</em>`: `font-style: italic`, `text-transform: lowercase`, цвет `var(--accent)`. Добавляет премиальный редакторский лоск.
+* **Body / UI Font:** `Inter`, `Heebo`, Arial, sans-serif (`--f-text`)
+  - Нейтральный, сбалансированный читаемый гротеск.
+* **Многоязычность и RTL (Zero Font Flickering):**
+  - Поддерживаются 4 языка: английский (`en`), русский (`ru`), иврит (`he`, RTL) и арабский (`ar`, RTL).
+  - Специфические гарнитуры (`Heebo 800` для иврита, `TrueArabic` для арабского) подключены через `@font-face` с жесткими диапазонами `unicode-range`. Латинские и кириллические символы всегда рендерятся в `Anton`/`Inter`, предотвращая скачки макета при переключении языков.
 
-### Визуальные приемы и акценты (Visual Accents & Techniques)
-* **Микро-границы:** Тонкие контрастные бордеры `1px solid #FFFFFF` с эффектом матового стекла (`backdrop-blur-md`).
-* **Амбиентное свечение:** Мягкие радиальные градиенты на фоне (`radial-gradient`), создающие глубину сцены без перегрузки визуала.
-* **Иерархия акцентов:** Одиночный яркий акцент (`#E2391D`) зарезервирован строго под целевое действие (CTA) и интерактивные статусы.
-
-### Характер движения и взаимодействия (Motion & Interactions)
-* **Кнопки и ссылки:** Микро-масштабирование (`scale: 1.02`) и плавная смена прозрачности (`duration-200`).
-* **Карточки:** При ховере граница плавно подсвечивается акцентным цветом с мягким смещением иконки.
-* **Рекомендация для анимации:** Идеально подходит для реализации с помощью **GSAP ScrollTrigger** (плавный fade-up секций с каскадной задержкой `stagger: 0.1`, параллакс фонового свечения) или **Framer Motion** (`initial={{ opacity: 0, y: 20 }}`).
+#### Шкала размеров (Type Scale):
+* `Hero Display:` `clamp(46px, 7.6vw, 140px)` (Line-height: `0.92`)
+* `Big Telemetry Numbers:` `clamp(64px, 7vw, 128px)` (Tabular numbers, Line-height: `1.0`)
+* `Section Title:` `clamp(36px, 4.8vw, 72px)`
+* `Body Lead:` `15px` (Line-height: `1.65`, Color: `var(--mute)`)
+* `Telemetry / Micro Labels:` `10px – 11px` (`letter-spacing: 0.26em – 0.28em`, Uppercase)
 
 ---
 
-## 💻 4. Эталонный код верстки (Reference Snippet)
+### Геометрия, Сетки и Микро-взаимодействия
+
+* **Боковые поля (Gutter):** `padding-inline: var(--gx)` где `--gx: 4.2vw` (адаптивный отступ, идеально выравнивающий контент на 1440px+ и смартфонах).
+* **Скругления (Border Radius):**
+  - Кнопки-пилюли: `border-radius: 40px`
+  - Модальные окна и AI-панель: `border-radius: 14px`
+  - Меню выбора языков: `border-radius: 10px`
+  - Карточки и секции: строгие прямые углы `0px` с волосяным бордером `1px solid var(--line)`.
+* **Custom Cursor (Кастомный курсор):**
+  - Инверсный курсор с `mix-blend-mode: difference`.
+  - При наведении на интерактивные ссылки/кнопки внешний круг сужается до 16px с белой заливкой и масштабированной диагональной стрелкой (`.cur[data-mode="link"]`).
+  - При наведении на текстовые инпуты курсор исчезает (`.cur[data-mode="text"]`), уступая место системному кареточному курсору.
+
+---
+
+## 🧠 3. Архитектурный и сценарный анализ (Engineering & UX Patterns)
+
+### 1. Canvas Scroll Scrubbing (Сдергивание чехла)
+* **Проблема:** Полноэкранное видео скраббить через `video.currentTime` в браузерах нельзя — это вызывает лаги декодера ключевых кадров (I-frame) и падение FPS до 10-15 кадров/сек.
+* **Решение:** Видео преобразуется в последовательность оптимизированных WebP-кадров (121 кадр, от 12 КБ до 25 КБ на кадр) под 3 брейкпоинта: `768px`, `1280px`, `1920px`.
+* Отрисовка идет на элементе `<canvas>` с ручным масштабированием через `ctx.drawImage` с логикой `cover` и сохранением нижней трети под отражение пола.
+* При быстром скролле алгоритм `nearest()` находит ближайший уже загруженный кадр, исключая белые мерцания, пока фоновый пул подгружает целевой кадр.
+
+### 2. Pinned Video with Text Underlay (Сквозной вотермарк)
+* В секции `Drive` видео дрифта закрепляется (`pin: true`), а гигантский бренд `MUSTANG` располагается в абсолютном слое.
+* Текстовые плашки телеметрии прокручиваются поверх зафиксированного видео, создавая глубокий 3D-эффект многослойного пространства без WebGL.
+
+### 3. Dynamic Single-Image Detail Zoom
+* Вместо загрузки 4 разных макро-снимков высокого разрешения галерея `Detail` оперирует одной фотографией.
+* Параметры переходов задаются в виде легких метаданных `{ photo: 'profile', pos: '30% 72%', zoom: 2.6 }`, что экономит ~5 МБ сетевого трафика на мобильных устройствах.
+
+### 4. Zero-Asset CSS Filter Grading
+* Для 4 вариантов кастомных полос (`Gold`, `Red`, `Silver`, `Black`) не рендерятся 4 отдельных 4K-изображения автомобиля.
+* Графика берется из одного рендера с нейтральной полосой, а цвет меняется мгновенно инлайновым CSS-фильтром `filter: hue-rotate(-38deg) saturate(2.2)`.
+
+### 5. Интегрированный AI Консультант (Ferrari AiChat Pattern)
+* Плавающий виджет `AiChat` в правом нижнем углу интерфейса.
+* Поддерживает предзаготовленные быстрые вопросы (мощность, сроки поставки, кастомизация, бронирование), авто-прокрутку к новым сообщениям и интеграцию с общей локализацией.
+
+---
+
+## 💻 4. Эталонный код компонентов (Production-Ready Snippets)
+
+### Сниппет 1: Hero Canvas Sequence Scrubber (React + GSAP ScrollTrigger)
 
 ```tsx
-import React from 'react';
+'use client';
+import { useEffect, useRef, useState } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-export function Mustang6663rtHero() {
+gsap.registerPlugin(ScrollTrigger);
+
+interface CanvasHeroProps {
+  totalFrames?: number;
+  framePattern?: (idx: number) => string;
+}
+
+export function CanvasHeroScrubber({
+  totalFrames = 121,
+  framePattern = (i) => `/frames/assembly/1280/frame_${String(i).padStart(4, '0')}.webp`
+}: CanvasHeroProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const container = containerRef.current;
+    if (!canvas || !container) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Кэш изображений
+    const images: HTMLImageElement[] = [];
+    let loadedCount = 0;
+
+    for (let i = 1; i <= totalFrames; i++) {
+      const img = new Image();
+      img.src = framePattern(i);
+      img.onload = () => {
+        loadedCount++;
+        if (loadedCount === 1) renderFrame(1);
+      };
+      images.push(img);
+    }
+
+    const renderFrame = (index: number) => {
+      const img = images[Math.min(totalFrames - 1, Math.max(0, index - 1))];
+      if (!img || !img.complete) return;
+
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = canvas.clientWidth * dpr;
+      canvas.height = canvas.clientHeight * dpr;
+      ctx.scale(dpr, dpr);
+
+      // Масштабирование 'cover'
+      const scale = Math.max(canvas.clientWidth / img.naturalWidth, canvas.clientHeight / img.naturalHeight);
+      const w = img.naturalWidth * scale;
+      const h = img.naturalHeight * scale;
+      const x = (canvas.clientWidth - w) / 2;
+      const y = (canvas.clientHeight - h) * 0.6; // Фиксация с акцентом на отражение колес
+
+      ctx.fillStyle = '#050505';
+      ctx.fillRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+      ctx.drawImage(img, x, y, w, h);
+    };
+
+    const trigger = ScrollTrigger.create({
+      trigger: container,
+      start: 'top top',
+      end: '+=400%',
+      pin: true,
+      scrub: 0.5,
+      onUpdate: (self) => {
+        setProgress(self.progress);
+        const frameIndex = Math.floor(self.progress * (totalFrames - 1)) + 1;
+        renderFrame(frameIndex);
+      }
+    });
+
+    return () => {
+      trigger.kill();
+    };
+  }, [totalFrames, framePattern]);
+
   return (
-    <section className="relative w-full min-h-[640px] bg-[#050505] text-[#F2EFE9] overflow-hidden px-6 py-24 md:py-32 flex flex-col items-center justify-center border-b border-[#FFFFFF]">
-      {/* Background ambient glow / gradient */}
-      <div 
-        className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-[720px] h-[360px] opacity-25 blur-[120px] rounded-full"
-        style={{ background: 'radial-gradient(circle, #E2391D 0%, transparent 70%)' }}
-      />
+    <div ref={containerRef} className="relative w-full h-screen bg-[#050505] overflow-hidden">
+      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full object-cover" />
+      
+      {/* HUD Telemetry Overlay */}
+      <div className="absolute top-8 left-8 text-xs font-mono uppercase tracking-widest text-[#F2EFE9]/60 flex items-center gap-3 z-10">
+        <span className="w-2 h-2 rounded-full bg-[#E2391D] animate-ping" />
+        <span>REVEAL SEQ // {Math.round(progress * 100)}%</span>
+      </div>
 
-      {/* Main Container */}
-      <div className="relative z-10 max-w-[1200px] w-full mx-auto flex flex-col items-center text-center">
-        {/* Badge / Pill */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#FFFFFF] bg-[#111111]/60 backdrop-blur-md mb-8 text-xs font-medium text-[#D4A24C] tracking-wide shadow-sm">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#E2391D] animate-pulse" />
-          <span>Стиль: Mustang 6663 RT</span>
-        </div>
-
-        {/* Heading */}
-        <h1 className="max-w-4xl text-4xl sm:text-6xl lg:text-7xl font-semibold tracking-[5.4px] leading-[1.08] mb-6 font-['Inter']">
-          Системный дизайн нового поколения
+      <div className="absolute bottom-12 left-1/2 -translate-x-1/2 text-center pointer-events-none z-10">
+        <h1 className="font-['Anton'] text-7xl md:text-9xl tracking-tight text-[#F2EFE9] uppercase">
+          MUSTANG <span className="font-['Instrument_Serif'] lowercase italic text-[#D4A24C]">6663</span> RT
         </h1>
+      </div>
+    </div>
+  );
+}
+```
 
-        {/* Subtitle */}
-        <p className="max-w-2xl text-base sm:text-lg text-[#D4A24C] font-normal leading-relaxed mb-10 font-['Anton']">
-          MUSTANG 6663 RT: a hand-built matte black fastback with gold-leaf stripes. Sixty-six cars, then the tooling burns....
-        </p>
+---
 
-        {/* Action Buttons */}
-        <div className="flex flex-wrap items-center justify-center gap-4">
-          <button className="px-6 py-3 rounded-[3px] bg-[#E2391D] text-white font-medium text-sm transition-all duration-200 hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-[#E2391D]/20">
-            Начать работу
-          </button>
-          <button className="px-6 py-3 rounded-[3px] border border-[#FFFFFF] bg-[#111111]/80 text-[#F2EFE9] font-medium text-sm transition-all duration-200 hover:bg-[#111111] hover:border-[#D4A24C]/40">
-            Документация
-          </button>
+### Сниппет 2: Stripe Color Grading Selector (CSS Filter Switcher)
+
+```tsx
+'use client';
+import React, { useState } from 'react';
+
+interface FinishOption {
+  id: string;
+  name: string;
+  code: string;
+  hex: string;
+  filter: string;
+}
+
+const FINISHES: FinishOption[] = [
+  { id: 'gld', name: 'Raw Gold Leaf', code: 'GLD', hex: '#C9A24E', filter: 'none' },
+  { id: 'red', name: 'Competition Red', code: 'RED', hex: '#C8321E', filter: 'hue-rotate(-38deg) saturate(2.2)' },
+  { id: 'slv', name: 'Brushed Silver', code: 'SLV', hex: '#B9BCC2', filter: 'saturate(0) brightness(1.08)' },
+  { id: 'blk', name: 'Matte Shadow', code: 'BLK', hex: '#3A3A3A', filter: 'saturate(0) brightness(.62) contrast(1.15)' }
+];
+
+export function StripeConfigurator() {
+  const [selected, setSelected] = useState<FinishOption>(FINISHES[0]);
+
+  return (
+    <section className="relative w-full bg-[#050505] text-[#F2EFE9] py-24 px-6 border-t border-white/10">
+      <div className="max-w-6xl mx-auto flex flex-col items-center">
+        <span className="text-[11px] font-mono tracking-[0.28em] text-[#E2391D] uppercase mb-3 flex items-center gap-2">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#E2391D]" /> 05 // LIVERY FINISH
+        </span>
+        <h2 className="font-['Anton'] text-4xl md:text-6xl uppercase tracking-tight mb-12">
+          SELECT <em className="font-['Instrument_Serif'] text-[#D4A24C] lowercase italic">stripe</em> PACKAGE
+        </h2>
+
+        {/* Viewport with CSS Filter application */}
+        <div className="relative w-full max-w-4xl aspect-[16/9] bg-[#0B0B0B] border border-white/10 rounded-lg overflow-hidden mb-8 shadow-2xl">
+          <img
+            src="/img/profile-1280.webp"
+            alt="Mustang 6663 RT Profile"
+            className="w-full h-full object-cover transition-all duration-500 ease-out"
+            style={{ filter: selected.filter }}
+          />
+          <div className="absolute bottom-4 left-6 font-mono text-xs text-[#F2EFE9]/50">
+            SPEC: {selected.code} // {selected.name.toUpperCase()}
+          </div>
         </div>
 
-        {/* Bento Grid Preview Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mt-16 w-full text-left">
-          {[
-            { title: "Точная сетка", desc: "12-колоночная система с выверенными отступами" },
-            { title: "Высокая плотность", desc: "Контрастная типографика и микро-акценты" },
-            { title: "Плавная физика", desc: "Адаптировано для GSAP ScrollTrigger" }
-          ].map((card, idx) => (
-            <div 
-              key={idx}
-              className="p-6 rounded-[3px] border border-[#FFFFFF] bg-[#111111]/70 backdrop-blur-sm transition-all duration-300 hover:border-[#E2391D]/50 group"
+        {/* Swatch Controls */}
+        <div className="flex gap-4">
+          {FINISHES.map((f) => (
+            <button
+              key={f.id}
+              onClick={() => setSelected(f)}
+              className={`flex items-center gap-3 px-5 py-2.5 rounded-full border transition-all text-xs font-semibold tracking-wider uppercase ${
+                selected.id === f.id
+                  ? 'border-[#D4A24C] bg-white/10 text-white'
+                  : 'border-white/20 text-white/60 hover:border-white/40'
+              }`}
             >
-              <div className="w-8 h-8 rounded-lg bg-[#E2391D]/10 flex items-center justify-center text-[#E2391D] mb-4 group-hover:scale-110 transition-transform">
-                0{idx + 1}
-              </div>
-              <h3 className="text-lg font-medium text-[#F2EFE9] mb-2 font-['Inter']">{card.title}</h3>
-              <p className="text-sm text-[#D4A24C] font-['Anton']">{card.desc}</p>
-            </div>
+              <span className="w-3.5 h-3.5 rounded-full border border-white/20" style={{ backgroundColor: f.hex }} />
+              {f.code}
+            </button>
           ))}
         </div>
       </div>
@@ -143,12 +345,17 @@ export function Mustang6663rtHero() {
 
 ---
 
-## 🤖 Инструкция для AI-агентов (Prompt Ingestion)
+## 🤖 5. Инструкция для AI-агентов (Cursor, Claude Code, Antigravity)
 
-```text
-При реализации интерфейса в стиле «Mustang 6663 RT»:
-1. Строго соблюдай палитру: фон #050505, карточки #111111, границы #FFFFFF.
-2. Для заголовков используй шрифт 'Inter' с отрицательным трекингом '5.4px'.
-3. Скругление карточек держи в районе 3px.
-4. Сохраняй простор между секциями (py-24 или py-32) и модульную Bento-композицию.
-```
+При создании сайтов для люксовых автомобильных марок, high-end техники, мужских брендов или сложных технологических продуктов:
+
+1. **Цветовая дисциплина:** Не используйте чистый черный `#000000` под фон — берите глубокий угольный `#050505` с панелями `#0B0B0B`. Для текста используйте не стерильный белый, а антибликовый молочный `#F2EFE9`.
+2. **Типографический прием «Editorial Brutalism»:**
+   - Заголовки пишите прописным сжатым гротеском (`Anton`, `Impact`, `Oswald`) с line-height `0.92`.
+   - Одно ключевое эмоциональное слово в заголовке оборачивайте в курсивную классическую антикву строчными буквами (`Instrument Serif`, `Cormorant Garamond`) золотого оттенка `#D4A24C`.
+3. **Оптимизация скролл-анимаций:**
+   - Если требуется раскрытие продукта со скроллом — используйте покадровый экспорт в WebP и рендер на HTML5 Canvas с интерполяцией `nearest()`. Никогда не скрабьте нативное видео по `currentTime`.
+   - Если требуется кастомизация цвета/материала — используйте CSS Filters на одном слое вместо 4 тяжелых картинок.
+4. **Микро-детали:**
+   - Используйте красные индикаторы `#E2391D` для живых статусов (`pulse`) и бейджей аллокации.
+   - Делайте моноширинные подписи (`font-mono`) с трекингом `0.28em` для инженерного контекста.
