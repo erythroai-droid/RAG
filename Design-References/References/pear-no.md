@@ -21,10 +21,40 @@ mobilePreview: "Assets/pear-no-mobile.jpg"
 
 ## 📸 1. Визуальный слой (Visual Preview)
 
-![[pear-no-desktop.jpg]]
+### Десктопная версия: Главы скроллителлинга (Scrollytelling Chapters)
 
-> **Мобильная версия:**
-> ![[pear-no-mobile.jpg]]
+#### 01. Hero & Вводный экран («Pear makes you appear»)
+![[pear-no-01-hero.jpg]]
+
+#### 02. Ch. 1 The Model (Revenue Share, No Retainers)
+![[pear-no-02-model.jpg]]
+
+#### 03. Ch. 2 The Work — Search Engine Optimization
+![[pear-no-03-work-seo.jpg]]
+
+#### 04. Ch. 2 The Work — Custom Software
+![[pear-no-04-work-software.jpg]]
+
+#### 05. Ch. 3 The Terms (Фильтр партнеров: «We say no more often than yes»)
+![[pear-no-05-terms.jpg]]
+
+#### 06. Ch. 4 Questions (Интерактивный FAQ)
+![[pear-no-06-questions-faq.jpg]]
+
+#### 07. The Application & Footer (Форма заявки с кастомными инпутами)
+![[pear-no-07-application-form.jpg]]
+
+---
+
+### Мобильная версия (Mobile Walkthrough, 390×844)
+
+| 01. Hero | 02. The Model | 03. The Work |
+| :---: | :---: | :---: |
+| ![[pear-no-mobile-01-hero.jpg]] | ![[pear-no-mobile-02-model.jpg]] | ![[pear-no-mobile-03-work.jpg]] |
+
+| 04. Terms | 05. FAQ | 06. Application |
+| :---: | :---: | :---: |
+| ![[pear-no-mobile-04-terms.jpg]] | ![[pear-no-mobile-05-faq.jpg]] | ![[pear-no-mobile-06-form.jpg]] |
 
 ---
 
