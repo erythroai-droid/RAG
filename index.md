@@ -69,6 +69,7 @@ graph TD
         TPL_LEG["[[legal-page-template|РЁР°Р±Р»РѕРЅ Legal/WCAG]]"]
         TPL_CLIENT["[[client-brief-design-dev|РљР»РёРµРЅС‚СЃРєРёР№ Р±СЂРёС„]]"]
         TPL_AGREE["[[software-development-agreement-israel|Р”РѕРіРѕРІРѕСЂ РЅР° СЂР°Р·СЂР°Р±РѕС‚РєСѓ]]"]
+        TPL_SCROLL["[[product-scroll-landing|product-scroll-landing]]"]
         CASE_AUDIT["[[ai-audit-agent|РљРµР№СЃ: AI Audit]]"]
         CASE_CONSULT["[[ai-consultant|РљРµР№СЃ: AI Consultant]]"]
     end
@@ -83,7 +84,7 @@ graph TD
     INDEX --> ARCH_BE & ARCH_FE & ARCH_AI & ARCH_OPS & ARCH_AUDIT & ARCH_DEPLOY & ARCH_PLAY & ARCH_AIVIS & ARCH_RAG & ARCH_SPRING & ARCH_GOOGLE & ARCH_X & ARCH_EMAIL & ARCH_LEGAL & ARCH_TARGO & ARCH_RLS
     INDEX --> TOK_FIGMA & TOK_COL & TOK_TYP & TOK_GEO & TOK_ANI & TOK_HERO & TOK_CMP
     INDEX --> SKILL_PROMPT & SKILL_MCP & SKILL_ACP & SKILL_MD & SKILL_QA & SKILL_L1 & SKILL_CMS & SKILL_IMPORT & SKILL_SPRING & SKILL_EMAIL & SKILL_SEO & SKILL_GIT
-    INDEX --> TPL_BRIEF & TPL_FIELDMAP & TPL_SPRING & TPL_CASE & TPL_CASEMD & TPL_SERV & TPL_ORD & TPL_SEO & TPL_LEG & TPL_CLIENT & TPL_AGREE & CASE_AUDIT & CASE_CONSULT
+    INDEX --> TPL_BRIEF & TPL_FIELDMAP & TPL_SPRING & TPL_CASE & TPL_CASEMD & TPL_SERV & TPL_ORD & TPL_SEO & TPL_LEG & TPL_CLIENT & TPL_AGREE & TPL_SCROLL & CASE_AUDIT & CASE_CONSULT
     INDEX --> PIT & RAG & GLOSS & FAQ
 ```
 

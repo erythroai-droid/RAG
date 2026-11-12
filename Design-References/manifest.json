@@ -1,0 +1,34 @@
+{
+  "version": "1.0.0",
+  "updatedAt": "2026-11-12T10:40:23.610Z",
+  "totalReferences": 1,
+  "references": [
+    {
+      "id": "example-minimal-clean",
+      "slug": "example-minimal-clean",
+      "title": "Example Minimal Clean",
+      "url": "https://example.com",
+      "type": "website",
+      "tags": [
+        "dark-mode",
+        "landing",
+        "minimal",
+        "clean",
+        "light-mode",
+        "typography"
+      ],
+      "stack": [
+        "nextjs",
+        "tailwind",
+        "framer-motion",
+        "lucide-react"
+      ],
+      "mood": "Премиальный темный минимализм, строгий контраст, неоновые микро-акценты",
+      "summary": "Референс интерфейса Example Minimal Clean с разобранными токенами, сеткой и эталонной версткой.",
+      "previewImage": "example-minimal-clean-desktop.jpg",
+      "mobilePreviewImage": "example-minimal-clean-mobile.jpg",
+      "noteFile": "References/example-minimal-clean.md",
+      "createdAt": "2026-11-12T10:40:23.533Z"
+    }
+  ]
+}

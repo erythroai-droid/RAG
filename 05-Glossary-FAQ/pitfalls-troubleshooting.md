@@ -1,13 +1,13 @@
-﻿# Pitfalls catalog (Erythro.ai)
+# Pitfalls catalog (Erythro.ai)
 
 RAG-oriented knowledge base of recurring failures. Each entry is a **self-contained chunk**:
-symptom → cause → fix → prevent. Prefer this file when answering “why did X break?” or “how do we avoid Y?”.
+symptom > cause > fix > prevent. Prefer this file when answering �why did X break?� or �how do we avoid Y?�.
 
 **Related docs:** `PLAYBOOK.md` (product chronology), `DEPLOYMENT.md` (infra), `PORTFOLIO_CMS.md` (portfolio domain), `RAG_INDEX.md` (ingest map).
 
 ---
 
-## PIT-001 — Empty Payload admin after adding a storage / Lexical plugin
+## PIT-001 � Empty Payload admin after adding a storage / Lexical plugin
 
 **Tags:** `admin`, `importmap`, `payload`, `vercel-blob`, `lexical-tables`  
 **Seen:** Blob adapter; Lexical `EXPERIMENTAL_TableFeature`
@@ -26,7 +26,7 @@ Commit the regenerated `importMap.js`. Hard-refresh admin.
 
 ---
 
-## PIT-002 — Admin build fails with `node:console` / UnhandledSchemeError
+## PIT-002 � Admin build fails with `node:console` / UnhandledSchemeError
 
 **Tags:** `admin`, `webpack`, `vercel-blob`, `next-config`
 
@@ -34,13 +34,13 @@ Commit the regenerated `importMap.js`. Hard-refresh admin.
 
 **Cause:** `@payloadcms/plugin-cloud-storage` barrel re-exports server-only `resolveSignedURLKey` into the client upload handler.
 
-**Fix:** `NormalModuleReplacementPlugin` in `next.config.ts` → stub `src/stubs/resolve-signed-url-key.client.js`.
+**Fix:** `NormalModuleReplacementPlugin` in `next.config.ts` > stub `src/stubs/resolve-signed-url-key.client.js`.
 
 **Prevent:** Keep the stub when upgrading `@payloadcms/*`; re-test `pnpm build && pnpm start` + `/admin/login`.
 
 ---
 
-## PIT-003 — Video from Media does not play / seek
+## PIT-003 � Video from Media does not play / seek
 
 **Tags:** `media`, `video`, `range`, `vercel-blob`
 
@@ -58,11 +58,11 @@ curl -D - -o NUL -H "Range: bytes=0-1023" "<media-url>"
 
 ---
 
-## PIT-004 — Production missing DB column (`subtitle`, `heroMediaMobile`, richtext jsonb, …)
+## PIT-004 � Production missing DB column (`subtitle`, `heroMediaMobile`, richtext jsonb, �)
 
 **Tags:** `migrations`, `postgres`, `ci`, `portfolio`, `vercel`
 
-**Symptom:** Runtime or API tests: `column … does not exist`. Preview/prod after schema change.
+**Symptom:** Runtime or API tests: `column � does not exist`. Preview/prod after schema change.
 
 **Cause:** Dev used Payload `push`; prod migrations lagged or race; CI DB out of sync.
 
@@ -74,11 +74,11 @@ curl -D - -o NUL -H "Range: bytes=0-1023" "<media-url>"
 **Prevent:**
 - Do not rely on interactive `push` in CI/prod (`push: false` when `CI=true` / `NODE_ENV=test` / `PAYLOAD_DISABLE_PUSH=1`). Import/seed scripts set `PAYLOAD_DISABLE_PUSH` so they never prompt against Supabase.
 - Ship migration + fix script together with the field change.
-- Prefer `varchar` casts for migration-name params in SQL scripts (`$1::varchar`) — PIT-005.
+- Prefer `varchar` casts for migration-name params in SQL scripts (`$1::varchar`) � PIT-005.
 
 ---
 
-## PIT-005 — SQL fix script fails: `character varying = text` / `$1` type mismatch
+## PIT-005 � SQL fix script fails: `character varying = text` / `$1` type mismatch
 
 **Tags:** `postgres`, `migrations`, `scripts`
 
@@ -92,11 +92,11 @@ curl -D - -o NUL -H "Range: bytes=0-1023" "<media-url>"
 
 ---
 
-## PIT-006 — Vercel build hangs on Payload migrate / interactive drizzle prompt
+## PIT-006 � Vercel build hangs on Payload migrate / interactive drizzle prompt
 
 **Tags:** `vercel`, `migrations`, `payload`, `batch`
 
-**Symptom:** Build stuck; eventually timeout. Interactive “rename or create column?” prompts.
+**Symptom:** Build stuck; eventually timeout. Interactive �rename or create column?� prompts.
 
 **Cause:** Payload/drizzle trying to push/migrate interactively; concurrent migrate races; leftover `batch=-1`.
 
@@ -108,7 +108,7 @@ curl -D - -o NUL -H "Range: bytes=0-1023" "<media-url>"
 
 ---
 
-## PIT-007 — Portfolio language switch only after full reload
+## PIT-007 � Portfolio language switch only after full reload
 
 **Tags:** `i18n`, `portfolio`, `cms`, `locale`
 
@@ -122,7 +122,7 @@ curl -D - -o NUL -H "Range: bytes=0-1023" "<media-url>"
 
 ---
 
-## PIT-008 — Transparent PNG shows solid gray/coal plate
+## PIT-008 � Transparent PNG shows solid gray/coal plate
 
 **Tags:** `portfolio`, `css`, `images`
 
@@ -136,7 +136,7 @@ curl -D - -o NUL -H "Range: bytes=0-1023" "<media-url>"
 
 ---
 
-## PIT-009 — Body images cropped left/right (e.g. 1920×1080)
+## PIT-009 � Body images cropped left/right (e.g. 1920?1080)
 
 **Tags:** `portfolio`, `images`, `css`, `richtext`
 
@@ -155,7 +155,7 @@ curl -D - -o NUL -H "Range: bytes=0-1023" "<media-url>"
 
 ---
 
-## PIT-010 — Mobile hero shows desktop video / wrong crop
+## PIT-010 � Mobile hero shows desktop video / wrong crop
 
 **Tags:** `portfolio`, `hero`, `mobile`, `media`
 
@@ -165,11 +165,11 @@ curl -D - -o NUL -H "Range: bytes=0-1023" "<media-url>"
 
 **Fix:** Separate `heroMediaMobile`; render by **per-slot type** (`type` / `typeMobile`); mobile stills `object-top`; layout `100dvh` flex so image + meta fit one screen.
 
-**Prevent:** Always provide mobile-specific media guidance in admin (prefer 1080×1920). Never assume desktop type equals mobile type.
+**Prevent:** Always provide mobile-specific media guidance in admin (prefer 1080?1920). Never assume desktop type equals mobile type.
 
 ---
 
-## PIT-011 — Mobile hero copy unreadable over photo
+## PIT-011 � Mobile hero copy unreadable over photo
 
 **Tags:** `portfolio`, `hero`, `mobile`, `gradient`
 
@@ -177,28 +177,28 @@ curl -D - -o NUL -H "Range: bytes=0-1023" "<media-url>"
 
 **Cause:** Opaque black plate or too-weak gradient.
 
-**Fix:** Full-bleed media + gradient copy plate (`from-coal-900` via stronger opacity → transparent). Tune `via-/80` as needed.
+**Fix:** Full-bleed media + gradient copy plate (`from-coal-900` via stronger opacity > transparent). Tune `via-/80` as needed.
 
 **Prevent:** Prefer gradient over solid plates; verify on real device photos, not only solid colors.
 
 ---
 
-## PIT-012 — CI API tests: Supabase IPv6 / SSL / pooler / push hang
+## PIT-012 � CI API tests: Supabase IPv6 / SSL / pooler / push hang
 
 **Tags:** `ci`, `supabase`, `github-actions`
 
 **Symptoms:** `ENETUNREACH`, cert chain errors, `tenant/user not found`, 90s hang on `getPayload`.
 
 **Fixes (already in workflow):**
-- Resolve Direct → Session pooler (`scripts/ci-resolve-supabase-url.mjs`, try `aws-0`…`aws-2`).
+- Resolve Direct > Session pooler (`scripts/ci-resolve-supabase-url.mjs`, try `aws-0`�`aws-2`).
 - `DATABASE_SSL_INSECURE=1` / `sslmode=no-verify` **only in CI**.
 - `push: false` when `CI=true` or `NODE_ENV=test`.
 
-**Prevent:** Do not point GHA at Direct IPv6-only hosts. Keep resolver + SSL flags documented in `DEPLOYMENT.md` §11.
+**Prevent:** Do not point GHA at Direct IPv6-only hosts. Keep resolver + SSL flags documented in `DEPLOYMENT.md` �11.
 
 ---
 
-## PIT-013 — Vercel rejects Next.js (CVE) / engines.node mismatch
+## PIT-013 � Vercel rejects Next.js (CVE) / engines.node mismatch
 
 **Tags:** `vercel`, `next`, `engines`, `security`
 
@@ -212,7 +212,7 @@ curl -D - -o NUL -H "Range: bytes=0-1023" "<media-url>"
 
 ---
 
-## PIT-014 — Seed loses localized array row values
+## PIT-014 � Seed loses localized array row values
 
 **Tags:** `seed`, `i18n`, `payload`
 
@@ -226,7 +226,7 @@ curl -D - -o NUL -H "Range: bytes=0-1023" "<media-url>"
 
 ---
 
-## PIT-015 — Stale CMS cache after content change
+## PIT-015 � Stale CMS cache after content change
 
 **Tags:** `cache`, `revalidate`, `portfolio`
 
@@ -236,11 +236,11 @@ curl -D - -o NUL -H "Range: bytes=0-1023" "<media-url>"
 
 **Fix:** Collection hooks call revalidate (`src/lib/revalidate.ts`); bump portfolio cache key when document shape changes (e.g. `portfolio-projects-v6` after rich text).
 
-**Prevent:** Any new CMS field shape that changes mapper output → bump cache key string in the same PR.
+**Prevent:** Any new CMS field shape that changes mapper output > bump cache key string in the same PR.
 
 ---
 
-## PIT-016 — PowerShell breaks bash heredoc git commits
+## PIT-016 � PowerShell breaks bash heredoc git commits
 
 **Tags:** `windows`, `git`, `powershell`
 
@@ -252,7 +252,7 @@ curl -D - -o NUL -H "Range: bytes=0-1023" "<media-url>"
 
 ---
 
-## PIT-017 — Pin + overflow-hidden = black gap / broken scroll stack
+## PIT-017 � Pin + overflow-hidden = black gap / broken scroll stack
 
 **Tags:** `gsap`, `scroll`, `layout`
 
@@ -266,7 +266,7 @@ curl -D - -o NUL -H "Range: bytes=0-1023" "<media-url>"
 
 ---
 
-## PIT-018 — Menu contrast wrong on light sections
+## PIT-018 � Menu contrast wrong on light sections
 
 **Tags:** `navbar`, `theme`, `contrast`
 
@@ -280,15 +280,15 @@ curl -D - -o NUL -H "Range: bytes=0-1023" "<media-url>"
 
 ---
 
-## PIT-019 — Lexical tables clipped / squashed on mobile (RU worse)
+## PIT-019 � Lexical tables clipped / squashed on mobile (RU worse)
 
 **Tags:** `portfolio`, `richtext`, `tables`, `mobile`, `css`
 
 **Symptom:** Wide tables in project body shrink; long RU cell text looks cut off; no horizontal scroll.
 
 **Cause:**
-1. No overflow styles on Payload’s `.lexical-table-container`.
-2. Flex ancestors default `min-width: auto` → grow to table min-content → parent `overflow-hidden` / page `overflow-x: clip` clips without an inner scrollport.
+1. No overflow styles on Payload�s `.lexical-table-container`.
+2. Flex ancestors default `min-width: auto` > grow to table min-content > parent `overflow-hidden` / page `overflow-x: clip` clips without an inner scrollport.
 
 **Fix:** CSS on `.lexical-table-container` (`overflow-x: auto`, table `width: max-content`, cells `white-space: nowrap`) + `min-w-0` on ProjectBody flex wrappers. Thin scrollbar restored on the table scroller (global scrollbar hide otherwise).
 
@@ -296,61 +296,61 @@ curl -D - -o NUL -H "Range: bytes=0-1023" "<media-url>"
 
 ---
 
-## PIT-020 — Contact form in admin, no email in the mailbox
+## PIT-020 � Contact form in admin, no email in the mailbox
 
 **Tags:** `contact`, `email`, `smtp`, `hostinger`, `dns`, `vercel`  
 **Seen:** 2026-08-14. Mailbox `order@erythro.ai`. Verified working after DNS + SMTP ship.
 
-**Symptom:** Form on `erythro.ai` returns success. Row appears in `/admin` → Contact Submissions. No message in Hostinger. Gmail → `order@erythro.ai` may already work (inbound OK) while site orders still do not.
+**Symptom:** Form on `erythro.ai` returns success. Row appears in `/admin` > Contact Submissions. No message in Hostinger. Gmail > `order@erythro.ai` may already work (inbound OK) while site orders still do not.
 
 **Cause (two independent layers):**
 1. **Inbound DNS.** Mail records must live on **whatever nameservers the domain uses**.
-   Erythro: NS were Vercel, then moved to **Cloudflare**. Hostinger Email “connect automatically”
+   Erythro: NS were Vercel, then moved to **Cloudflare**. Hostinger Email �connect automatically�
    does nothing unless NS are Hostinger. Without MX/SPF/DKIM at the **current** DNS host,
-   Hostinger shows “mailbox cannot receive / MX missing”.
+   Hostinger shows �mailbox cannot receive / MX missing�.
 2. **Outbound from the site.** Production `POST /api/contact` used to only `payload.create({ collection: 'contact-submissions' })`. Payload then logs `No email adapter provided. Email will be written to console.` Saving in CMS is not sending mail. Send path is nodemailer SMTP (`smtp.hostinger.com:465`, user/from `order@erythro.ai`), env `SMTP_PASS` on Vercel Production/Preview.
 
 **Fix:**
-1. DNS host of the domain (now **Cloudflare** → DNS → Records; previously Vercel Domains → DNS). Leave Name empty for apex; do not add records in Hostinger’s DNS zone:
+1. DNS host of the domain (now **Cloudflare** > DNS > Records; previously Vercel Domains > DNS). Leave Name empty for apex; do not add records in Hostinger�s DNS zone:
    - MX `mx1.hostinger.com` priority 5; MX `mx2.hostinger.com` priority 10
    - TXT `v=spf1 include:_spf.mail.hostinger.com ~all`
-   - CNAME `hostingermail-a._domainkey` → `hostingermail-a.dkim.mail.hostinger.com` (and `-b`, `-c`)
-   - TXT `_dmarc` → `v=DMARC1; p=none; rua=mailto:order@erythro.ai`
+   - CNAME `hostingermail-a._domainkey` > `hostingermail-a.dkim.mail.hostinger.com` (and `-b`, `-c`)
+   - TXT `_dmarc` > `v=DMARC1; p=none; rua=mailto:order@erythro.ai`
 2. Code: `src/lib/contactNotification.ts` + `src/app/api/contact/route.ts`. Recipients = Site Settings notify (contact / order). Set `SMTP_PASS` (mailbox password, never commit). Merge to `main`.
 3. Confirm Hostinger Domain settings green, then submit the live form. Logs: `[api/contact]`, `[contactNotification]`.
 
-**Prevent:** After **any** NS move, re-add mail records at the new DNS. Treat CMS save and SMTP as separate steps. Do not assume Payload’s email adapter is configured.
+**Prevent:** After **any** NS move, re-add mail records at the new DNS. Treat CMS save and SMTP as separate steps. Do not assume Payload�s email adapter is configured.
 
 ---
 
-## PIT-021 — Contact form mail lands in Hostinger Spam (Gmail forward still works)
+## PIT-021 � Contact form mail lands in Hostinger Spam (Gmail forward still works)
 
 **Tags:** `contact`, `email`, `smtp`, `hostinger`, `spam`  
 **Seen:** 2026-08-16. Mailbox `order@erythro.ai`; forward to Gmail OK.
 
 **Symptom:** Form succeeds; row in Contact Submissions; message appears in Hostinger **Spam**, not Inbox. Forwarding rule to Gmail still delivers.
 
-**Cause:** Not broken DNS (MX/SPF/DKIM/DMARC already green). Hostinger’s local filter often scores **self-SMTP** poorly: From `order@erythro.ai` → To `order@erythro.ai` with Reply-To = visitor’s external address (classic contact-form pattern). Gmail receive via forward uses different scoring.
+**Cause:** Not broken DNS (MX/SPF/DKIM/DMARC already green). Hostinger�s local filter often scores **self-SMTP** poorly: From `order@erythro.ai` > To `order@erythro.ai` with Reply-To = visitor�s external address (classic contact-form pattern). Gmail receive via forward uses different scoring.
 
-**Fix (ops — do this first):**
-1. In Hostinger webmail: open one spam message → **Not spam** / whitelist.
-2. Emails → Filters (or webmail Settings → Filters): if From contains `order@erythro.ai` **or** Subject contains `Erythro.ai contact` / `Erythro.ai order` → move to Inbox / never spam.
-3. Optional: Site Settings → Form notifications → set inbox to Gmail (`erythro.ai@gmail.com`); keep `order@erythro.ai` only as SMTP From. Then Hostinger is not the primary read target.
+**Fix (ops � do this first):**
+1. In Hostinger webmail: open one spam message > **Not spam** / whitelist.
+2. Emails > Filters (or webmail Settings > Filters): if From contains `order@erythro.ai` **or** Subject contains `Erythro.ai contact` / `Erythro.ai order` > move to Inbox / never spam.
+3. Optional: Site Settings > Form notifications > set inbox to Gmail (`erythro.ai@gmail.com`); keep `order@erythro.ai` only as SMTP From. Then Hostinger is not the primary read target.
 
-**Fix (code):** `contactNotification` sends From as `"Erythro.ai" <order@…>`, named Reply-To, aligned envelope, `Auto-Submitted` headers (reduces some false positives; does not replace the filter).
+**Fix (code):** `contactNotification` sends From as `"Erythro.ai" <order@�>`, named Reply-To, aligned envelope, `Auto-Submitted` headers (reduces some false positives; does not replace the filter).
 
 **Prevent:** Prefer reading form alerts in Gmail (or a dedicated notify address) rather than the same Hostinger mailbox used as SMTP From.
 
 ---
 
-## PIT-022 — Local e2e / `getPayload` hangs on Drizzle «Accept warnings and push schema?»
+## PIT-022 � Local e2e / `getPayload` hangs on Drizzle �Accept warnings and push schema?�
 
 **Tags:** `e2e`, `payload`, `push`, `windows`, `playwright`  
 **Seen:** 2026-08-18 full `pnpm test`. Warning mentioned deleting `full` / `home_only` columns.
 
 **Symptom:** Playwright `webServer` times out 60s waiting for `:3000`, or tests hang with no output. Dev terminal stuck on `Pulling schema from database...` then interactive `y/N`.
 
-**Cause:** Payload postgres adapter `push` is on in `next dev`. Schema drift vs DB → Drizzle prompts. `getPayload` in e2e `seedTestUser` hits the same prompt. CI already sets `push: false`; local `pnpm dev` does not.
+**Cause:** Payload postgres adapter `push` is on in `next dev`. Schema drift vs DB > Drizzle prompts. `getPayload` in e2e `seedTestUser` hits the same prompt. CI already sets `push: false`; local `pnpm dev` does not.
 
 **Fix:**
 - `PAYLOAD_DISABLE_PUSH=1` for `pnpm dev` and `pnpm test:e2e` (`playwright.config.ts` sets it).
@@ -360,7 +360,7 @@ curl -D - -o NUL -H "Range: bytes=0-1023" "<media-url>"
 
 ---
 
-## PIT-023 — Playwright e2e false failures (Next.js Link, browsers, timeouts, stale copy)
+## PIT-023 � Playwright e2e false failures (Next.js Link, browsers, timeouts, stale copy)
 
 **Tags:** `e2e`, `playwright`, `next`, `windows`  
 **Seen:** 2026-08-18 full local suite.
@@ -369,43 +369,43 @@ curl -D - -o NUL -H "Range: bytes=0-1023" "<media-url>"
 
 | Symptom | Cause | Fix |
 |---|---|---|
-| `Executable doesn't exist` … `chromium-####/chrome.exe` | Browsers not installed in this env | `pnpm exec playwright install chromium` |
+| `Executable doesn't exist` � `chromium-####/chrome.exe` | Browsers not installed in this env | `pnpm exec playwright install chromium` |
 | `waitForURL` timeout after CTA click; URL may already be `/portfolio` | Default `waitUntil: 'load'` does not fire again on App Router client navigation | `{ waitUntil: 'commit' }`; click `#service-body a[href*="/portfolio"]` |
 | Admin `beforeAll` timeout 30s; later admin tests skipped | First compile of `/admin` + `seedTestUser` | `test.describe.configure({ timeout: 120000 })` + `testInfo.setTimeout(120000)` |
-| Homepage expects `Engineering the future`, page has `ENGINEERING FUTURE` | Template/e2e copy not updated after Hero Motion / CMS | Assert current copy (`HERO_MOTION.md` кадр 1) |
+| Homepage expects `Engineering the future`, page has `ENGINEERING FUTURE` | Template/e2e copy not updated after Hero Motion / CMS | Assert current copy (`HERO_MOTION.md` ���� 1) |
 | `webServer` 60s timeout | Cold `next dev` + Payload | `timeout: 180 * 1000`; `reuseExistingServer: true`; free port 3000 |
-| Mobile Hero «Find out more» e2e: `casesTop` still ~500px | Test clicks as soon as `.splash-bg` is gone; `refreshScrollLayout()` `scrollTo(0)` 800ms later cancels the CTA scroll. Asserting `#contacts` hits the hidden desktop overlay (`display:none`, top 0) | Wait ≥1000ms after splash, then click; assert `#contacts-mobile` near top and `#cases` scrolled past |
+| Mobile Hero �Find out more� e2e: `casesTop` still ~500px | Test clicks as soon as `.splash-bg` is gone; `refreshScrollLayout()` `scrollTo(0)` 800ms later cancels the CTA scroll. Asserting `#contacts` hits the hidden desktop overlay (`display:none`, top 0) | Wait ?1000ms after splash, then click; assert `#contacts-mobile` near top and `#cases` scrolled past |
 
-**Prevent:** After copy or CTA changes, update e2e in the same PR. Local full run: `pnpm test` (int) then `pnpm test:e2e` with Chromium installed. E2E still **not** on GHA — do not assume CI covers UI.
+**Prevent:** After copy or CTA changes, update e2e in the same PR. Local full run: `pnpm test` (int) then `pnpm test:e2e` with Chromium installed. E2E still **not** on GHA � do not assume CI covers UI.
 
 ---
 
-## PIT-024 — Vercel build fails: middleware → Payload → `node:console` UnhandledSchemeError
+## PIT-024 � Vercel build fails: middleware > Payload > `node:console` UnhandledSchemeError
 
 **Tags:** `vercel`, `middleware`, `edge`, `payload`, `markdown`, `agent-readiness`  
 **Seen:** 2026-08-28 PR `fix/order-page-solutions` (agent readiness / markdown negotiation).
 
 **Symptom:** Vercel `pnpm run build` fails with webpack `UnhandledSchemeError: Reading from "node:console"` (also `node:crypto`, `node:diagnostics_channel`). Import trace ends at `./src/middleware.ts`.
 
-**Cause:** Middleware (Edge bundle) imported `@/lib/markdownNegotiation`, which pulls `legalPages.server` → `payload` → `undici` Node builtins. Edge/webpack cannot resolve `node:` schemes the same way as the Node server bundle. Related to PIT-002 (admin client), but here the leak is via **middleware**, not the admin import map.
+**Cause:** Middleware (Edge bundle) imported `@/lib/markdownNegotiation`, which pulls `legalPages.server` > `payload` > `undici` Node builtins. Edge/webpack cannot resolve `node:` schemes the same way as the Node server bundle. Related to PIT-002 (admin client), but here the leak is via **middleware**, not the admin import map.
 
 **Fix:**
 - Edge-safe Accept parser only: `src/lib/markdownAccept.ts` (`shouldServeMarkdown`).
-- Middleware imports `markdownAccept` + `agentDiscovery` — never `markdownNegotiation` / Payload / CMS.
+- Middleware imports `markdownAccept` + `agentDiscovery` � never `markdownNegotiation` / Payload / CMS.
 - Server route `src/app/api/markdown-negotiate/` keeps the heavy `generateMarkdownForRoute`.
 
-**Prevent:** Treat middleware as Edge-only. Any new helper used from `middleware.ts` must be free of Payload, `pg`, `undici`, and other Node-only deps. If in doubt, split “parse headers” from “fetch CMS”.
+**Prevent:** Treat middleware as Edge-only. Any new helper used from `middleware.ts` must be free of Payload, `pg`, `undici`, and other Node-only deps. If in doubt, split �parse headers� from �fetch CMS�.
 
 ---
 
-## PIT-025 — Unit CI: markdown `/order/:slug` returns 404 (wrong static slug)
+## PIT-025 � Unit CI: markdown `/order/:slug` returns 404 (wrong static slug)
 
 **Tags:** `ci`, `vitest`, `order-plans`, `markdown`  
 **Seen:** 2026-08-28 Unit Tests job after agent-readiness merge.
 
-**Symptom:** `generates markdown for /order/:slug` expects 200, gets 404. Logs may show `ECONNREFUSED …:5432` — easy to misread as “need Postgres in Unit job”.
+**Symptom:** `generates markdown for /order/:slug` expects 200, gets 404. Logs may show `ECONNREFUSED �:5432` � easy to misread as �need Postgres in Unit job�.
 
-**Cause:** Test hard-coded slug `audit-diagnostic`, which existed only in **uncommitted** local `orderPlans` WIP. On CI, Unit job has no `DATABASE_URL`; CMS fetch fails and falls back to committed `ORDER_PLANS` (`free-start`, `ai-business-card`, …) — no `audit-diagnostic` → 404. Empty Postgres service would not help without seed data.
+**Cause:** Test hard-coded slug `audit-diagnostic`, which existed only in **uncommitted** local `orderPlans` WIP. On CI, Unit job has no `DATABASE_URL`; CMS fetch fails and falls back to committed `ORDER_PLANS` (`free-start`, `ai-business-card`, �) � no `audit-diagnostic` > 404. Empty Postgres service would not help without seed data.
 
 **Fix:** Resolve slug from `getAllOrderSlugs()[0]` (static committed plans). Keep Unit job DB-free.
 
@@ -413,25 +413,25 @@ curl -D - -o NUL -H "Range: bytes=0-1023" "<media-url>"
 
 ---
 
-## PIT-026 — Unit CI: all tests pass, Vitest exits 1 with 14 unhandled rejections
+## PIT-026 � Unit CI: all tests pass, Vitest exits 1 with 14 unhandled rejections
 
 **Tags:** `ci`, `vitest`, `payload`, `database`  
 **Seen:** 2026-08-28 Unit Tests (`68 passed`, `14 errors`, exit code 1).
 
 **Symptom:** Suite green, then `Vitest caught N unhandled errors` / `Unhandled Rejection` with empty `{ message: undefined, stacks: [] }`.
 
-**Cause:** Without `DATABASE_URL`, helpers still call `getPayload()`. Payload/pg opens a pool to `localhost:5432`; connection failures surface as **unhandled** rejected promises after the test’s try/catch already returned static fallbacks. Vitest treats unhandled rejections as run failure.
+**Cause:** Without `DATABASE_URL`, helpers still call `getPayload()`. Payload/pg opens a pool to `localhost:5432`; connection failures surface as **unhandled** rejected promises after the test�s try/catch already returned static fallbacks. Vitest treats unhandled rejections as run failure.
 
 **Fix:** In `vitest.setup.ts`, when `DATABASE_URL` is missing, mock `payload.getPayload` to throw immediately (no dial). CMS helpers catch and use static data. When `DATABASE_URL` is set (API job / local), use real Payload.
 
-**Prevent:** Unit job stays “no DB”. Don’t “fix” by adding a blank Postgres service. Reproduce locally: unset `DATABASE_URL` and run `pnpm exec vitest run --exclude tests/int/api.int.spec.ts`.
+**Prevent:** Unit job stays �no DB�. Don�t �fix� by adding a blank Postgres service. Reproduce locally: unset `DATABASE_URL` and run `pnpm exec vitest run --exclude tests/int/api.int.spec.ts`.
 
 ---
 
-## PIT-027 — Production `/admin` Cloudflare 524 / Vercel 300s timeout
+## PIT-027 � Production `/admin` Cloudflare 524 / Vercel 300s timeout
 
 **Tags:** `admin`, `cloudflare`, `524`, `payload`, `prodMigrations`, `batch=-1`, `vercel`  
-**Seen:** 2026-08-30 `https://erythro.ai/admin` — Cloudflare “A timeout occurred Error code 524” at 00:46:33 UTC.
+**Seen:** 2026-08-30 `https://erythro.ai/admin` � Cloudflare �A timeout occurred Error code 524� at 00:46:33 UTC.
 
 **Symptom:** Public pages work (cached). `/admin` hangs, then Cloudflare 524. Vercel runtime: `Task timed out after 300 seconds`. Logs show the interactive prompt:
 
@@ -448,13 +448,13 @@ DELETE FROM payload_migrations WHERE batch = -1;
 ```
 Wait for hung Fluid isolates to die (up to 300s) or redeploy so new instances skip the prompt. `pnpm db:clear-dev-push` does the same SQL.
 
-**Fix (code):** Do not pass `prodMigrations` at Vercel request runtime — migrations already run in `pnpm build` via `payload migrate`. Keep `push: false` in production / `VERCEL=1`. Local `pnpm dev` sets `PAYLOAD_DISABLE_PUSH=1` so it cannot rewrite `batch=-1` on prod.
+**Fix (code):** Do not pass `prodMigrations` at Vercel request runtime � migrations already run in `pnpm build` via `payload migrate`. Keep `push: false` in production / `VERCEL=1`. Local `pnpm dev` sets `PAYLOAD_DISABLE_PUSH=1` so it cannot rewrite `batch=-1` on prod.
 
 **Prevent:** Never point local `next dev` at prod without `PAYLOAD_DISABLE_PUSH=1`. Schema changes go through `src/migrations/` + build `payload migrate`, not Drizzle push against Supabase.
 
 ---
 
-## PIT-028 — CI API test: missing `solution_plans_features.home_only` (and `features_locales.full`)
+## PIT-028 � CI API test: missing `solution_plans_features.home_only` (and `features_locales.full`)
 
 **Tags:** `ci`, `postgres`, `migrations`, `drizzle-push`, `solution-plans`  
 **Seen:** 2026-08-30 API Tests after local `next:dev` against prod Supabase (same incident as PIT-027).
@@ -477,26 +477,26 @@ ALTER TABLE "solution_plans_features_locales"
 ```
 CI runs the fix script before API tests.
 
-**Prevent:** Same as PIT-027 — never push schema against prod. Prefer `PAYLOAD_DISABLE_PUSH=1` / localhost DB for local work.
+**Prevent:** Same as PIT-027 � never push schema against prod. Prefer `PAYLOAD_DISABLE_PUSH=1` / localhost DB for local work.
 
 ---
 
-## PIT-029 — Audit landing copy vs QA_Auditor report tiers
+## PIT-029 � Audit landing copy vs QA_Auditor report tiers
 
 **Tags:** `audit`, `copy`, `qa-auditor`  
 **Seen:** 2026-08-30 `/audit` vs `C:\agents\website-auditor\erythro-ai`
 
-**Symptom:** Marketing claimed ~55–60 checks, “homepage + 5 funnel pages” on Free, and Diagnostic as a full 60+ checklist with a fix plan.
+**Symptom:** Marketing claimed ~55�60 checks, �homepage + 5 funnel pages� on Free, and Diagnostic as a full 60+ checklist with a fix plan.
 
 **Cause:** Copy described the lab in the abstract, not `A44Tier` disclosure: Free 1 URL (scorecard, top-3, Lighthouse); Diagnostic 5 URLs + summary cards; Pro full 60+ checklist + recommendations **and up to 10 funnel URLs** (`A44Tier.pageCap`: Free=1, Diagnostic=5, Pro=10). Scale names in PDFs are Speed & Mobile UX, SEO & Visibility, Lead gen & Forms, Security & Stability, AI Visibility & Brand Discovery.
 
-**Fix:** Align `src/lib/auditPage.ts` (including `/audit` «How it works»), `src/lib/orderPlans.ts` (`AUDIT_ORDER_PLANS` + `AUDIT_CHECK_CATEGORIES`), and order UI with `QA_Auditor` `A44Copy` / `ReportScopeOfWork` / `AGENTS.md`. Client PDFs say “60+”, not “55–60”. Do not brand Agent Readiness as Vercel. Scorecard weights in `AuditCollector` are Speed 27% · Lead 22% · SEO 22% · Security 18% · AI Visibility 11%; L1 is reported, not weighted. The How-it-works categories **and** Order «What we check» cards must follow `ReportScopeOfWork` itemsCore (network, indexing, PSI, per-locale, AI Visibility, Agent Readiness L1, funnel crawl) **plus Pro-only Funnel review** (AI verdict after the crawl — not Gemini-branded on the marketing page). Pro Order features must disclose `pageCap=10`, not only “everything in Diagnostic”. After copy edits, PATCH the `audit-page` global and upsert `solution-plans` (`scripts/patch-audit-funnel-review.ts`, `scripts/seed-audit-order-plans.ts`) — CMS arrays win over static fallbacks.
+**Fix:** Align `src/lib/auditPage.ts` (including `/audit` �How it works�), `src/lib/orderPlans.ts` (`AUDIT_ORDER_PLANS` + `AUDIT_CHECK_CATEGORIES`), and order UI with `QA_Auditor` `A44Copy` / `ReportScopeOfWork` / `AGENTS.md`. Client PDFs say �60+�, not �55�60�. Do not brand Agent Readiness as Vercel. Scorecard weights in `AuditCollector` are Speed 27% � Lead 22% � SEO 22% � Security 18% � AI Visibility 11%; L1 is reported, not weighted. The How-it-works categories **and** Order �What we check� cards must follow `ReportScopeOfWork` itemsCore (network, indexing, PSI, per-locale, AI Visibility, Agent Readiness L1, funnel crawl) **plus Pro-only Funnel review** (AI verdict after the crawl � not Gemini-branded on the marketing page). Pro Order features must disclose `pageCap=10`, not only �everything in Diagnostic�. After copy edits, PATCH the `audit-page` global and upsert `solution-plans` (`scripts/patch-audit-funnel-review.ts`, `scripts/seed-audit-order-plans.ts`) � CMS arrays win over static fallbacks.
 
 **Prevent:** When auditor checks or tier unlocks change, update landing + order copy in the same change. Diff against `QA_Auditor/AGENTS.md`, `ReportScopeOfWork.java`, and `A44Tier.pageCap`.
 
 ---
 
-## PIT-030 — Audit order checkout must persist structured client fields
+## PIT-030 � Audit order checkout must persist structured client fields
 
 **Tags:** `audit`, `order`, `contact-submissions`  
 **Seen:** 2026-08-31
@@ -511,31 +511,31 @@ CI runs the fix script before API tests.
 
 ---
 
-## PIT-031 — Docker Compose eats `$` inside `SMTP_PASS` on the audit worker
+## PIT-031 � Docker Compose eats `$` inside `SMTP_PASS` on the audit worker
 
 **Symptom:** Worker logs `email skipped: SMTP_PASS not set` or SMTP auth fails after deploy; `docker compose` warns `The "R" variable is not set` (or another letter from the password).
 
 **Cause:** Compose interpolates `$VAR` / `$R` in `/home/audit-agent/.env` when recreating the container, so a Hostinger password containing `$` is truncated or emptied.
 
-**Fix:** Escape literal dollars as `$$` when writing worker `.env` (`scripts/deploy_vps_audit_stack.py`). Verify with `docker exec audit_agent_worker node -e "console.log(String((process.env.SMTP_PASS||'').length))"` — length must match local `SMTP_PASS`.
+**Fix:** Escape literal dollars as `$$` when writing worker `.env` (`scripts/deploy_vps_audit_stack.py`). Verify with `docker exec audit_agent_worker node -e "console.log(String((process.env.SMTP_PASS||'').length))"` � length must match local `SMTP_PASS`.
 
-**Prevent:** Never paste raw `$…` secrets into Compose env files without `$$` escaping. Prefer `env_file` values that are pre-escaped by the deploy script.
+**Prevent:** Never paste raw `$�` secrets into Compose env files without `$$` escaping. Prefer `env_file` values that are pre-escaped by the deploy script.
 
 ---
 
-## PIT-032 — Audit email / “Open full report” returns R2 `InvalidArgument` Authorization XML
+## PIT-032 � Audit email / �Open full report� returns R2 `InvalidArgument` Authorization XML
 
-**Symptom:** Client opens the link from the audit email (or “Open full report”) and sees `<Error><Code>InvalidArgument</Code><Message>Authorization</Message></Error>` instead of HTML.
+**Symptom:** Client opens the link from the audit email (or �Open full report�) and sees `<Error><Code>InvalidArgument</Code><Message>Authorization</Message></Error>` instead of HTML.
 
-**Cause:** Worker stored/emailed the private S3 API URL (`*.r2.cloudflarestorage.com/...`) because `R2_PUBLIC_BASE_URL` was unset. That endpoint requires signed auth — browsers cannot open it.
+**Cause:** Worker stored/emailed the private S3 API URL (`*.r2.cloudflarestorage.com/...`) because `R2_PUBLIC_BASE_URL` was unset. That endpoint requires signed auth � browsers cannot open it.
 
-**Fix:** Email and client-facing `reportUrl` use `https://erythro.ai/audit/report/[id]?k=[reportAccessToken]`, which redirects to `/api/audit/report/[id]/html?k=…` (standalone A44 document, not an iframe). Private storage URL stays only in `auditSummary.storageUrl`. Optionally set a public R2 custom domain / r2.dev as `R2_PUBLIC_BASE_URL` later.
+**Fix:** Email and client-facing `reportUrl` use `https://erythro.ai/audit/report/[id]?k=[reportAccessToken]`, which redirects to `/api/audit/report/[id]/html?k=�` (standalone A44 document, not an iframe). Private storage URL stays only in `auditSummary.storageUrl`. Optionally set a public R2 custom domain / r2.dev as `R2_PUBLIC_BASE_URL` later.
 
 **Prevent:** Never put `r2.cloudflarestorage.com` URLs in customer emails or external CTAs. Gate UI with `isPublicReportUrl()`. Never email `/audit/report/[id]` without `?k=`.
 
 ---
 
-## PIT-033 — CMS `htmlResult` PATCH returns 500 for full A44 HTML
+## PIT-033 � CMS `htmlResult` PATCH returns 500 for full A44 HTML
 
 **Symptom:** QA_Auditor finishes (score + R2 upload OK) but `PATCH /api/audit/internal/[id]` with `htmlResult` (~50KB+) returns 500; retry without `htmlResult` succeeds.
 
@@ -547,7 +547,7 @@ CI runs the fix script before API tests.
 
 ---
 
-## PIT-034 — A44 report logos 404 under `/api/audit/templates/figma-assets/`
+## PIT-034 � A44 report logos 404 under `/api/audit/templates/figma-assets/`
 
 **Symptom:** Standalone report page loads, but header/footer logos and icons are missing; network shows `Route not found "/api/audit/templates/figma-assets/logo-digital.svg"`.
 
@@ -555,23 +555,23 @@ CI runs the fix script before API tests.
 
 **Fix:** Ship assets in `public/templates/figma-assets/` (primary) and optionally R2 `assets/figma-assets/`. Rewrite HTML to `/templates/figma-assets/...`. `/api/audit/assets/figma-assets/...` falls back to local files when R2 credentials fail. Re-upload R2 copy with `npx tsx scripts/upload_audit_figma_assets_r2.mjs` when icons change.
 
-**Prevent:** Never leave package HTML with `../templates/figma-assets` paths for web delivery. Do not rely only on R2 GetObject for logos — Vercel secret mismatches return opaque 404s.
+**Prevent:** Never leave package HTML with `../templates/figma-assets` paths for web delivery. Do not rely only on R2 GetObject for logos � Vercel secret mismatches return opaque 404s.
 
 ---
 
-## PIT-035 — Vercel `R2_ACCESS_KEY_ID` truncated (length 13) breaks report HTML
+## PIT-035 � Vercel `R2_ACCESS_KEY_ID` truncated (length 13) breaks report HTML
 
 **Symptom:** Email says report ready; `/api/audit/report/[id]/html` returns `Report HTML not available yet`. Logs: `[r2] getObject failed: Credential access key has length 13, should be 32`.
 
 **Cause:** Wrong/truncated Access Key ID in Vercel Project Env (local key is 32 hex chars). Combined with Payload rejecting large `htmlResult` (`The following field is invalid: Html Result`), CMS stays empty and R2 fallback fails.
 
-**Fix:** Set correct `R2_ACCESS_KEY_ID` (32 chars) on Production+Preview and redeploy. Persist audit pipeline fields (including `htmlResult`) via SQL in `/api/audit/internal/[id]` — Payload re-validates existing `html_result` on later updates and keeps status stuck at `in_progress`. Backfill stuck rows from R2/HTML when needed.
+**Fix:** Set correct `R2_ACCESS_KEY_ID` (32 chars) on Production+Preview and redeploy. Persist audit pipeline fields (including `htmlResult`) via SQL in `/api/audit/internal/[id]` � Payload re-validates existing `html_result` on later updates and keeps status stuck at `in_progress`. Backfill stuck rows from R2/HTML when needed.
 
 **Prevent:** After adding R2 secrets, verify lengths (Access Key 32, Secret 64). Smoke `GetObject` from a Vercel function, not only from the VPS worker. Never use `payload.update` for large audit HTML.
 
 ---
 
-## PIT-036 — Hebrew font wrong until full reload after language switch
+## PIT-036 � Hebrew font wrong until full reload after language switch
 
 **Tags:** `i18n`, `fonts`, `heebo`, `rtl`, `client-locale`
 
@@ -581,11 +581,11 @@ CI runs the fix script before API tests.
 
 **Fix:** `applyDocumentLocale` in `useSitePrefs` toggles the next/font variable classes and `--font-inter-latin` together with `lang`/`dir`.
 
-**Prevent:** Any client-only locale switch must mirror layout font wiring, not only `lang`/`dir`. Keep checklist item “Client locale maps…” plus font CSS variables in mind for non-reload i18n.
+**Prevent:** Any client-only locale switch must mirror layout font wiring, not only `lang`/`dir`. Keep checklist item �Client locale maps�� plus font CSS variables in mind for non-reload i18n.
 
 ---
 
-## PIT-037 — n8n Code node expression `$node.name` breaks execution & light email signature styles
+## PIT-037 � n8n Code node expression `$node.name` breaks execution & light email signature styles
 
 **Tags:** `n8n`, `email`, `autoresponder`, `imap`, `smtp`, `css`
 
@@ -604,7 +604,7 @@ CI runs the fix script before API tests.
 
 ---
 
-## PIT-038 — n8n email autoresponder: repeated replies in active client threads & default n8n attribution
+## PIT-038 � n8n email autoresponder: repeated replies in active client threads & default n8n attribution
 
 **Tags:** `n8n`, `email`, `autoresponder`, `smtp`, `cooldown`, `threading`, `attribution`  
 **Seen:** 2026-09-02 `Erythro.ai Email Autoresponder` (`order@erythro.ai` & `team@erythro.ai`).
@@ -615,13 +615,13 @@ CI runs the fix script before API tests.
 3. Emails contain the footer string *"This email was sent automatically with n8n"*.
 
 **Cause:**
-1. IMAP trigger fires on every incoming message. Without checking `In-Reply-To`, `References`, or `Re:` / `Fwd:` / `Отв:` prefixes, the workflow treats conversational replies as new requests.
+1. IMAP trigger fires on every incoming message. Without checking `In-Reply-To`, `References`, or `Re:` / `Fwd:` / `���:` prefixes, the workflow treats conversational replies as new requests.
 2. Without rate limiting, sequential emails trigger parallel executions that race and send duplicate responses.
 3. n8n `emailSend` (SMTP) node has default attribution enabled unless explicitly toggled off in node Options.
 
 **Fix:**
-1. **Remove Attribution:** In `emailSend` nodes → **Options** → **Add Option** → `Append n8n Attribution` → toggle **OFF**.
-2. **Thread Detection:** In JavaScript Code node (`Process & Sign Autoresponder`), check headers `in-reply-to`, `references`, and `subject` regex `/^(re:|fwd:|отв:|на:)/i` → push `ongoing_thread_reply` to `skipReasons`.
+1. **Remove Attribution:** In `emailSend` nodes > **Options** > **Add Option** > `Append n8n Attribution` > toggle **OFF**.
+2. **Thread Detection:** In JavaScript Code node (`Process & Sign Autoresponder`), check headers `in-reply-to`, `references`, and `subject` regex `/^(re:|fwd:|���:|��:)/i` > push `ongoing_thread_reply` to `skipReasons`.
 3. **24h Cooldown:** Use n8n persistent state `$getWorkflowStaticData('global')` to store `lastReplied[fromAddress] = timestamp` and enforce a 24-hour silence window (`rate_limited_24h`).
 4. Commit updated workflow JSON in `infra/n8n/workflows/email-autoresponder.json` and deploy.
 
@@ -629,68 +629,68 @@ CI runs the fix script before API tests.
 
 ---
 
-## PIT-039 — GitHub Secret Scanning: hardcoded Google API key (public leak)
+## PIT-039 � GitHub Secret Scanning: hardcoded Google API key (public leak)
 
 **Tags:** `security`, `secrets`, `github`, `pagespeed`, `google-api`  
-**Seen:** 2026-09-02 GitHub Secret scanning alert #1 — `AuditCollector.java` fallback `PAGESPEED_API_KEY`.
+**Seen:** 2026-09-02 GitHub Secret scanning alert #1 � `AuditCollector.java` fallback `PAGESPEED_API_KEY`.
 
-**Symptom:** GitHub Security → Secret scanning alerts shows **Google API Key** with **Public leak**. Key prefix `AIzaSy…` in `services/audit-agent/QA_Auditor/src/main/java/ai/erythro/AuditCollector.java`.
+**Symptom:** GitHub Security > Secret scanning alerts shows **Google API Key** with **Public leak**. Key prefix `AIzaSy�` in `services/audit-agent/QA_Auditor/src/main/java/ai/erythro/AuditCollector.java`.
 
 **Cause:** Last-resort hardcoded Google API key in `getPageSpeedApiKey()` instead of env / `.env` only. Public repo = anyone can call PageSpeed Insights (or whatever APIs the key allows) on your quota/billing.
 
 **Fix (order matters):**
-1. **Revoke/rotate first** in [Google Cloud Console → Credentials](https://console.cloud.google.com/apis/credentials): delete or restrict the leaked key, create a new one.
-2. Put the new key only in env (`PAGESPEED_API_KEY` / `GEMINI_API_KEY`) or local `.env` (gitignored) — never in source.
-3. Remove hardcoded fallback from code (return `null` → anonymous PageSpeed mode).
-4. Commit, push, then in the GitHub alert: **Revoke** (if GitHub can) → **Close as remediated**.
+1. **Revoke/rotate first** in [Google Cloud Console > Credentials](https://console.cloud.google.com/apis/credentials): delete or restrict the leaked key, create a new one.
+2. Put the new key only in env (`PAGESPEED_API_KEY` / `GEMINI_API_KEY`) or local `.env` (gitignored) � never in source.
+3. Remove hardcoded fallback from code (return `null` > anonymous PageSpeed mode).
+4. Commit, push, then in the GitHub alert: **Revoke** (if GitHub can) > **Close as remediated**.
 
-**Prevent:** No `AIza…` / tokens in Java/TS source. Pre-commit secret scan (gitleaks / GitHub push protection). Do not rewrite public git history unless coordinated — rotation is the real kill switch.
+**Prevent:** No `AIza�` / tokens in Java/TS source. Pre-commit secret scan (gitleaks / GitHub push protection). Do not rewrite public git history unless coordinated � rotation is the real kill switch.
 
 ---
 
-## PIT-040 — Duplicate auto-replies: Hostinger Mail Autoreply + n8n
+## PIT-040 � Duplicate auto-replies: Hostinger Mail Autoreply + n8n
 
 **Tags:** `n8n`, `email`, `autoresponder`, `hostinger`, `duplicate`  
-**Seen:** 2026-09-03 `order@erythro.ai` — two different confirmation emails on one inbound message.
+**Seen:** 2026-09-03 `order@erythro.ai` � two different confirmation emails on one inbound message.
 
 **Symptom:** Client receives **two** auto-replies:
-1. Generic Hostinger Mail text: *“Thank you for reaching out…”* / *“technical specialist will get back to you within one business day”* / signature *“Erythro.ai Team”* + *“High-Performance Web & Scalable AI Infrastructure”*.
-2. Branded n8n text from `Process & Sign Autoresponder` (Hello {name}, Customer Service Orders, Tel / Email / URL, *Hi-Load Web Development…*).
+1. Generic Hostinger Mail text: *�Thank you for reaching out��* / *�technical specialist will get back to you within one business day�* / signature *�Erythro.ai Team�* + *�High-Performance Web & Scalable AI Infrastructure�*.
+2. Branded n8n text from `Process & Sign Autoresponder` (Hello {name}, Customer Service Orders, Tel / Email / URL, *Hi-Load Web Development�*).
 
 The generic body is **not** in `infra/n8n/workflows/email-autoresponder.json`.
 
 **Cause:** Two independent senders on the same mailbox.
 1. **Hostinger Mail Autoreply / Vacation** on `order@erythro.ai` (and possibly `team@`) fires on inbound SMTP *before* IMAP. It appends the Hostinger webmail signature (`hmail-signature`, tagline *High-Performance Web & Scalable AI Infrastructure*). These messages are not saved to `INBOX.Sent`.
-2. **n8n IMAP → SMTP** then sends the JS template.
+2. **n8n IMAP > SMTP** then sends the JS template.
 
 **Fix:** Keep n8n only. Disable Hostinger Autoreply:
-1. [Hostinger Mail](https://mail.hostinger.com/) → `order@erythro.ai` → **Settings → Auto-reply** (or **Vacation**) → **Off**. Repeat for `team@erythro.ai` if set.
-2. Alternative: hPanel → **Emails** → account menu → **Autoresponder** → disable.
+1. [Hostinger Mail](https://mail.hostinger.com/) > `order@erythro.ai` > **Settings > Auto-reply** (or **Vacation**) > **Off**. Repeat for `team@erythro.ai` if set.
+2. Alternative: hPanel > **Emails** > account menu > **Autoresponder** > disable.
 3. Optional: update the Hostinger **Signature** to the n8n branded block so *manual* webmail replies match; Autoreply must still stay off.
 
 **Prevent:** Before activating an n8n IMAP autoresponder, confirm Hostinger Autoreply/Vacation is off for every watched mailbox. Do not run two auto-reply layers on one inbox.
 
 ---
 
-## PIT-041 — Do not HTTP-fetch a user-supplied website URL (SSRF)
+## PIT-041 � Do not HTTP-fetch a user-supplied website URL (SSRF)
 
 **Tags:** `ssrf`, `audit`, `dns`, `forms`  
-**Seen:** 2026-09-03 — website live-check on `/audit` (replaced a proposed n8n workflow)
+**Seen:** 2026-09-03 � website live-check on `/audit` (replaced a proposed n8n workflow)
 
-**Symptom:** “Verify the site exists” by `fetch(userUrl)` from Vercel/n8n can hit `127.0.0.1`, RFC1918, link-local, or cloud metadata.
+**Symptom:** �Verify the site exists� by `fetch(userUrl)` from Vercel/n8n can hit `127.0.0.1`, RFC1918, link-local, or cloud metadata.
 
 **Cause:** The URL is attacker-controlled. Server-side HTTP to that URL is classic SSRF.
 
 **Fix:** Format-check the hostname, block localhost / `*.local` / raw IPs, `dns.lookup` only, then require at least one **public** A/AAAA. No HTTP to the target. Implementation: `src/lib/checkWebsite.ts`, `POST /api/audit/check-website`.
 
-**Prevent:** Never proxy or GET a client-supplied URL from app/n8n for “is this site real?”. DNS to a public IP is enough for the form; the audit worker already fetches the site later in its own sandbox.
+**Prevent:** Never proxy or GET a client-supplied URL from app/n8n for �is this site real?�. DNS to a public IP is enough for the form; the audit worker already fetches the site later in its own sandbox.
 
 ---
 
-## PIT-042 — Chrome autofill squares the audit pill inputs
+## PIT-042 � Chrome autofill squares the audit pill inputs
 
 **Tags:** `audit`, `forms`, `css`, `autofill`, `chrome`  
-**Seen:** 2026-09-03 — `/audit` name / email / website / phone pills
+**Seen:** 2026-09-03 � `/audit` name / email / website / phone pills
 
 **Symptom:** After browser autofill, pill fields lose rounded corners (rectangular yellow/gray overlay).
 
@@ -702,16 +702,16 @@ The generic body is **not** in `infra/n8n/workflows/email-autoresponder.json`.
 
 ---
 
-## PIT-043 — Turnstile widget blocked or siteverify skipped
+## PIT-043 � Turnstile widget blocked or siteverify skipped
 
 **Tags:** `turnstile`, `csp`, `forms`, `env`  
-**Seen:** 2026-09-03 — contact / audit / order intake
+**Seen:** 2026-09-03 � contact / audit / order intake
 
-**Symptom:** Widget iframe empty; console CSP `frame-src` / `script-src` / `worker-src` violation. Widget chrome shows «Невозможно подключиться к веб-сайту» (error 600010). Or forms submit without a challenge locally, then `403` on production.
+**Symptom:** Widget iframe empty; console CSP `frame-src` / `script-src` / `worker-src` violation. Widget chrome shows ����������� ������������ � ���-����� (error 600010). Or forms submit without a challenge locally, then `403` on production.
 
-**Cause:** CSP omitted `https://challenges.cloudflare.com` in `frame-src` (script-only is not enough), or blocked Turnstile's `blob:` Web Worker (`worker-src` inherits `default-src 'self'`). Next.js inlines only `NEXT_PUBLIC_*` sitekeys; Cloudflare dashboard names (`TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY`) need the `next.config` env map + secret alias. Production `TURNSTILE_HOSTNAMES` must not include `localhost`. Widget domains in the Cloudflare dashboard *must* include `localhost` for local testing. Opening via a LAN IP (`172.x`) also fails — that hostname is not on the widget.
+**Cause:** CSP omitted `https://challenges.cloudflare.com` in `frame-src` (script-only is not enough), or blocked Turnstile's `blob:` Web Worker (`worker-src` inherits `default-src 'self'`). Next.js inlines only `NEXT_PUBLIC_*` sitekeys; Cloudflare dashboard names (`TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY`) need the `next.config` env map + secret alias. Production `TURNSTILE_HOSTNAMES` must not include `localhost`. Widget domains in the Cloudflare dashboard *must* include `localhost` for local testing. Opening via a LAN IP (`172.x`) also fails � that hostname is not on the widget.
 
-**Fix:** CSP needs `script-src` / `connect-src` / `frame-src` → `https://challenges.cloudflare.com`, plus `worker-src 'self' blob:` and `blob:` on `script-src`. Accept `TURNSTILE_SITE_KEY` → `NEXT_PUBLIC_TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY` → `TURNSTILE_SECRET`. Siteverify only on the server (`src/lib/turnstile.ts`). Restart `next dev` after changing public env or CSP. Open local as `http://localhost:3000` (or 3001), not the Hyper-V/WSL LAN IP.
+**Fix:** CSP needs `script-src` / `connect-src` / `frame-src` > `https://challenges.cloudflare.com`, plus `worker-src 'self' blob:` and `blob:` on `script-src`. Accept `TURNSTILE_SITE_KEY` > `NEXT_PUBLIC_TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY` > `TURNSTILE_SECRET`. Siteverify only on the server (`src/lib/turnstile.ts`). Restart `next dev` after changing public env or CSP. Open local as `http://localhost:3000` (or 3001), not the Hyper-V/WSL LAN IP.
 
 **Prevent:** Never call siteverify from the browser. Reset the widget in `finally` after every submit (tokens are single-use). Mirror Vercel env for Production + Preview.
 
@@ -719,14 +719,14 @@ The generic body is **not** in `infra/n8n/workflows/email-autoresponder.json`.
 
 ---
 
-## PIT-044 — Form “thank you” is API SMTP, not n8n IMAP
+## PIT-044 � Form �thank you� is API SMTP, not n8n IMAP
 
 **Tags:** `email`, `forms`, `n8n`, `autoresponder`, `smtp`  
-**Seen:** 2026-09-04 — contact / order / audit forms
+**Seen:** 2026-09-04 � contact / order / audit forms
 
-**Symptom:** After a site form submit, staff get the notify mail on `order@erythro.ai`, but the client never receives «спасибо, заявка принята». n8n IMAP autoresponder works for mail sent *from Gmail/other* to `order@`.
+**Symptom:** After a site form submit, staff get the notify mail on `order@erythro.ai`, but the client never receives ��������, ������ �������. n8n IMAP autoresponder works for mail sent *from Gmail/other* to `order@`.
 
-**Cause:** Site notify is From `"Erythro.ai" <order@erythro.ai>` To the CMS notify inbox (often the same mailbox), Reply-To = visitor, `Auto-Submitted: auto-generated`. n8n `Process & Sign Autoresponder` skips `From @erythro.ai` and `Auto-Submitted` ≠ `no`. Hostinger Autoreply must stay Off (PIT-040). Teaching n8n to reply to that Reply-To would risk mail loops.
+**Cause:** Site notify is From `"Erythro.ai" <order@erythro.ai>` To the CMS notify inbox (often the same mailbox), Reply-To = visitor, `Auto-Submitted: auto-generated`. n8n `Process & Sign Autoresponder` skips `From @erythro.ai` and `Auto-Submitted` ? `no`. Hostinger Autoreply must stay Off (PIT-040). Teaching n8n to reply to that Reply-To would risk mail loops.
 
 **Fix:** Send a separate confirmation with `sendClientAcknowledgement` in `src/lib/contactNotification.ts` after CMS persist: To = visitor email, From = `order@erythro.ai`, Reply-To = `order@erythro.ai`, `Auto-Submitted: auto-replied`. Do not fail `/api/contact` if ack SMTP fails. n8n stays for inbound mail from **external** mailboxes only.
 
@@ -734,25 +734,25 @@ The generic body is **not** in `infra/n8n/workflows/email-autoresponder.json`.
 
 ---
 
-## PIT-045 — Cloudflare Insights beacon blocked by CSP
+## PIT-045 � Cloudflare Insights beacon blocked by CSP
 
 **Tags:** `csp`, `cloudflare`, `web-analytics`, `psi`  
-**Seen:** 2026-09-04 `erythro.ai` — PageSpeed / Chrome Issues: `beacon.min.js` CSP violation
+**Seen:** 2026-09-04 `erythro.ai` � PageSpeed / Chrome Issues: `beacon.min.js` CSP violation
 
 **Symptom:** Console / PSI: Loading `https://static.cloudflareinsights.com/beacon.min.js/...` violates `script-src`. Chrome Issues panel: Content security policy on `/beacon.min.js`.
 
 **Cause:** Cloudflare Web Analytics auto-injects the Insights beacon on proxied zones. CSP in `next.config.ts` listed Turnstile (`challenges.cloudflare.com`) but not the Insights hosts.
 
-**Fix:** Allow `https://static.cloudflareinsights.com` on `script-src` and `https://cloudflareinsights.com` on `connect-src` (manual beacons). Auto-injected RUM also posts to `'self'` `/cdn-cgi/rum`, which was already allowed. Do not pin the hashed `/beacon.min.js/v…` path — Cloudflare rotates it.
+**Fix:** Allow `https://static.cloudflareinsights.com` on `script-src` and `https://cloudflareinsights.com` on `connect-src` (manual beacons). Auto-injected RUM also posts to `'self'` `/cdn-cgi/rum`, which was already allowed. Do not pin the hashed `/beacon.min.js/v�` path � Cloudflare rotates it.
 
 **Prevent:** When enabling a Cloudflare/Vercel/GA script, add both the script origin and its report endpoint to CSP in the same change. Re-check PSI console after deploy.
 
 ---
 
-## PIT-046 — Hebrew (RTL) modals show a horizontal scrollbar
+## PIT-046 � Hebrew (RTL) modals show a horizontal scrollbar
 
 **Tags:** `rtl`, `i18n`, `modals`, `overflow`, `hebrew`  
-**Seen:** 2026-09-04 — contact / solutions order modal, audit order modal (`dir=he`)
+**Seen:** 2026-09-04 � contact / solutions order modal, audit order modal (`dir=he`)
 
 **Symptom:** Dialog panel grows a horizontal scrollbar only in Hebrew. EN/RU look fine.
 
@@ -764,14 +764,14 @@ The generic body is **not** in `infra/n8n/workflows/email-autoresponder.json`.
 
 ---
 
-## PIT-047 — Turnstile widget language follows the browser, not the site locale
+## PIT-047 � Turnstile widget language follows the browser, not the site locale
 
 **Tags:** `turnstile`, `i18n`, `forms`  
-**Seen:** 2026-09-04 — contact / order / audit forms in EN and HE showed Russian «Успешно»
+**Seen:** 2026-09-04 � contact / order / audit forms in EN and HE showed Russian ��������
 
 **Symptom:** Site UI is English or Hebrew, but Cloudflare Turnstile success/privacy copy stays in Russian (or whatever the OS/browser language is).
 
-**Cause:** `turnstile.render` defaults to `language: 'auto'`, which uses the visitor’s browser locale. `TurnstileField` did not pass `language`, so a Russian Windows/Chrome profile always got RU chrome.
+**Cause:** `turnstile.render` defaults to `language: 'auto'`, which uses the visitor�s browser locale. `TurnstileField` did not pass `language`, so a Russian Windows/Chrome profile always got RU chrome.
 
 **Fix:** Pass `language: 'en' | 'ru' | 'he'` from the site locale into `turnstile.render` (`src/components/TurnstileField.tsx`). Re-render the widget when locale changes.
 
@@ -779,10 +779,10 @@ The generic body is **not** in `infra/n8n/workflows/email-autoresponder.json`.
 
 ---
 
-## PIT-048 — PhoneE164Field is HTML-required by default; standalone pills must not use `split`
+## PIT-048 � PhoneE164Field is HTML-required by default; standalone pills must not use `split`
 
 **Tags:** `forms`, `phone`, `contact`, `audit`  
-**Seen:** 2026-09-05 — unifying contact / contacts / order checkout with the audit pill form
+**Seen:** 2026-09-05 � unifying contact / contacts / order checkout with the audit pill form
 
 **Symptom:** Contact modal and `/contacts` blocked submit on an empty phone even though JS validation treats phone as optional. On mobile, a standalone phone pill showed an extra top divider.
 
@@ -790,14 +790,14 @@ The generic body is **not** in `infra/n8n/workflows/email-autoresponder.json`.
 
 **Fix:** Pass `required={false}` on optional contact phones. Pass `split` only when the phone shares a pill with a sibling (audit page + order checkout). Standalone contact phones stay in their own `FormPillShell` without `split`. Shared chrome lives in `src/components/form/FormPills.tsx`.
 
-**Prevent:** Do not wrap `PhoneE164Field` in an extra `sr-only` phone label — the field already has one. Combined rows: `clip` off when a dropdown opens; `split` on the phone half only. Keep the field root at `dir="ltr"` so the calling code stays on the physical left in Hebrew.
+**Prevent:** Do not wrap `PhoneE164Field` in an extra `sr-only` phone label � the field already has one. Combined rows: `clip` off when a dropdown opens; `split` on the phone half only. Keep the field root at `dir="ltr"` so the calling code stays on the physical left in Hebrew.
 
 ---
 
-## PIT-049 — Hebrew RTL flips the phone calling-code to the right
+## PIT-049 � Hebrew RTL flips the phone calling-code to the right
 
 **Tags:** `forms`, `phone`, `rtl`, `hebrew`  
-**Seen:** 2026-09-05 — all pill forms in `he`
+**Seen:** 2026-09-05 � all pill forms in `he`
 
 **Symptom:** In Hebrew, the country flag and `+972` sit on the right of the phone field; the national number is on the left.
 
@@ -805,11 +805,11 @@ The generic body is **not** in `infra/n8n/workflows/email-autoresponder.json`.
 
 **Fix:** Force `dir="ltr"` and `flex-row` on the `PhoneE164Field` root. Logical padding (`ps-` / `pe-`) then maps to left/right as in EN/RU. Keep the country dropdown `dir="rtl"` in Hebrew so names stay readable.
 
-**Prevent:** Phone numbers are LTR chrome. Do not let the surrounding RTL form reverse the calling-code + number order. Hebrew placeholders on remaining `dir="ltr"` fields (phone, URL) must be forced to the physical right via `:placeholder-shown`. Email inherits the RTL form like name — do not set `dir="ltr"` on it, and override UA LTR on `type="email"`.
+**Prevent:** Phone numbers are LTR chrome. Do not let the surrounding RTL form reverse the calling-code + number order. Hebrew placeholders on remaining `dir="ltr"` fields (phone, URL) must be forced to the physical right via `:placeholder-shown`. Email inherits the RTL form like name � do not set `dir="ltr"` on it, and override UA LTR on `type="email"`.
 
 ---
 
-## PIT-050 — Backdrop contrast sampler locks to site theme under overlays
+## PIT-050 � Backdrop contrast sampler locks to site theme under overlays
 
 **Tags:** `navbar`, `chat`, `contrast`, `elementsFromPoint`
 
@@ -819,14 +819,14 @@ The generic body is **not** in `infra/n8n/workflows/email-autoresponder.json`.
 
 **Fix:** Same two-pass as Navbar: honor `data-menu-contrast` anywhere in the stack first; then sample luminance but stop before `BODY`/`HTML`. Mark the control itself `data-contrast-ignore`.
 
-**Prevent:** Do not treat a transparent overlay’s inherited page background as the backdrop. Skip `header` and `[data-contrast-ignore]`. Every full-bleed light/dark section still needs `data-menu-contrast` (PIT-018).
+**Prevent:** Do not treat a transparent overlay�s inherited page background as the backdrop. Skip `header` and `[data-contrast-ignore]`. Every full-bleed light/dark section still needs `data-menu-contrast` (PIT-018).
 
 ---
 
-## PIT-051 — Payload media cutover to R2 needs a public base URL
+## PIT-051 � Payload media cutover to R2 needs a public base URL
 
 **Tags:** `media`, `r2`, `blob`, `payload`  
-**Seen:** 2026-09-05 — Blob → `erythro-media`
+**Seen:** 2026-09-05 � Blob > `erythro-media`
 
 **Symptom:** After installing `@payloadcms/storage-s3`, admin still uploads to Blob, or `next/image` / `<video>` break on R2 API hostnames.
 
@@ -838,7 +838,7 @@ The generic body is **not** in `infra/n8n/workflows/email-autoresponder.json`.
 
 ---
 
-## PIT-052 — Audit worker must re-check SSRF and use timing-safe secrets
+## PIT-052 � Audit worker must re-check SSRF and use timing-safe secrets
 
 **Tags:** `security`, `ssrf`, `audit`, `hmac`  
 **Seen:** 2026-09-05
@@ -853,10 +853,10 @@ The generic body is **not** in `infra/n8n/workflows/email-autoresponder.json`.
 
 ---
 
-## PIT-053 — UFW does not block Docker published ports
+## PIT-053 � UFW does not block Docker published ports
 
 **Tags:** `security`, `vps`, `docker`, `ufw`  
-**Seen:** 2026-09-05 — `montblanc_api` on `0.0.0.0:8080`
+**Seen:** 2026-09-05 � `montblanc_api` on `0.0.0.0:8080`
 
 **Symptom:** UFW allows only 22/80/443, but `curl http://VPS_IP:8080` still returns 200.
 
@@ -868,52 +868,52 @@ The generic body is **not** in `infra/n8n/workflows/email-autoresponder.json`.
 
 ---
 
-## PIT-054 — Site mail is in Hostinger INBOX, Unread stays empty; `team@` password ≠ `order@`
+## PIT-054 � Site mail is in Hostinger INBOX, Unread stays empty; `team@` password ? `order@`
 
 **Tags:** `contact`, `email`, `hostinger`, `n8n`, `imap`  
 **Seen:** 2026-09-06. Mailboxes `order@erythro.ai` / `team@erythro.ai`.
 
-**Symptom:** «Письма с сайта перестали доходить» to `order@` / `team@`. Form still returns success. Rows in `/admin` → Contact Submissions. Gmail Unread / Hostinger Unread empty.
+**Symptom:** ������� � ����� ��������� ��������� to `order@` / `team@`. Form still returns success. Rows in `/admin` > Contact Submissions. Gmail Unread / Hostinger Unread empty.
 
 **Cause (three independent layers):**
-1. **SMTP works.** `POST /api/contact` saves then sends From `order@` via `smtp.hostinger.com:465`. Recipients are CMS split: contact → `notifyEmailContact` (`team@`), order/audit → `notifyEmailOrder` (`order@`). DNS MX/SPF/DKIM stay on Cloudflare → Hostinger.
+1. **SMTP works.** `POST /api/contact` saves then sends From `order@` via `smtp.hostinger.com:465`. Recipients are CMS split: contact > `notifyEmailContact` (`team@`), order/audit > `notifyEmailOrder` (`order@`). DNS MX/SPF/DKIM stay on Cloudflare > Hostinger.
 2. **n8n IMAP marks INBOX as read.** Workflow `Erythro.ai Email Autoresponder` polls both boxes with `markAsRead: true`. Site notify is From `@erythro.ai` + `Auto-Submitted: auto-generated`, so n8n skips the reply but still flags the message `\Seen` within a minute. Unread count is always 0; mail is still in INBOX (not Junk).
 3. **`team@` credentials differ from `SMTP_PASS` (`order@`).** Same password fails IMAP/SMTP 535 on `team@`. n8n team trigger and webmail login for `team@` break even when delivery to that mailbox still succeeds via `order@` SMTP.
 
 **Fix (ops):**
-1. [mail.hostinger.com](https://mail.hostinger.com/) → `order@` → **Inbox / All**, not Unread. Subject `Erythro.ai order inquiry` / `Erythro.ai contact`.
-2. hPanel → Emails → `team@erythro.ai` → reset password if login fails; put the new pass only in n8n IMAP/SMTP **Team** credentials (do not overwrite Vercel `SMTP_PASS` unless `order@` changed too).
-3. Optional: Site Settings → Form notifications → point contact notify at Gmail (`erythro.ai@gmail.com`) if that is the inbox actually read (PIT-021).
+1. [mail.hostinger.com](https://mail.hostinger.com/) > `order@` > **Inbox / All**, not Unread. Subject `Erythro.ai order inquiry` / `Erythro.ai contact`.
+2. hPanel > Emails > `team@erythro.ai` > reset password if login fails; put the new pass only in n8n IMAP/SMTP **Team** credentials (do not overwrite Vercel `SMTP_PASS` unless `order@` changed too).
+3. Optional: Site Settings > Form notifications > point contact notify at Gmail (`erythro.ai@gmail.com`) if that is the inbox actually read (PIT-021).
 
-**Prevent:** Do not treat Unread=0 as “SMTP down”. Confirm CMS row + IMAP INBOX. Document per-mailbox Hostinger passwords; n8n order vs team credentials are independent.
+**Prevent:** Do not treat Unread=0 as �SMTP down�. Confirm CMS row + IMAP INBOX. Document per-mailbox Hostinger passwords; n8n order vs team credentials are independent.
 
 ---
 
-## PIT-055 — Mobile form “success” with no email: honeypot autofill
+## PIT-055 � Mobile form �success� with no email: honeypot autofill
 
 **Tags:** `contact`, `email`, `honeypot`, `mobile`, `ios`, `autofill`  
 **Seen:** 2026-09-06. Mobile Safari / Chrome; `POST /api/contact` 200, no CMS row.  
-**Verified:** 2026-09-06 after deploy (`hp_erythro_trap`) — site mail arrives from mobile to `order@` / `team@`.
+**Verified:** 2026-09-06 after deploy (`hp_erythro_trap`) � site mail arrives from mobile to `order@` / `team@`.
 
 **Symptom:** Desktop form mail arrives. Same lead from the phone shows success on the site, but no row in Contact Submissions and no SMTP to `order@` / `team@`.
 
-**Cause:** Trap input was named/labelled `company_website` / “Company website” and parked at `-left-[9999px]`. iOS Contacts and Chrome Autofill fill hidden company/website fields (especially on `/order` and `/audit`, which already have a real `website` URL). `/api/contact` treats a non-empty trap as a bot: silent `{ ok: true }`, no persist, no mail.
+**Cause:** Trap input was named/labelled `company_website` / �Company website� and parked at `-left-[9999px]`. iOS Contacts and Chrome Autofill fill hidden company/website fields (especially on `/order` and `/audit`, which already have a real `website` URL). `/api/contact` treats a non-empty trap as a bot: silent `{ ok: true }`, no persist, no mail.
 
 **Fix:** Rename trap to `hp_erythro_trap`, label `Fax`, `readOnly` + `autoComplete="off"` + password-manager ignore attrs, clip-hide (`h-0 w-0 overflow-hidden`) instead of `-9999px`. Keep dropping legacy `company_website` for scraped bots. Log `[api/contact] honeypot drop`.
 
-**Prevent:** Honeypot name/label must not contain company, website, email, phone, or url. After a “form works, no mail” report, grep Vercel for `honeypot drop` before blaming SMTP.
+**Prevent:** Honeypot name/label must not contain company, website, email, phone, or url. After a �form works, no mail� report, grep Vercel for `honeypot drop` before blaming SMTP.
 
 ---
 
-## PIT-056 — `cookies()` / middleware `Set-Cookie` / Payload headers kill CDN HTML cache
+## PIT-056 � `cookies()` / middleware `Set-Cookie` / Payload headers kill CDN HTML cache
 
 **Tags:** `nextjs`, `isr`, `performance`, `locale`, `theme`, `ttfb`, `middleware`, `cdn`  
-**Seen:** 2026-09 — home/portfolio stayed `ƒ Dynamic` + `Cache-Control: private, no-store` after dropping `getRequestPrefs` from those pages.
+**Seen:** 2026-09 � home/portfolio stayed `? Dynamic` + `Cache-Control: private, no-store` after dropping `getRequestPrefs` from those pages.
 
 **Symptom:** No `s-maxage`, no `x-vercel-cache: HIT`, `cf-cache-status: DYNAMIC`. Cold TTFB stays high; warm only improves via Data Cache (`unstable_cache`).
 
 **Cause (stack):**
-1. Any `cookies()` / `headers()` in the shared `(frontend)` tree — including `not-found.tsx` — opts routes into Dynamic Rendering.
+1. Any `cookies()` / `headers()` in the shared `(frontend)` tree � including `not-found.tsx` � opts routes into Dynamic Rendering.
 2. Middleware that `Set-Cookie`s `NEXT_LOCALE` makes the response uncacheable at the CDN even when Next would emit ISR headers.
 3. Calling `@payloadcms/next` helpers that wrap `next/headers` (not plain `getPayload` Local API) also forces dynamic.
 
@@ -921,23 +921,23 @@ The generic body is **not** in `infra/n8n/workflows/email-autoresponder.json`.
 1. Layout SSR defaults (`lang="en"`) + `THEME_BOOTSTRAP_SCRIPT` / `LOCALE_BOOTSTRAP_SCRIPT`.
 2. Home + `/portfolio` + `/services/[slug]`: `export const dynamic = 'force-static'` + `revalidate = 60`; `clientHydratePrefs`; no `getRequestPrefs` / no `cookies()` in `generateMetadata`.
 3. `not-found` must not call `cookies()` (client hydrate locale).
-4. Middleware: markdown rewrite + Link header only — **never** set `NEXT_LOCALE`.
-5. CMS reads via `getPayloadLocal()` (`src/lib/payloadStatic.ts`) with `overrideAccess: true` — never `initReq` / `headers()`.
+4. Middleware: markdown rewrite + Link header only � **never** set `NEXT_LOCALE`.
+5. CMS reads via `getPayloadLocal()` (`src/lib/payloadStatic.ts`) with `overrideAccess: true` � never `initReq` / `headers()`.
 
-**Verify after deploy:** `Cache-Control` contains `s-maxage=60`, second request `x-vercel-cache: HIT` (or `STALE`), build table shows `○` / ISR for `/`, `/portfolio`, and `/services/*` (not `ƒ`).
+**Verify after deploy:** `Cache-Control` contains `s-maxage=60`, second request `x-vercel-cache: HIT` (or `STALE`), build table shows `0` / ISR for `/`, `/portfolio`, and `/services/*` (not `?`).
 
 **Prevent:** Never put `cookies()` in shared layout or `not-found`. Never Set-Cookie on cacheable HTML responses. Keep Local API for static pages.
 
 ---
 
-## PIT-057 — Desktop hero LCP delayed by `useState(isLg)` gating the poster
+## PIT-057 � Desktop hero LCP delayed by `useState(isLg)` gating the poster
 
 **Tags:** `nextjs`, `lcp`, `cls`, `hero`, `cwv`  
-**Seen:** 2026-09 — home LCP ~4s / CLS ~0.9 despite ISR HIT ~0.3s TTFB.
+**Seen:** 2026-09 � home LCP ~4s / CLS ~0.9 despite ISR HIT ~0.3s TTFB.
 
 **Symptom:** Desktop LCP is the hero poster/heading, but poster was missing from the first HTML paint.
 
-**Cause:** `HeroAnimation` only rendered the desktop poster when `isLg === true`, and `isLg` started as `false` until a `matchMedia` `useEffect` ran. First paint had no desktop image; height lock for the motion headline also ran in `useEffect` (after paint) → CLS.
+**Cause:** `HeroAnimation` only rendered the desktop poster when `isLg === true`, and `isLg` started as `false` until a `matchMedia` `useEffect` ran. First paint had no desktop image; height lock for the motion headline also ran in `useEffect` (after paint) > CLS.
 
 **Fix:**
 1. Always SSR the desktop poster with `hidden lg:block` (CSS), never gate on React `isLg`. Keep video mount behind splash + lg.
@@ -950,32 +950,32 @@ The generic body is **not** in `infra/n8n/workflows/email-autoresponder.json`.
 
 ---
 
-## PIT-058 — Hero still through `/_next/image` adds LCP hop without smaller bytes
+## PIT-058 � Hero still through `/_next/image` adds LCP hop without smaller bytes
 
 **Tags:** `nextjs`, `lcp`, `hero`, `r2`, `cwv`  
-**Seen:** 2026-09 — mobile Performance ~69; `Hero_Mobile.webp` already ~50 KiB / 1080×1920.
+**Seen:** 2026-09 � mobile Performance ~69; `Hero_Mobile.webp` already ~50 KiB / 1080?1920.
 
-**Symptom:** Mobile LCP stays ~5–6 s under Slow 4G even after ISR HIT and CLS ≈ 0.
+**Symptom:** Mobile LCP stays ~5�6 s under Slow 4G even after ISR HIT and CLS ? 0.
 
-**Cause:** LCP used `next/image` → `/_next/image?url=…r2.dev…`. Optimizer returned the **same** byte size as the R2 object, but cold requests paid an extra Vercel hop (~2× latency vs direct R2).
+**Cause:** LCP used `next/image` > `/_next/image?url=�r2.dev�`. Optimizer returned the **same** byte size as the R2 object, but cold requests paid an extra Vercel hop (~2? latency vs direct R2).
 
 **Fix:** For absolute CDN URLs, paint and preload the public URL directly (`heroStillSrc` + `<img>` / `<link rel="preload" href>`). Keep `/_next/image` only for relative/local paths. Below-fold brand/logo `<img>`s must use `loading="lazy"` so React 19 does not auto-inject competing `<link rel="preload">` for every SSR image.
 
-**Prevent:** Do not route already-optimized WebP hero stills through the image optimizer unless it measurably shrinks transfer size. Do not leave eager SSR `<img>` (no `loading="lazy"`) for below-fold logos — React 19 preloads them into `<head>` and steals bandwidth from LCP.
+**Prevent:** Do not route already-optimized WebP hero stills through the image optimizer unless it measurably shrinks transfer size. Do not leave eager SSR `<img>` (no `loading="lazy"`) for below-fold logos � React 19 preloads them into `<head>` and steals bandwidth from LCP.
 
 ---
 
-## PIT-059 — Hero GSAP / HeroMotionText on the critical path tanks mobile lab + score variance
+## PIT-059 � Hero GSAP / HeroMotionText on the critical path tanks mobile lab + score variance
 
 **Tags:** `nextjs`, `lcp`, `tbt`, `gsap`, `hero`, `cwv`  
-**Seen:** 2026-09 — mobile PSI oscillating ~48–70 with desktop ~76–99 after ISR/R2 fixes.
+**Seen:** 2026-09 � mobile PSI oscillating ~48�70 with desktop ~76�99 after ISR/R2 fixes.
 
 **Symptom:** Lab Performance jumps run-to-run; TBT/LCP dominate. Observed (unthrottled) LCP is fine (~1 s).
 
 **Cause:** `HeroSection` statically imported `HeroMotionText` + `gsap`, so the cinematic headline chunk compiled/ran during LCP under Slow 4G. Small scheduling differences amplified score swings.
 
 **Fix:**
-1. `waitForPostLcpMotion()` (splash → LCP observer/timeout → idle) in `src/lib/lcpGate.ts`.
+1. `waitForPostLcpMotion()` (splash > LCP observer/timeout > idle) in `src/lib/lcpGate.ts`.
 2. Keep a static H1 twin until the gate; then dynamic-import `HeroMotionText`.
 3. Hero chrome fade via CSS transitions (no GSAP on critical path).
 4. `HeroAnimation` loads GSAP ScrollTrigger only on `lg`.
@@ -984,12 +984,12 @@ The generic body is **not** in `infra/n8n/workflows/email-autoresponder.json`.
 
 ---
 
-## PIT-061 — Home TBT stays high while GSAP sections hydrate with the hero
+## PIT-061 � Home TBT stays high while GSAP sections hydrate with the hero
 
 **Tags:** `nextjs`, `tbt`, `gsap`, `home`, `cwv`  
-**Seen:** 2026-09 — after PIT-059, mobile lab still red on Total Blocking Time.
+**Seen:** 2026-09 � after PIT-059, mobile lab still red on Total Blocking Time.
 
-**Symptom:** LCP improved; Performance still low because TBT stays ~1–2 s+.
+**Symptom:** LCP improved; Performance still low because TBT stays ~1�2 s+.
 
 **Cause:** `HomeClient` mounted Case Studies / Services / Solutions / FAQ / Footer (all GSAP) plus Chat/A11y during the same hydration window as the hero. Navbar also static-imported ScrollTrigger.
 
@@ -999,12 +999,12 @@ The generic body is **not** in `infra/n8n/workflows/email-autoresponder.json`.
 
 ---
 
-## PIT-062 — Deferring below-fold mount for TBT caused mobile CLS 0.265
+## PIT-062 � Deferring below-fold mount for TBT caused mobile CLS 0.265
 
 **Tags:** `nextjs`, `cls`, `tbt`, `gsap`, `home`, `cwv`  
-**Seen:** 2026-09 — after PIT-061, two mobile lab runs both reported CLS **0.265** (TBT green ~30–80 ms).
+**Seen:** 2026-09 � after PIT-061, two mobile lab runs both reported CLS **0.265** (TBT green ~30�80 ms).
 
-**Symptom:** Spacer `min-h-[70vh]` swapped for Cases/Services/… with mobile `-mt-8` overlap onto the hero → visible layout shift at the fold.
+**Symptom:** Spacer `min-h-[70vh]` swapped for Cases/Services/� with mobile `-mt-8` overlap onto the hero > visible layout shift at the fold.
 
 **Cause:** Late client mount (`ssr: false` + `loadBelowFold`) changed document geometry under the LCP viewport.
 
@@ -1014,10 +1014,10 @@ The generic body is **not** in `infra/n8n/workflows/email-autoresponder.json`.
 
 ---
 
-## PIT-060-Montblanc — Dropping port 8080 in DOCKER-USER breaks Montblanc shop with 502 Bad Gateway
+## PIT-060-Montblanc � Dropping port 8080 in DOCKER-USER breaks Montblanc shop with 502 Bad Gateway
 
 **Tags:** `montblanc`, `vps`, `docker`, `iptables`, `vercel`, `proxy`, `502`, `security`  
-**Seen:** 2026-09-06 — products stop loading, admin login fails with "Request failed with status code 502" on `https://pizza-na-dom.mk.ua` and `montblanc-frontend.vercel.app`.
+**Seen:** 2026-09-06 � products stop loading, admin login fails with "Request failed with status code 502" on `https://pizza-na-dom.mk.ua` and `montblanc-frontend.vercel.app`.
 
 **Symptom:**
 - Frontend catalogue fails to fetch `/products` or `/backend-api/products` (returns 502 Bad Gateway).
@@ -1050,10 +1050,10 @@ During security audit / hardening scripts (`harden_vps_docker_ufw.py`, `persist_
 
 ---
 
-## PIT-063 — Hero text entrance tweening `fontSize` triggers severe Desktop CLS (1.31)
+## PIT-063 � Hero text entrance tweening `fontSize` triggers severe Desktop CLS (1.31)
 
 **Tags:** `nextjs`, `cls`, `gsap`, `hero`, `cwv`, `performance`  
-**Seen:** 2026-09 — performance audit on `erythro.ai` showed Desktop CLS **1.31** (Google threshold < 0.1).
+**Seen:** 2026-09 � performance audit on `erythro.ai` showed Desktop CLS **1.31** (Google threshold < 0.1).
 
 **Symptom:**
 Performance trace records a 1.84s layout shift cluster on Desktop (`DIV class='absolute whitespace-normal text-center font-bold uppercase tracking-tight lg:whitespace-nowrap lg:text-left'`) right after page load and hydration.
@@ -1071,29 +1071,29 @@ Never tween geometric CSS properties (`font-size`, `width`, `height`, `top`, `le
 
 ---
 
-## PIT-064 — Cloudflare Access Subdomain field is not the app name
+## PIT-064 � Cloudflare Access Subdomain field is not the app name
 
 **Tags:** `cloudflare`, `access`, `zero-trust`, `admin`, `security`  
-**Seen:** 2026-09-06 — while enabling Access for Payload `/admin`.
+**Seen:** 2026-09-06 � while enabling Access for Payload `/admin`.
 
 **Symptom:**
 Filling **Subdomain** with `erythro-admin` builds destination `erythro-admin.erythro.ai/admin*`. Apex `https://erythro.ai/admin` stays public (HTTP 200).
 
 **Cause:**
-In Zero Trust Self-hosted apps, the application **Name** is a label only. The **Public hostname → Subdomain** field is a real DNS label; leave it empty for apex `erythro.ai`.
+In Zero Trust Self-hosted apps, the application **Name** is a label only. The **Public hostname > Subdomain** field is a real DNS label; leave it empty for apex `erythro.ai`.
 
 **Fix:**
-Subdomain = empty, Domain = `erythro.ai`, Path = `/admin*`, plus an Allow policy (email). Verify: `curl.exe -sI https://erythro.ai/admin` → **302** to `*.cloudflareaccess.com` with `Www-Authenticate: Cloudflare-Access`.
+Subdomain = empty, Domain = `erythro.ai`, Path = `/admin*`, plus an Allow policy (email). Verify: `curl.exe -sI https://erythro.ai/admin` > **302** to `*.cloudflareaccess.com` with `Www-Authenticate: Cloudflare-Access`.
 
 **Prevent:**
 Never put the app display name into Subdomain. Confirm the composed hostname preview matches the real admin URL before Save.
 
 ---
 
-## PIT-065 — Audit Page Pricing save: `The following field is invalid: id`
+## PIT-065 � Audit Page Pricing save: `The following field is invalid: id`
 
 **Tags:** `payload`, `postgres`, `audit-page`, `nested-array`, `i18n`  
-**Seen:** 2026-09-07 — filling Audit Page → Pricing in admin (RU saved once, then EN and even RU failed).
+**Seen:** 2026-09-07 � filling Audit Page > Pricing in admin (RU saved once, then EN and even RU failed).
 
 **Symptom:**
 Payload admin banner `The following field is invalid: id` / `Value must be unique` when saving the **Audit Page** global, especially the Pricing tab. First save of plan cards can succeed; every later save fails, including the locale that already worked. Not caused by saving 3 cards instead of 4.
@@ -1103,21 +1103,21 @@ Payload admin banner `The following field is invalid: id` / `Value must be uniqu
 
 **Fix:**
 Migration `20260907_010000_audit_page_pricing_features_fk` adds
-`audit_page_pricing_plans_features_parent_id_fk` … `ON DELETE cascade`.
+`audit_page_pricing_plans_features_parent_id_fk` � `ON DELETE cascade`.
 Hard-refresh admin, keep the existing 3 plan rows, add Delegate as a 4th card if needed, translate EN/HE **in place** (do not duplicate cards). Do not use Copy locale data.
 
 **Prevent:**
-Handwritten nested-array tables must FK `_parent_id` → parent array `id` with `ON DELETE cascade`, same as Payload’s generated schema (`solution_plans_features`). One-level arrays (How it works stats/steps) are fine without that nested FK.
+Handwritten nested-array tables must FK `_parent_id` > parent array `id` with `ON DELETE cascade`, same as Payload�s generated schema (`solution_plans_features`). One-level arrays (How it works stats/steps) are fine without that nested FK.
 
 ---
 
-## PIT-066 — Local `next dev`: red splash stuck, client chunks blocked by CSP
+## PIT-066 � Local `next dev`: red splash stuck, client chunks blocked by CSP
 
 **Tags:** `csp`, `next-dev`, `splash`, `unsafe-eval`, `webpack`  
-**Seen:** 2026-09-08 — local homepage hangs on brand splash plate (logo never appears).
+**Seen:** 2026-09-08 � local homepage hangs on brand splash plate (logo never appears).
 
 **Symptom:**
-SSR HTML loads (page content exists under the overlay), but `.splash-bg` never fades. Console: `Evaluating a string as JavaScript violates … script-src` / missing `'unsafe-eval'`. Webpack cannot load `SplashScreen.tsx` (and other client modules that still need eval in dev).
+SSR HTML loads (page content exists under the overlay), but `.splash-bg` never fades. Console: `Evaluating a string as JavaScript violates � script-src` / missing `'unsafe-eval'`. Webpack cannot load `SplashScreen.tsx` (and other client modules that still need eval in dev).
 
 **Cause:**
 Public CSP removed `'unsafe-eval'` for production hardening. `next dev` still serves client bundles via webpack `eval-source-map`, which requires `script-src 'unsafe-eval'`. Production `next build` output does not need it.
@@ -1130,10 +1130,10 @@ Never ship production public CSP with `'unsafe-eval'`. When tightening CSP, smok
 
 ---
 
-## PIT-067 — Free audit button does nothing after website DNS check
+## PIT-067 � Free audit button does nothing after website DNS check
 
 **Tags:** `audit`, `react`, `form`, `currentTarget`, `contact-api`  
-**Seen:** 2026-09-09 — live `https://erythro.ai/audit`, CTA «Заказать бесплатный аудит сайта».
+**Seen:** 2026-09-09 � live `https://erythro.ai/audit`, CTA ��������� ���������� ����� �����.
 
 **Symptom:**
 Filled form + consent + Turnstile. Click submit. `/api/audit/check-website` returns 200, then **no** `POST /api/contact`. Button stays idle (no spinner, no error, no success). Laboratory never starts.
@@ -1149,16 +1149,16 @@ Never touch `e.currentTarget` after `await` in a React submit handler. Capture `
 
 ---
 
-## PIT-068 — Funnel review calls a modal/widget site “form only on contacts”
+## PIT-068 � Funnel review calls a modal/widget site �form only on contacts�
 
 **Tags:** `audit`, `funnel-review`, `gemini`, `lead-capture`, `modal`, `cta`  
-**Seen:** 2026-09-09 — Pro HTML «Разбор воронки» on erythro.ai: «Путь к лиду усложнен: форма заявки есть только на странице контактов».
+**Seen:** 2026-09-09 � Pro HTML ������� ������� on erythro.ai: ����� � ���� ��������: ����� ������ ���� ������ �� �������� ���������.
 
 **Symptom:**
-Client sees CTA «Обсудить» / «Начать сейчас», a contact modal, and a WhatsApp/chat widget on the homepage, but Funnel review says services and home have buttons without embedded forms. Looks like a shallow audit.
+Client sees CTA ���������� / ������� ������, a contact modal, and a WhatsApp/chat widget on the homepage, but Funnel review says services and home have buttons without embedded forms. Looks like a shallow audit.
 
 **Cause:**
-Gemini Funnel review was fed a one-line crawl: `forms` = `document.querySelectorAll('form').length` and a narrow CTA regex. `ContactModal` mounts only after click (`isOpen && <ContactModal>`). Agent browse did **not** reuse `probeModalLeadForm`. Chat/WhatsApp were not in the prompt. Gemini then invented “form only on /contacts”.
+Gemini Funnel review was fed a one-line crawl: `forms` = `document.querySelectorAll('form').length` and a narrow CTA regex. `ContactModal` mounts only after click (`isOpen && <ContactModal>`). Agent browse did **not** reuse `probeModalLeadForm`. Chat/WhatsApp were not in the prompt. Gemini then invented �form only on /contacts�.
 
 **Fix:**
 Agent browse clicks the same CTA probe as locale lead_capture, counts modal forms (`formViaCta`), chat and messengers, and tells Gemini that a modal after click is a valid lead path. Report + `/audit` copy disclose the method (inline form, CTA-modal, chat/WhatsApp). After copy edits: `PAYLOAD_DISABLE_PUSH=1 pnpm exec tsx scripts/patch-audit-funnel-review.ts`.
@@ -1168,29 +1168,29 @@ Do not judge lead capture from a static `<form>` count on modern sites. Funnel r
 
 ---
 
-## PIT-069 — Premature new tab navigation skips order confirmation modal
+## PIT-069 � Premature new tab navigation skips order confirmation modal
 
 **Tags:** `order`, `modal`, `ux`, `audit-report`, `popup`  
-**Seen:** 2026-09-09 — `/order/[slug]` checkout modal for audit plans.
+**Seen:** 2026-09-09 � `/order/[slug]` checkout modal for audit plans.
 
 **Symptom:**
-When clicking «Оформить заказ», the browser immediately navigates away to a new tab with the report progress bar (`/audit/report/[id]`), bypassing the confirmation modal on the order page.
+When clicking ��������� �����, the browser immediately navigates away to a new tab with the report progress bar (`/audit/report/[id]`), bypassing the confirmation modal on the order page.
 
 **Cause:**
 `AuditOrderModal` opened a placeholder tab via `openAuditReportStatusPlaceholder()` during the click gesture and navigated it right after `POST /api/contact` returned (`navigateAuditReportStatusTab`). This displaced the user before they could view the order confirmation details or decide to open the status tracking.
 
 **Fix:**
-Remove placeholder tab auto-navigation from `AuditOrderModal.handleSubmit`. Keep the user in the confirmation modal displaying «Заказ отправлен!» and provide a prominent action button «Смотреть статус заказа» (`<a href={reportHref} target="_blank">`), allowing the user to open the progress bar tab upon explicit click.
+Remove placeholder tab auto-navigation from `AuditOrderModal.handleSubmit`. Keep the user in the confirmation modal displaying ������ ���������!� and provide a prominent action button ��������� ������ ������ (`<a href={reportHref} target="_blank">`), allowing the user to open the progress bar tab upon explicit click.
 
 **Prevent:**
 Do not auto-open or redirect to separate progress tabs on submit when the flow is designed around an explicit confirmation modal with an action button. Rely on explicit user gestures (`target="_blank"` link) to open status views.
 
 ---
 
-## PIT-070 — Partial CMS collections drop static routes from sitemap.xml
+## PIT-070 � Partial CMS collections drop static routes from sitemap.xml
 
 **Tags:** `seo`, `sitemap`, `cms`, `routing`, `fallback`  
-**Seen:** 2026-09-10 — `src/lib/sitemapEntries.ts` and `/sitemap.xml`.
+**Seen:** 2026-09-10 � `src/lib/sitemapEntries.ts` and `/sitemap.xml`.
 
 **Symptom:**
 Valid, active site routes (such as `/services/design-branding`, `/order/ai-business-card`, or `/order/enterprise-custom`) return 200 HTTP status but are completely absent from `https://erythro.ai/sitemap.xml`.
@@ -1208,20 +1208,20 @@ Whenever providing CMS overrides over static fallback arrays, never branch with 
 
 ---
 
-## PIT-071 — Localization audit false positives & incomplete CMS string patches
+## PIT-071 � Localization audit false positives & incomplete CMS string patches
 
 **Tags:** `i18n`, `cms`, `localization`, `revalidate`, `hebrew`  
-**Seen:** 2026-09-10 — Translater `erythro_ai_localization_audit_v2.md` + `scripts/fix-localization-audit.ts`.
+**Seen:** 2026-09-10 � Translater `erythro_ai_localization_audit_v2.md` + `scripts/fix-localization-audit.ts`.
 
 **Symptom:**
 1. Auditor flags FAQ answers like `$21`, `$22` as broken currency / placeholders.
-2. Patch script “succeeds” but live still shows `עוזרי קול`, `DNS серверов`, `עדכוני תלות`.
+2. Patch script �succeeds� but live still shows `????? ???`, `DNS ��������`, `?????? ????`.
 3. `pingSiteRevalidate` returns `401 Invalid token` after local Payload writes.
 
 **Cause:**
-1. Next.js RSC Flight payload embeds numeric module refs as `$NN` in HTML — not user-visible copy. Regulatory FAQ text (e.g. IS 5568) can be fine while Flight still contains `$21`.
-2. JS `\b` word boundaries do **not** apply to Hebrew (non-ASCII “word” chars), so `/\bעוזרי קול\b/` never matches. Also `solution-plans` copy in `addons[].full` (Lexical) was omitted from the walk list (`excludes` alone is empty).
-3. Local `.env` `REVALIDATION_TOKEN` ≠ production Vercel secret; Payload hooks cannot `revalidateTag` outside a request (`PIT-015`). Service/order/legal reads use `unstable_cache` with `SITE_CONTENT_TAG` and often `revalidate: false` — page ISR alone does **not** refresh them.
+1. Next.js RSC Flight payload embeds numeric module refs as `$NN` in HTML � not user-visible copy. Regulatory FAQ text (e.g. IS 5568) can be fine while Flight still contains `$21`.
+2. JS `\b` word boundaries do **not** apply to Hebrew (non-ASCII �word� chars), so `/\b????? ???\b/` never matches. Also `solution-plans` copy in `addons[].full` (Lexical) was omitted from the walk list (`excludes` alone is empty).
+3. Local `.env` `REVALIDATION_TOKEN` ? production Vercel secret; Payload hooks cannot `revalidateTag` outside a request (`PIT-015`). Service/order/legal reads use `unstable_cache` with `SITE_CONTENT_TAG` and often `revalidate: false` � page ISR alone does **not** refresh them.
 
 **Fix:**
 - Ignore Flight `$NN` in localization audits; verify visible DOM / CMS fields only.
@@ -1233,17 +1233,17 @@ When writing locale string hygiene scripts, never rely on `\b` for HE/RU; always
 
 ---
 
-## PIT-072 — Audit report waiting page hangs: worker trigger timeout + poll 429
+## PIT-072 � Audit report waiting page hangs: worker trigger timeout + poll 429
 
 **Tags:** `audit`, `worker`, `vercel-cron`, `rate-limit`, `n8n`  
-**Seen:** 2026-09-10 — Pro `#122` stayed `new`; `/audit/report/122` polled until 429.
+**Seen:** 2026-09-10 � Pro `#122` stayed `new`; `/audit/report/122` polled until 429.
 
 **Symptom:**
 Form submit succeeds, waiting page never becomes a report, email never arrives. Logs: `[audit-agent] trigger error: This operation was aborted` then `[api/contact] audit worker not queued: timeout`. Status endpoint returns 429.
 
 **Cause:**
 1. `/api/contact` waits only 8s for `POST agent-api.erythro.ai/api/run-audit`. A transient stall aborts the trigger; CMS row stays `new`. The contact API still returns 200.
-2. n8n “AI Audit reconcile” did not hit Vercel (workflow inactive / not running), so nothing re-queued.
+2. n8n �AI Audit reconcile� did not hit Vercel (workflow inactive / not running), so nothing re-queued.
 3. Waiting UI polled every 4s through the contact limiter (5 / 60s), so the client saw network errors even if the job later started.
 
 **Fix:**
@@ -1253,14 +1253,14 @@ Form submit succeeds, waiting page never becomes a report, email never arrives. 
 - Poll every 8s with a 30/min limiter; honor `Retry-After` and do not treat 429 as a hard network error.
 
 **Prevent:**
-Do not share the contact-form 5/min bucket with `/api/audit/report/[id]`. Do not rely on n8n as the only re-queue. Do not use a 10-minute stale window for `new` jobs — clients are already on the waiting page.
+Do not share the contact-form 5/min bucket with `/api/audit/report/[id]`. Do not rely on n8n as the only re-queue. Do not use a 10-minute stale window for `new` jobs � clients are already on the waiting page.
 
 ---
 
-## PIT-073 — Mobile modal: page still scrolls, footer covers the dialog
+## PIT-073 � Mobile modal: page still scrolls, footer covers the dialog
 
 **Tags:** `modal`, `mobile`, `ios`, `z-index`, `overflow`, `portal`  
-**Seen:** 2026-09-11 — contact and order checkout dialogs on phone viewport.
+**Seen:** 2026-09-11 � contact and order checkout dialogs on phone viewport.
 
 **Symptom:**
 Opening a modal on mobile, the page behind still scrolls (rubber-band). The overlapping footer card slides up and paints on top of the dialog.
@@ -1276,36 +1276,36 @@ Never put `position: fixed` dialogs inside the overlapping page/footer wrappers.
 
 ---
 
-## PIT-074 — Hebrew audit scorecard labels jump next to the bars
+## PIT-074 � Hebrew audit scorecard labels jump next to the bars
 
 **Tags:** `audit`, `rtl`, `hebrew`, `html-report`, `scorecard`  
-**Seen:** 2026-09-11 — HE HTML report; labels beside the 0–100 bars.
+**Seen:** 2026-09-11 � HE HTML report; labels beside the 0�100 bars.
 
 **Symptom:**
-In the Hebrew report the five scale names do not share one edge against the bars: short rows sit far from the track, wrapped rows sit closer — the text “jumps”.
+In the Hebrew report the five scale names do not share one edge against the bars: short rows sit far from the track, wrapped rows sit closer � the text �jumps�.
 
 **Cause:**
 RTL scorecard puts labels in the right column. `text-align: right` (and a 128px column vs LTR 214px) flush text to the **outer** edge. Mixed HE + Latin (`SEO`, `UX`, `AI`) wrap unevenly, so the bar-adjacent side is ragged. EN/RU use `text-align: right` in the **left** column, which is the bar edge.
 
 **Fix:**
-Label column is `max-content` on desktop (one line). Mobile (`max-width: 720px`): two-line labels in `108rem` (EN/RU, fits «Лидогенерация») / `58rem` (HE) so bars get the rest (`1fr`). Equal `padding-inline` on `.chart-body`. Overlay lines use **subgrid** + `grid-column: 2`. RTL labels: `text-align: left` (physical left = bar).
+Label column is `max-content` on desktop (one line). Mobile (`max-width: 720px`): two-line labels in `108rem` (EN/RU, fits ���������������) / `58rem` (HE) so bars get the rest (`1fr`). Equal `padding-inline` on `.chart-body`. Overlay lines use **subgrid** + `grid-column: 2`. RTL labels: `text-align: left` (physical left = bar).
 
 **Prevent:**
-Do not copy LTR `text-align: right` onto RTL chart labels. On mobile do not use `white-space: nowrap` + `max-content` for scale names — that keeps the label column as wide as the longest single line and starves the bars. Keep HE/EN/RU on the same tracks.
+Do not copy LTR `text-align: right` onto RTL chart labels. On mobile do not use `white-space: nowrap` + `max-content` for scale names � that keeps the label column as wide as the longest single line and starves the bars. Keep HE/EN/RU on the same tracks.
 
 ---
 
-## PIT-075 — Audit “13 broken network requests” is one `/favicon.ico` 404 counted per navigate
+## PIT-075 � Audit �13 broken network requests� is one `/favicon.ico` 404 counted per navigate
 
 **Tags:** `audit`, `playwright`, `favicon`, `false-positive`  
-**Seen:** 2026-09-11 — A44 finding «Битые сетевые запросы», count 13 on erythro.ai.
+**Seen:** 2026-09-11 � A44 finding ������ ������� ��������, count 13 on erythro.ai.
 
 **Symptom:**
-Client HTML/PDF reports 13 (or 3+pageCap) 4xx/5xx responses. The finding lists only a number, so it looks like broken integrations. `GET /favicon.ico` and `/apple-touch-icon.png` at the origin root return 404 even though `link rel=icon` points at `/images/favicon/…`.
+Client HTML/PDF reports 13 (or 3+pageCap) 4xx/5xx responses. The finding lists only a number, so it looks like broken integrations. `GET /favicon.ico` and `/apple-touch-icon.png` at the origin root return 404 even though `link rel=icon` points at `/images/favicon/�`.
 
 **Cause:**
 1. Chromium always requests `/favicon.ico` (and iOS `/apple-touch-icon.png`) at the site root, ignoring `<link rel="icon">` in another folder. There was no `public/favicon.ico`.
-2. Playwright `page.onResponse` recorded every status ≥400 with **no URL dedup**. Diagnostic/Pro: 3 locale homepage loads + up to 10 agent-browse navigations = 13 identical 404s.
+2. Playwright `page.onResponse` recorded every status ?400 with **no URL dedup**. Diagnostic/Pro: 3 locale homepage loads + up to 10 agent-browse navigations = 13 identical 404s.
 
 **Fix:**
 - Serve copies at `public/favicon.ico`, `public/apple-touch-icon.png`, `public/apple-touch-icon-precomposed.png` (same bytes as `public/images/favicon/`).
@@ -1315,16 +1315,16 @@ Client HTML/PDF reports 13 (or 3+pageCap) 4xx/5xx responses. The finding lists o
 **Prevent:**
 Keep a real file at `/favicon.ico` whenever icons live under `/images/favicon/`. Never treat `failed_network_requests.size()` as a raw event count across navigations.
 
-## PIT-076 — Audit report finding card text overflow on long URLs (Turnstile/tracking tokens)
+## PIT-076 � Audit report finding card text overflow on long URLs (Turnstile/tracking tokens)
 
 **Tags:** `audit`, `qa-auditor`, `report`, `css`, `overflow`, `pdf`  
-**Seen:** 2026-10-10 — AUD-160 diagnostic HTML, top-3 card 01.
+**Seen:** 2026-10-10 � AUD-160 diagnostic HTML, top-3 card 01.
 
 **Symptom:**
-In the executive summary (block `01 Уязвимости конверсии`), a long string runs out of the card and paints across cards 02 and 03. Those fragments look like random tokens. They are the tail of the same URL.
+In the executive summary (block `01 ���������� ���������`), a long string runs out of the card and paints across cards 02 and 03. Those fragments look like random tokens. They are the tail of the same URL.
 
 **Cause:**
-1. Playwright recorded Cloudflare Turnstile `401` on `/cdn-cgi/challenge-platform/…`. Each load mints a new path of 1000+ characters with no spaces (PIT-078 skip was not in `recordFailedNetwork`).
+1. Playwright recorded Cloudflare Turnstile `401` on `/cdn-cgi/challenge-platform/�`. Each load mints a new path of 1000+ characters with no spaces (PIT-078 skip was not in `recordFailedNetwork`).
 2. `formatFailedNetworkSamples` joined up to 5 full paths into the card.
 3. The generator CSS comes from `templates/audit_template_a4_4.html`. That file still had `.finding-box { width: 230px }` and no `overflow` / `word-break`. `public/samples` already had the clip, so the stored report did not.
 
@@ -1337,55 +1337,56 @@ In the executive summary (block `01 Уязвимости конверсии`), a
 **Prevent:**
 Do not put a raw URL or hash into a fixed summary card. Clip the card even when the string is already short. Ignore Cloudflare challenge URLs in failed-network findings.
 
-## PIT-077 — Cold audit scores differ from a repeat run
+## PIT-077 � Cold audit scores differ from a repeat run
 
 **Tags:** `audit`, `qa-auditor`, `pagespeed`, `ttfb`, `cdn`, `isr`, `warmup`  
-**Seen:** 2026-09-11 — first audit after idle origin/CDN looked worse; the next audit showed “normal” PSI/TTFB.
+**Seen:** 2026-09-11 � first audit after idle origin/CDN looked worse; the next audit showed �normal� PSI/TTFB.
 
 **Symptom:** A cold audit (first hit of the day, or first lab from Google PageSpeed) reports slower TTFB / lower Performance / worse LCP than a repeat a few minutes later.
 
 **Cause:**
 1. Vercel ISR / Cloudflare edge is `MISS`/`STALE` on the first HTML fetch; serverless may also be cold.
-2. PageSpeed Insights fetches from a **different PoP** than the audit worker. Warming the site from the VPS does not warm Google’s lab path.
-3. TTFB used to keep a single sample after one TLS warmup — still noisy on a just-woken origin.
+2. PageSpeed Insights fetches from a **different PoP** than the audit worker. Warming the site from the VPS does not warm Google�s lab path.
+3. TTFB used to keep a single sample after one TLS warmup � still noisy on a just-woken origin.
 
 **Fix:**
 `AuditCollector` now: (1) two origin GETs before Playwright; (2) TTFB = median of 3 samples after discarding TLS; (3) PSI runs a throwaway lab per strategy, then the measured run (fallback to warmup if the second fails). Set `PSI_SKIP_WARMUP=1` to skip the extra PSI call.
 
 **Prevent:** Never treat the first cold lab as the client-facing score. Keep warmup on for production audits.
 
-## PIT-078 — Audit “broken network requests” is Cloudflare Turnstile 401s
+## PIT-078 � Audit �broken network requests� is Cloudflare Turnstile 401s
 
 **Tags:** `audit`, `qa-auditor`, `cloudflare`, `turnstile`, `false-positive`  
-**Seen:** 2026-09-11 — finding «Битые сетевые запросы», 12 unique 4xx: `401 /cdn-cgi/challenge-platform/h/g/p…`.
+**Seen:** 2026-09-11 � finding ������ ������� ��������, 12 unique 4xx: `401 /cdn-cgi/challenge-platform/h/g/p�`.
 
-**Symptom:** Client report lists many unique 401s on `/cdn-cgi/challenge-platform/…`. Looks like broken integrations; the page itself loads fine.
+**Symptom:** Client report lists many unique 401s on `/cdn-cgi/challenge-platform/�`. Looks like broken integrations; the page itself loads fine.
 
-**Cause:** Turnstile / Bot Fight issues a **new challenge URL** per widget load. Playwright `onResponse` recorded each 401 as a distinct failed URL (PIT-075 only deduped identical URL+status). `/cdn-cgi/` is Cloudflare internals, not the site’s assets.
+**Cause:** Turnstile / Bot Fight issues a **new challenge URL** per widget load. Playwright `onResponse` recorded each 401 as a distinct failed URL (PIT-075 only deduped identical URL+status). `/cdn-cgi/` is Cloudflare internals, not the site�s assets.
 
 **Fix:** `AuditCollector.recordFailedNetwork` skips `/cdn-cgi/`, `/challenge-platform/`, and `challenges.cloudflare.com`. Real 4xx/5xx on origin assets still count.
 
 **Prevent:** Do not treat Cloudflare challenge or Turnstile token endpoints as site breakage. Ignore `/cdn-cgi/` in failed-network findings.
 
-## PIT-079 — Order pages drop `og:image`; LinkedIn shows an empty preview
+## PIT-079 � Order pages drop `og:image`; LinkedIn shows an empty preview
 
 **Tags:** `seo`, `open-graph`, `linkedin`, `order`, `metadata`  
-**Seen:** 2026-09-12 — `https://erythro.ai/order/business-automation` had `og:title` / `og:description` / `og:url` but no `og:image`. LinkedIn Featured card rendered a blank placeholder. Homepage OG was complete (`Og.jpg` on R2, 1200×630, 200 OK). `twitter:image` on the order URL was the homepage `Og.jpg` (inherited from the root layout).
+**Seen:** 2026-09-12 � `https://erythro.ai/order/business-automation` had `og:title` / `og:description` / `og:url` but no `og:image`. LinkedIn Featured card rendered a blank placeholder. Homepage OG was complete (`Og.jpg` on R2, 1200?630, 200 OK). `twitter:image` on the order URL was the homepage `Og.jpg` (inherited from the root layout).
 
 **Cause:** Next.js `generateMetadata` on `/order/[slug]` set its own `openGraph` object **without** `images`. That **replaces** the root layout OG block instead of merging it, so `og:image` / `og:image:width` / `og:image:height` disappear. LinkedIn reads `og:image`, not `twitter:image`.
 
 **Fix:**
 - Always include `openGraph.images` (and matching `twitter.images`) on any route that overrides OG.
 - Default image: Site Settings `Og.jpg` on R2 (`https://pub-bca1ac764c56451890e973c90029a977.r2.dev/Og.jpg`).
-- Business Automation: dedicated 1200×630 offer JPEG at `https://pub-bca1ac764c56451890e973c90029a977.r2.dev/og/Business-Automation-4.jpg` (source in `public/images/og/business-automation.jpg`). Helper: `src/lib/ogImages.ts`.
+- Business Automation: dedicated 1200?630 offer JPEG at `https://pub-bca1ac764c56451890e973c90029a977.r2.dev/og/Business-Automation-4.jpg` (source in `public/images/og/business-automation.jpg`). Helper: `src/lib/ogImages.ts`.
 - After deploy, refresh LinkedIn cache via [Post Inspector](https://www.linkedin.com/post-inspector/). LinkedInBot currently gets `200` HTML from `erythro.ai` (not a Bot Fight challenge).
+- **Repeat 2026-11-07:** calc LP `/lp/audit/calc/[locale]` (`leak-{en,ru,he}.erythro.ai`) had the same gap: `openGraph` and `twitter` without `images`. Fix: `ogImageForLeakCalc(locale)` with per-locale 1200x630 cards `public/images/og/leak-calc-{en,ru,he}.jpg`.
 
-**Prevent:** If a page sets `openGraph: { title, description, url }`, also set `images: [{ url, width: 1200, height: 630 }]`. Do not rely on the layout OG image leaking through. Prefer a public R2 JPEG (absolute URL) so the crawler does not have to fetch the image through the site’s Cloudflare zone.
+**Prevent:** If a page sets `openGraph: { title, description, url }`, also set `images: [{ url, width: 1200, height: 630 }]`. Do not rely on the layout OG image leaking through. Prefer a public R2 JPEG (absolute URL) so the crawler does not have to fetch the image through the site�s Cloudflare zone.
 
-## PIT-080 — Free audit opens a blank tab before the waiting page
+## PIT-080 � Free audit opens a blank tab before the waiting page
 
 **Tags:** `audit`, `ux`, `popup`, `waiting`, `modal`  
-**Seen:** 2026-09-12 — `/audit` Free website audit. Click submit → empty / waiting tab instead of staying on the form.
+**Seen:** 2026-09-12 � `/audit` Free website audit. Click submit > empty / waiting tab instead of staying on the form.
 
 **Cause:** `openAuditReportStatusPlaceholder()` opened `about:blank` on click (PIT-067 popup workaround), then navigated to `/audit/report/[id]` after `POST /api/contact`. `/order` already stopped doing this (PIT-069).
 
@@ -1395,14 +1396,14 @@ Do not put a raw URL or hash into a fixed summary card. Clip the card even when 
 
 ---
 
-## PIT-081 — Form submit can hang with no error (DNS / SMTP / missing network copy)
+## PIT-081 � Form submit can hang with no error (DNS / SMTP / missing network copy)
 
 **Tags:** `forms`, `timeout`, `audit`, `contact`, `l10n`  
-**Seen:** 2026-09-13 — `/audit` and `/order` checkout: click submit, spinner never appears or never stops; `/audit/report/[id]` looks queued forever on a network blip.
+**Seen:** 2026-09-13 � `/audit` and `/order` checkout: click submit, spinner never appears or never stops; `/audit/report/[id]` looks queued forever on a network blip.
 
 **Cause:**
 1. Website DNS check ran **before** `status = 'sending'` and had no client/server timeout. A hung `fetch('/api/audit/check-website')` or `dns.lookup` looked like a dead button (no spinner, no error). `ensureWebsiteOk() === false` also returned without resetting UI.
-2. `POST /api/contact` and Hostinger SMTP had no timeouts, so a stuck mailbox left the button on «Sending…».
+2. `POST /api/contact` and Hostinger SMTP had no timeouts, so a stuck mailbox left the button on �Sending��.
 3. Audit/order forms displayed English API `message` on 400/429. Waiting page set `error = 'network'` but still rendered the queued progress UI with no copy.
 
 **Fix:**
@@ -1414,43 +1415,43 @@ Do not put a raw URL or hash into a fixed summary card. Clip the card even when 
 
 ---
 
-## PIT-082 — Contact intake is not an AV/phishing scanner; inbound IMAP is not stored
+## PIT-082 � Contact intake is not an AV/phishing scanner; inbound IMAP is not stored
 
 **Tags:** `security`, `forms`, `sanitize`, `sql`, `email`, `n8n`  
-**Seen:** 2026-09-13 — review of “virus / SQL injection / phishing before DB write”
+**Seen:** 2026-09-13 � review of �virus / SQL injection / phishing before DB write�
 
-**Cause:** Intake is **text JSON** (`POST /api/contact`), not files. There is no ClamAV (and none is needed: no `type=file`, IMAP `downloadAttachments: false`). Inbound `order@` / `team@` mail is n8n auto-reply only — body is never written to Payload. SQL injection is not a string-concat risk (Payload/Drizzle bound params). Naive HTML strip (`<\/?[^>]+>`) missed `&lt;script&gt;` and leftover `javascript:` / `file:` obfuscation. Website field accepted any string matching the domain regex (no URL parser, credentials possible in theory). n8n HTML greeting interpolated raw `From` display name.
+**Cause:** Intake is **text JSON** (`POST /api/contact`), not files. There is no ClamAV (and none is needed: no `type=file`, IMAP `downloadAttachments: false`). Inbound `order@` / `team@` mail is n8n auto-reply only � body is never written to Payload. SQL injection is not a string-concat risk (Payload/Drizzle bound params). Naive HTML strip (`<\/?[^>]+>`) missed `&lt;script&gt;` and leftover `javascript:` / `file:` obfuscation. Website field accepted any string matching the domain regex (no URL parser, credentials possible in theory). n8n HTML greeting interpolated raw `From` display name.
 
 **Fix:**
-- Keep: rate limit → honeypot → Turnstile siteverify → `guardContactSubmission` (sanitize + validate) → `payload.create`; public REST `create: () => false`. Staff/client HTML uses `escapeHtml`. Website DNS + public IP only (PIT-041).
+- Keep: rate limit > honeypot > Turnstile siteverify > `guardContactSubmission` (sanitize + validate) > `payload.create`; public REST `create: () => false`. Staff/client HTML uses `escapeHtml`. Website DNS + public IP only (PIT-041).
 - `contactSanitize`: NFKC + control-char strip, HTML entity decode, repeated tag/protocol strip (`javascript|vbscript|data|file|blob|about`), leftover `<>`. Website field keeps the scheme so `javascript:example.com` is rejected, not rewritten to `example.com`.
 - `sanitizeAuditWebsite`: `http:`/`https:` only, reject userinfo, parse via `URL`.
 - n8n autoresponder: escape sender name in HTML greeting (repo JSON; import to n8n to apply live).
 
-**Prevent:** Do not add ClamAV for text-only forms. Do not persist IMAP bodies into CMS. Do not treat client `message` URLs as malware — clients send links; this is not URL reputation. Free-audit cooldown is live (7 days; `AUDIT_INTAKE_LIMITS_OPEN_FOR_QA = false` — QA override only via `AUDIT_SKIP_COOLDOWN=1`). Never concatenate user strings into SQL.
+**Prevent:** Do not add ClamAV for text-only forms. Do not persist IMAP bodies into CMS. Do not treat client `message` URLs as malware � clients send links; this is not URL reputation. Free-audit cooldown is live (7 days; `AUDIT_INTAKE_LIMITS_OPEN_FOR_QA = false` � QA override only via `AUDIT_SKIP_COOLDOWN=1`). Never concatenate user strings into SQL.
 
 ---
 
-## PIT-083 — Audit `/how` Hebrew is CMS machine translation, not the code fallback
+## PIT-083 � Audit `/how` Hebrew is CMS machine translation, not the code fallback
 
 **Tags:** `i18n`, `cms`, `audit`, `hebrew`  
-**Seen:** 2026-09-13 — localization audit on live `/audit` after the 13 Sep deploy.
+**Seen:** 2026-09-13 � localization audit on live `/audit` after the 13 Sep deploy.
 
 **Symptom:**
-1. Auditor flags FAQ answers `$22`–`$26` as leaked RSC variables (EN/RU empty, HE full text).
-2. Hebrew How-it-works copy: `מפה` for credit card, `רומנית / הולנדית` instead of RU/HE, `המעבדה מסירה` (“removes”), informal `שלח`, step labels `01`/`02`/`03`.
-3. Navbar/Solutions “business automation” looks lowercase vs Free Start.
-4. RU catalog `"Многостраничный сайт "` has a trailing space.
+1. Auditor flags FAQ answers `$22`�`$26` as leaked RSC variables (EN/RU empty, HE full text).
+2. Hebrew How-it-works copy: `???` for credit card, `?????? / ???????` instead of RU/HE, `?????? ?????` (�removes�), informal `???`, step labels `01`/`02`/`03`.
+3. Navbar/Solutions �business automation� looks lowercase vs Free Start.
+4. RU catalog `"��������������� ���� "` has a trailing space.
 
 **Cause:**
-1. False positive — Next.js Flight refs `$NN` in HTML (PIT-071). FAQ answers are Lexical; HE often inlines full text while EN/RU stay as module refs.
-2. `fetchAuditPage` merges CMS `audit-page` over `src/lib/auditPage.ts`. Code already has `כרטיס אשראי` / `EN, RU ו-HE` / `המעבדה סורקת` / `שלחו` / `שלב 1`. Live CMS still has the first machine-translation seed, so HE on Vercel stays stale after a code-only deploy. Visual `01`/`02`/`03` on the How track is the same numbered circles for every locale (`HowStepsTrack`); the HE `01` labels were the CMS `step.label`, sr-only.
-3. False positive — tariff names use `uppercase` CSS (`Navbar`, `SolutionSection`). Source is already `Business Automation`.
+1. False positive � Next.js Flight refs `$NN` in HTML (PIT-071). FAQ answers are Lexical; HE often inlines full text while EN/RU stay as module refs.
+2. `fetchAuditPage` merges CMS `audit-page` over `src/lib/auditPage.ts`. Code already has `????? ?????` / `EN, RU ?-HE` / `?????? ?????` / `????` / `??? 1`. Live CMS still has the first machine-translation seed, so HE on Vercel stays stale after a code-only deploy. Visual `01`/`02`/`03` on the How track is the same numbered circles for every locale (`HowStepsTrack`); the HE `01` labels were the CMS `step.label`, sr-only.
+3. False positive � tariff names use `uppercase` CSS (`Navbar`, `SolutionSection`). Source is already `Business Automation`.
 4. `locMap` treated `.trim()` as a truthiness check and then assigned the untrimmed CMS string.
 
 **Fix:**
 - Ignore Flight `$NN` and CSS `uppercase` in localization audits (PIT-071).
-- `isStaleAuditHebrew()` in `fetchAuditPage` / `pickAll`: if CMS HE matches the MT needles (`מפה`, `רומנית`, `מסירה`, `מצלמת`, `הונגרית`, `עקיפת המשפך`, `מדריך וגודל`, `דליפות פרסומות`, `משא ומתן על הנחה`, …), use the code fallback. Cache key `audit-page-v4-he-sanitize`.
+- `isStaleAuditHebrew()` in `fetchAuditPage` / `pickAll`: if CMS HE matches the MT needles (`???`, `??????`, `?????`, `?????`, `???????`, `????? ?????`, `????? ?????`, `?????? ???????`, `??? ???? ?? ????`, �), use the code fallback. Cache key `audit-page-v4-he-sanitize`.
 - `pnpm db:fix-audit-he-copy` (`scripts/patch-audit-he-copy.ts`) writes HE steps from `auditPage` and trims service offering names.
 - `locMap` / `locList` / `L()` assign `.trim()`.
 
@@ -1458,31 +1459,31 @@ Do not put a raw URL or hash into a fixed summary card. Clip the card even when 
 
 ---
 
-## PIT-084 — Audit pricing CTAs without a leading slash 404 under `/audit`
+## PIT-084 � Audit pricing CTAs without a leading slash 404 under `/audit`
 
 **Tags:** `audit`, `cms`, `next-link`, `i18n`, `pricing`  
-**Seen:** 2026-09-13 — live `/audit` Pricing tab. Diagnostic and Pro “Get started” went to `/audit/order/audit-*` (404). Free was `/order/audit-free` (200).
+**Seen:** 2026-09-13 � live `/audit` Pricing tab. Diagnostic and Pro �Get started� went to `/audit/order/audit-*` (404). Free was `/order/audit-free` (200).
 
 **Symptom:**
 1. Paid plan buttons 404 on EN/RU/HE. Relative `ctaHref` `order/audit-diagnostic` / `order/audit-pro` in the `audit-page` CMS global.
-2. HE `ללא כרטיס` (ticket/card, not credit card), `או סוכנות?` (audit or an agency?).
-3. RU Free CTA `начать сейчас`; Diagnostic/Pro `Воронка раскрыта` / `Съёмка сайта`. Intro still mentions Delegate though the grid is Free / Diagnostic / Pro.
+2. HE `??? ?????` (ticket/card, not credit card), `?? ???????` (audit or an agency?).
+3. RU Free CTA `������ ������`; Diagnostic/Pro `������� ��������` / `������ �����`. Intro still mentions Delegate though the grid is Free / Diagnostic / Pro.
 
-**Cause:** `mapPlans` copied CMS `ctaHref` as-is. Next `<Link href="order/…">` is **page-relative**. `navigateCtaHref` already prefixed `/` for `window.location`; the pricing cards use `<Link>`. Copy lives in CMS; code fallbacks do not win until sanitized or patched.
+**Cause:** `mapPlans` copied CMS `ctaHref` as-is. Next `<Link href="order/�">` is **page-relative**. `navigateCtaHref` already prefixed `/` for `window.location`; the pricing cards use `<Link>`. Copy lives in CMS; code fallbacks do not win until sanitized or patched.
 
 **Fix:**
 - `normalizeCtaHref()` (`src/lib/ctaNav.ts`) used in `fetchAuditPage` / `AuditBody` / site-content CTAs. Cache key `audit-page-v5-pricing-href`.
-- HE/RU tariff copy in `auditPage.ts` + `orderPlans.ts`; stale HE needles `60+ אנשים`, `ללא כרטיס`, `או סוכנות?`.
+- HE/RU tariff copy in `auditPage.ts` + `orderPlans.ts`; stale HE needles `60+ ?????`, `??? ?????`, `?? ???????`.
 - `pnpm db:fix-audit-pricing` writes leading-slash hrefs and the new strings into CMS.
 
-**Prevent:** Store internal CTA paths with a leading `/`. Do not put relative paths in a CMS text field that feeds Next `<Link>`. Pricing cards are edited on **Plans** (`kind: AI Audit`), not Audit Page — run `db:fix-audit-pricing` or `db:migrate-audit-plans-unify` to sync static → Plans. A code-only deploy does not overwrite filled CMS.
+**Prevent:** Store internal CTA paths with a leading `/`. Do not put relative paths in a CMS text field that feeds Next `<Link>`. Pricing cards are edited on **Plans** (`kind: AI Audit`), not Audit Page � run `db:fix-audit-pricing` or `db:migrate-audit-plans-unify` to sync static > Plans. A code-only deploy does not overwrite filled CMS.
 
 ---
 
-## PIT-085 — `*.vercel.app` indexes as a duplicate of erythro.ai; sitemap 5xx
+## PIT-085 � `*.vercel.app` indexes as a duplicate of erythro.ai; sitemap 5xx
 
 **Tags:** `seo`, `robots`, `vercel`, `sitemap`, `canonical`  
-**Seen:** 2026-09-14 — `https://erythro-ai.vercel.app` returns 200 with `index, follow` while canonical is `https://erythro.ai`. Vercel Standard Protection (`all_except_custom_domains`) still leaves the short production alias public.
+**Seen:** 2026-09-14 � `https://erythro-ai.vercel.app` returns 200 with `index, follow` while canonical is `https://erythro.ai`. Vercel Standard Protection (`all_except_custom_domains`) still leaves the short production alias public.
 
 **Symptom:** Google may index the Vercel alias next to the custom domain. `GET /sitemap.xml` is dynamic against Payload; a DB timeout becomes 5xx and Search Console drops the sitemap.
 
@@ -1491,47 +1492,47 @@ Do not put a raw URL or hash into a fixed summary card. Clip the card even when 
 **Fix:**
 - Host-aware `robots.txt`: `Disallow: /` + `X-Robots-Tag: noindex` on `*.vercel.app`.
 - Middleware: `X-Robots-Tag: noindex, nofollow` on all `*.vercel.app`; **308** production aliases to `https://erythro.ai` (skip `/robots.txt` and `/api/*`).
-- Canonical + JSON-LD + sitemap `<loc>` use `https://erythro.ai` (no trailing slash). Inner pages already 308 `/path/` → `/path`.
+- Canonical + JSON-LD + sitemap `<loc>` use `https://erythro.ai` (no trailing slash). Inner pages already 308 `/path/` > `/path`.
 - Sitemap `revalidate = 3600`, static fallback on throw, CDN `s-maxage=3600`, hourly cron `/api/cron/sitemap-health` emails `order@` on failure.
 
 **Prevent:** Do not point GitHub homepage / GSC / ads at `*.vercel.app`. After deploy, `curl -sI https://erythro-ai.vercel.app/` must be 308 (or auth wall), and `curl -s https://erythro-ai.vercel.app/robots.txt` must contain `Disallow: /`.
 
 ---
 
-## PIT-086 — `pg_advisory_lock` in a migration releases before the commit; parallel `next build` workers collide
+## PIT-086 � `pg_advisory_lock` in a migration releases before the commit; parallel `next build` workers collide
 
 **Tags:** `payload`, `postgres`, `migrations`, `build`
-**Seen:** 2026-09-15 — `20260915_010000_consultant_entities` (consultant collections + global).
+**Seen:** 2026-09-15 � `20260915_010000_consultant_entities` (consultant collections + global).
 
-**Symptom:** `pnpm build` reports `Migrated: … (12488ms)` and then immediately
+**Symptom:** `pnpm build` reports `Migrated: � (12488ms)` and then immediately
 
 ```
-ERROR: Error running migration … Failed query: SELECT pg_advisory_unlock(…)
+ERROR: Error running migration � Failed query: SELECT pg_advisory_unlock(�)
   current transaction is aborted, commands ignored until end of transaction block
 ```
 
 The tables are in fact created and `payload migrate:status` says `Yes`, but the build exits 1.
 
-**Cause:** `next build` boots Payload in several workers, so the migration runs concurrently. Payload wraps each migration in a transaction, while `pg_advisory_lock` is *session*-scoped: the `finally` block unlocks before the first worker commits. The second worker then walks into `CREATE TABLE IF NOT EXISTS` for tables it cannot see yet and fails on the unique index over `pg_type`. Its transaction is now aborted, so the `finally` unlock fails too — and that secondary error replaces the real one in the log.
+**Cause:** `next build` boots Payload in several workers, so the migration runs concurrently. Payload wraps each migration in a transaction, while `pg_advisory_lock` is *session*-scoped: the `finally` block unlocks before the first worker commits. The second worker then walks into `CREATE TABLE IF NOT EXISTS` for tables it cannot see yet and fails on the unique index over `pg_type`. Its transaction is now aborted, so the `finally` unlock fails too � and that secondary error replaces the real one in the log.
 
-**Fix:** Use `pg_advisory_xact_lock(<id>)`, which Postgres releases at commit or rollback. No `try`/`finally`, so nothing masks the original error. Keep everything else idempotent: `CREATE TABLE/INDEX IF NOT EXISTS`, `ADD COLUMN IF NOT EXISTS`, and `DO $$ … EXCEPTION WHEN duplicate_object` around `CREATE TYPE` and `ADD CONSTRAINT`.
+**Fix:** Use `pg_advisory_xact_lock(<id>)`, which Postgres releases at commit or rollback. No `try`/`finally`, so nothing masks the original error. Keep everything else idempotent: `CREATE TABLE/INDEX IF NOT EXISTS`, `ADD COLUMN IF NOT EXISTS`, and `DO $$ � EXCEPTION WHEN duplicate_object` around `CREATE TYPE` and `ADD CONSTRAINT`.
 
-**Prevent:** New migrations take the transaction-scoped lock. Never wrap migration DDL in `try`/`finally` — a cleanup statement on an aborted transaction hides the failure that matters.
+**Prevent:** New migrations take the transaction-scoped lock. Never wrap migration DDL in `try`/`finally` � a cleanup statement on an aborted transaction hides the failure that matters.
 
 ---
 
-## PIT-087 — Admin Media upload “Failed to fetch” (R2 CORS + CSP)
+## PIT-087 � Admin Media upload �Failed to fetch� (R2 CORS + CSP)
 
 **Tags:** `media`, `r2`, `cors`, `csp`, `payload`, `admin`  
-**Seen:** 2026-09-15 — `/admin/collections/media/create`  
-**Regression:** 2026-10-16 — same symptom after `@payloadcms/storage-s3` 3.90.x (see cause #3)
+**Seen:** 2026-09-15 � `/admin/collections/media/create`  
+**Regression:** 2026-10-16 � same symptom after `@payloadcms/storage-s3` 3.90.x (see cause #3)
 
-**Symptom:** Choosing a file in Payload Media shows **Failed to fetch**. Vercel may also log `POST /api/media` → `No files were uploaded.` Signed-URL route `/api/storage-s3-generate-signed-url` still returns 200. Chrome console may show a CSP `connect-src` violation to `*.r2.cloudflarestorage.com`, or a CORS preflight **403** on `*.r2.cloudflarestorage.com`.
+**Symptom:** Choosing a file in Payload Media shows **Failed to fetch**. Vercel may also log `POST /api/media` > `No files were uploaded.` Signed-URL route `/api/storage-s3-generate-signed-url` still returns 200. Chrome console may show a CSP `connect-src` violation to `*.r2.cloudflarestorage.com`, or a CORS preflight **403** on `*.r2.cloudflarestorage.com`.
 
 **Cause (three layers):**
-1. `s3Storage({ clientUploads: true })` has the browser `PUT` the file straight to `*.r2.cloudflarestorage.com`. Bucket `erythro-media` had **no CORS policy** (`wrangler … cors list` → code `10059`).
+1. `s3Storage({ clientUploads: true })` has the browser `PUT` the file straight to `*.r2.cloudflarestorage.com`. Bucket `erythro-media` had **no CORS policy** (`wrangler � cors list` > code `10059`).
 2. Even with CORS fixed, admin CSP `connect-src` allowed `*.r2.dev` (CDN reads) but **not** the S3 API host, so the browser blocked the PUT and Payload surfaced a generic network error.
-3. **Payload 3.90+** signs PUTs with `If-None-Match: *`. CORS that only allows `Content-Type` + `Content-Length` makes OPTIONS return **403**; the admin UI shows **Failed to fetch**. Probe: request headers `content-type,content-length,if-none-match` → 403; without `if-none-match` → 204.
+3. **Payload 3.90+** signs PUTs with `If-None-Match: *`. CORS that only allows `Content-Type` + `Content-Length` makes OPTIONS return **403**; the admin UI shows **Failed to fetch**. Probe: request headers `content-type,content-length,if-none-match` > 403; without `if-none-match` > 204.
 
 **Fix:**
 1. Apply CORS from `infra/r2-media-cors.json` (must include `If-None-Match`):
@@ -1539,7 +1540,7 @@ The tables are in fact created and `payload migrate:status` says `Yes`, but the 
 # Needs Cloudflare API token with R2 Edit (Object Read/Write S3 keys cannot PutBucketCors)
 npx wrangler r2 bucket cors set erythro-media --file infra/r2-media-cors.json --force
 ```
-   Or Dashboard → R2 → `erythro-media` → Settings → CORS → Allowed Headers: `Content-Type`, `Content-Length`, `If-None-Match`.
+   Or Dashboard > R2 > `erythro-media` > Settings > CORS > Allowed Headers: `Content-Type`, `Content-Length`, `If-None-Match`.
 2. Add `https://*.r2.cloudflarestorage.com` to **admin** CSP `connect-src` in `next.config.ts`, redeploy.
 3. Verify CORS:
 ```bash
@@ -1556,55 +1557,55 @@ curl -sI -X OPTIONS "https://$R2_ACCOUNT_ID.r2.cloudflarestorage.com/erythro-med
 
 ---
 
-## PIT-088 — Consultant chat is silent on Vercel Preview (`POST /api/consult` 403)
+## PIT-088 � Consultant chat is silent on Vercel Preview (`POST /api/consult` 403)
 
 **Tags:** `consultant`, `turnstile`, `preview`, `vercel`  
-**Seen:** 2026-09-16 — `feat/ai-consultant` preview `*.vercel.app`
+**Seen:** 2026-09-16 � `feat/ai-consultant` preview `*.vercel.app`
 
-**Symptom:** Widget opens, a question is sent, the typing indicator flashes, then nothing. Runtime logs show `POST /api/consult` → 403. No Gemini call.
+**Symptom:** Widget opens, a question is sent, the typing indicator flashes, then nothing. Runtime logs show `POST /api/consult` > 403. No Gemini call.
 
 **Cause:** `TURNSTILE_HOSTNAMES` is `erythro.ai,www.erythro.ai`. Preview lives on `*.vercel.app`. Siteverify (or an empty token, when the Cloudflare widget refuses that host) fails the hostname allowlist. `NODE_ENV` on Preview is `production`, so the local-dev skip does not apply. The widget only parsed SSE; a JSON 403 left the transcript empty.
 
 **Fix:** `verifyTurnstileToken` returns ok when `VERCEL_ENV=preview` (SSO is the gate). Production still requires a matching token + hostname. The widget shows the unavailable notice for non-SSE error bodies.
 
-**Prevent:** Do not add every preview URL to `TURNSTILE_HOSTNAMES`. Do not treat `NODE_ENV=production` as “this is erythro.ai”.
+**Prevent:** Do not add every preview URL to `TURNSTILE_HOSTNAMES`. Do not treat `NODE_ENV=production` as �this is erythro.ai�.
 
 ---
 
-## PIT-089 — Consultant “enabled: off” leaves the spark button; click jerks the panel
+## PIT-089 � Consultant �enabled: off� leaves the spark button; click jerks the panel
 
 **Tags:** `consultant`, `chatbutton`, `cache`, `cms`  
-**Seen:** 2026-09-17 — widget deployed, Consultant Settings unchecked
+**Seen:** 2026-09-17 � widget deployed, Consultant Settings unchecked
 
-**Symptom:** Admin unchecks **Consultant enabled**. The launcher stays on the site. Clicking it flashes the chat window, then it collapses — looks like a cached panel.
+**Symptom:** Admin unchecks **Consultant enabled**. The launcher stays on the site. Clicking it flashes the chat window, then it collapses � looks like a cached panel.
 
 **Cause:** `enabled` was read only inside `ErythroConsultant` **on first open**. `ChatButton` always rendered the entry points. The panel mounts from `sessionStorage` draft immediately, then `/api/consult/copy` returns `enabled: false` and unmounts it. `Cache-Control: private, max-age=60` on that GET also delayed the kill switch in the browser.
 
-**Fix:** `ChatButton` fetches `/api/consult/copy` (`no-store`) on mount and omits the AI-consultant launcher when `enabled === false` (the contact fan + WhatsApp FAB stay as fallback). Trust that boolean — do not require a non-empty greeting, and do not `unstable_cache` the copy payload. `POST /api/consult` returns 503 when the CMS flag is off. Do **not** unmount the overlay while that fetch is in flight — see PIT-090.
+**Fix:** `ChatButton` fetches `/api/consult/copy` (`no-store`) on mount and omits the AI-consultant launcher when `enabled === false` (the contact fan + WhatsApp FAB stay as fallback). Trust that boolean � do not require a non-empty greeting, and do not `unstable_cache` the copy payload. `POST /api/consult` returns 503 when the CMS flag is off. Do **not** unmount the overlay while that fetch is in flight � see PIT-090.
 
 **Prevent:** A public kill switch must hide the **launcher**, not only the dialog. Do not HTTP-cache or `unstable_cache` the copy endpoint that carries `enabled`. Do not ignore `enabled: false` when greeting is empty.
 
 ---
 
-## PIT-090 — Consultant first open delays / skips the slide
+## PIT-090 � Consultant first open delays / skips the slide
 
 **Tags:** `consultant`, `css-transition`, `transform`  
-**Seen:** 2026-09-17 — first FAB click felt stuck; later open/close were fine
+**Seen:** 2026-09-17 � first FAB click felt stuck; later open/close were fine
 
 **Symptom:** The first panel open waits, then appears (or fades). The second and later toggles slide like the burger menu.
 
-**Cause:** Two things stacked. (1) `if (isOpen && !copyReady) return null` tore the overlay out of the DOM until `/api/consult/copy` returned. (2) Remount painted with `consult--open` already on the node, so `transform: translateY(100%) → 0` had no from-state and the 850ms transition never ran.
+**Cause:** Two things stacked. (1) `if (isOpen && !copyReady) return null` tore the overlay out of the DOM until `/api/consult/copy` returned. (2) Remount painted with `consult--open` already on the node, so `transform: translateY(100%) > 0` had no from-state and the 850ms transition never ran.
 
-**Fix:** Keep `.consult` mounted closed. Drive `--open` one paint later (`requestAnimationFrame` × 2) so a first mount-while-open still starts at `translateY(100%)`. Prefetch CMS copy on mount; built-in labels cover the first frame.
+**Fix:** Keep `.consult` mounted closed. Drive `--open` one paint later (`requestAnimationFrame` ? 2) so a first mount-while-open still starts at `translateY(100%)`. Prefetch CMS copy on mount; built-in labels cover the first frame.
 
 **Prevent:** A CSS transform transition needs a closed frame in the document. Do not unmount a bottom-sheet while waiting for copy, CMS, or `mounted`. Same pattern as the burger panel: toggle a class on a node that already exists.
 
 ---
 
-## PIT-093 — Consultant answer never streams (Gemini cache + tools)
+## PIT-093 � Consultant answer never streams (Gemini cache + tools)
 
 **Tags:** `consultant`, `gemini`, `cache`, `ai-sdk`  
-**Seen:** 2026-09-18 — local `POST /api/consult` 200, «Печатает…» then empty
+**Seen:** 2026-09-18 � local `POST /api/consult` 200, ��������� then empty
 
 **Symptom:** The visitor sends a question. The typing indicator shows, then disappears. No assistant bubble, no error notice. Runtime log: `CachedContent can not be used with GenerateContent request setting system_instruction, tools or tool_config`.
 
@@ -1616,64 +1617,64 @@ curl -sI -X OPTIONS "https://$R2_ACCOUNT_ID.r2.cloudflarestorage.com/erythro-med
 
 ---
 
-## PIT-094 — Consultant second message shows «Ассистент временно недоступен»
+## PIT-094 � Consultant second message shows ���������� �������� �����������
 
 **Tags:** `consultant`, `turnstile`  
-**Seen:** 2026-09-18 — production `POST /api/consult` 200 then, after OTP, 403
+**Seen:** 2026-09-18 � production `POST /api/consult` 200 then, after OTP, 403
 
-**Symptom:** First chat reply streams. The next send (often after email OTP) shows «Ассистент временно недоступен. Контактная форма работает.» Runtime: `POST /api/consult` → 403 JSON, no Gemini call.
+**Symptom:** First chat reply streams. The next send (often after email OTP) shows ���������� �������� ����������. ���������� ����� ��������.� Runtime: `POST /api/consult` > 403 JSON, no Gemini call.
 
-**Cause:** Invisible Turnstile tokens are single-use. The widget called `reset()` + `execute()` on the same instance. `reset()` fires `expired-callback` with `''`; that resolved `getToken()` and the client posted an empty `cf-turnstile-response`. Siteverify never ran. The host also lived **inside** `.consult` (`transform: translateY(...)`) as a `0×0` / `visibility: hidden` box — Cloudflare will not mint a fresh widget there. After remint-in-place, even the first chat message posted an empty token.
+**Cause:** Invisible Turnstile tokens are single-use. The widget called `reset()` + `execute()` on the same instance. `reset()` fires `expired-callback` with `''`; that resolved `getToken()` and the client posted an empty `cf-turnstile-response`. Siteverify never ran. The host also lived **inside** `.consult` (`transform: translateY(...)`) as a `0?0` / `visibility: hidden` box � Cloudflare will not mint a fresh widget there. After remint-in-place, even the first chat message posted an empty token.
 
-**Fix:** Host the widget on `document.body` (off-screen 300×65, not `display: none` / `visibility: hidden` / transformed ancestor). Mint a **new** widget per request (`remove` + `render` + `execute`). Ignore empty `expired-callback` during a mint. Retry `getToken` once before POSTing. Log empty-token vs siteverify mismatch server-side (never the token).
+**Fix:** Host the widget on `document.body` (off-screen 300?65, not `display: none` / `visibility: hidden` / transformed ancestor). Mint a **new** widget per request (`remove` + `render` + `execute`). Ignore empty `expired-callback` during a mint. Retry `getToken` once before POSTing. Log empty-token vs siteverify mismatch server-side (never the token).
 
 **Prevent:** Do not treat `expired-callback` as a finished mint. Do not hide Turnstile with `width: 0` / `display: none` / `visibility: hidden`. Do not put the widget inside a CSS-`transform` overlay. A JSON 403 on `/api/consult` is captcha, not Gemini.
 
 ---
 
-## PIT-095 — Consultant «Заказать сайт» lands in Let’s Talk instead of Solutions
+## PIT-095 � Consultant ��������� ���� lands in Let�s Talk instead of Solutions
 
 **Tags:** `consultant`, `gsap`, `home`, `solutions`  
-**Seen:** 2026-09-18 — RU home, chip «Заказать сайт»
+**Seen:** 2026-09-18 � RU home, chip ��������� ����
 
-**Symptom:** Chip / escalate with no plan slug used `location.assign('/#solutions')`. The overlay closed and the viewport showed Let’s Talk (footer CTA), not the Solutions cards.
+**Symptom:** Chip / escalate with no plan slug used `location.assign('/#solutions')`. The overlay closed and the viewport showed Let�s Talk (footer CTA), not the Solutions cards.
 
-**Cause:** `#solutions` is GSAP-pinned on desktop (`id: solutions-pin`, `pinSpacing: false`). Native hash / `scrollIntoView` lands at the pin’s end, which is visually FAQ + Let’s Talk. Overlay `useLockBodyScroll` also restores the pre-open `scrollY` after `onClose()`, racing a `setTimeout(0)` jump. Independently, the Services pin **clamps** scroll at the Let’s Talk settle point until the overlay animation completes (`self.scroll(settleAt)`), so a jump to Solutions from the hero is pulled back to the red Let’s Talk block.
+**Cause:** `#solutions` is GSAP-pinned on desktop (`id: solutions-pin`, `pinSpacing: false`). Native hash / `scrollIntoView` lands at the pin�s end, which is visually FAQ + Let�s Talk. Overlay `useLockBodyScroll` also restores the pre-open `scrollY` after `onClose()`, racing a `setTimeout(0)` jump. Independently, the Services pin **clamps** scroll at the Let�s Talk settle point until the overlay animation completes (`self.scroll(settleAt)`), so a jump to Solutions from the hero is pulled back to the red Let�s Talk block.
 
-**Fix:** Close the overlay, wait until `html.modal-open` is gone (plus two frames), `ScrollTrigger.refresh()`, dispatch `erythro:skip-lets-talk-settle` (same as finishing the Let’s Talk gate), then `scrollToHomeSection('solutions')`: `history.replaceState` + `ScrollTrigger.getById('solutions-pin').start` (retry a few frames). Fallback `scrollIntoView` only when there is no pin (mobile).
+**Fix:** Close the overlay, wait until `html.modal-open` is gone (plus two frames), `ScrollTrigger.refresh()`, dispatch `erythro:skip-lets-talk-settle` (same as finishing the Let�s Talk gate), then `scrollToHomeSection('solutions')`: `history.replaceState` + `ScrollTrigger.getById('solutions-pin').start` (retry a few frames). Fallback `scrollIntoView` only when there is no pin (mobile).
 
 **Prevent:** Do not `assign('/#solutions')` from an overlay. Do not `scrollIntoView('#solutions')` on desktop while the pin exists. Wait for body-unlock before any `scrollTo`.
 
 ---
 
-## PIT-091 — AI Smart Card / AI-визитка copy drifts between CMS, menu, and order chrome
+## PIT-091 � AI Smart Card / AI-������� copy drifts between CMS, menu, and order chrome
 
 **Tags:** `i18n`, `cms`, `solutions`, `order`, `seo`  
-**Seen:** 2026-09-18 — live `/#solutions` + `/order/ai-business-card` EN/RU/HE audit.
+**Seen:** 2026-09-18 � live `/#solutions` + `/order/ai-business-card` EN/RU/HE audit.
 
 **Symptom:**
 1. Solutions CTA on EN is `Get a start` (not English).
-2. Menu still says `AI-Business Card` / `AI-визитка` / `כרטיס ביקור AI` while the card and checkout say `AI Smart Card` / `כרטיס חכם AI`.
+2. Menu still says `AI-Business Card` / `AI-�������` / `????? ????? AI` while the card and checkout say `AI Smart Card` / `????? ??? AI`.
 3. RU/HE order `<title>` keeps `| Order |`; RU tariff name stays English `AI Smart Card`.
-4. Checkout summary: RU `Итог`/`Итого`/`Всего к оплате` stacked; HE subtotal is `ביניים` instead of `סכום ביניים`. Wizard buttons: `Предыдущий` / `Следующий`.
+4. Checkout summary: RU `����`/`�����`/`����� � ������` stacked; HE subtotal is `??????` instead of `???? ??????`. Wizard buttons: `����������` / `���������`.
 
 **Cause:**
 Homepage cards, burger children, and `/order/[slug]` all read Payload `solution-plans` / `solutions-section` / `header`. Stale CMS rows override `src/translations` (`Get started`, localized titles). `generateMetadata` hardcoded `| Order |`. Header submenu children, when present, are **not** derived from plan titles, so a rename of the card does not rename the menu.
 
 **Fix:**
-Canonical names: EN `AI Smart Card`, RU `AI-визитка`, HE `כרטיס חכם AI`. Runtime hygiene in `src/lib/copyHygiene.ts` (applied from `getSiteContent` + `cmsPages`). Localized order title suffix. Checkout labels and `ProjectNav` RU `Назад` / `Далее`. CMS: `scripts/fix-localization-audit.ts` + `scripts/patch-smart-card-solution.ts`. Bump `unstable_cache` keys (`site-content-v14-smart-card-i18n`, `order-plans-v4-smart-card-i18n`).
+Canonical names: EN `AI Smart Card`, RU `AI-�������`, HE `????? ??? AI`. Runtime hygiene in `src/lib/copyHygiene.ts` (applied from `getSiteContent` + `cmsPages`). Localized order title suffix. Checkout labels and `ProjectNav` RU `�����` / `�����`. CMS: `scripts/fix-localization-audit.ts` + `scripts/patch-smart-card-solution.ts`. Bump `unstable_cache` keys (`site-content-v14-smart-card-i18n`, `order-plans-v4-smart-card-i18n`).
 
 **Prevent:**
-Do not treat CMS strings as already-localized because EN looks fine. After renaming a plan, patch **title + header children + seo.title** in all three locales, or leave submenu empty so it is generated from cards. Do not hardcode English chrome (`Order`, `Get a start`) in `generateMetadata` or section CTAs. When mapping Payload `locale: 'all'` rich text, prefer `{en,ru,he}` locale keys even if a sibling empty `root` makes `isLexicalDoc(value)` true — otherwise “What's included” disappears (PIT-092).
+Do not treat CMS strings as already-localized because EN looks fine. After renaming a plan, patch **title + header children + seo.title** in all three locales, or leave submenu empty so it is generated from cards. Do not hardcode English chrome (`Order`, `Get a start`) in `generateMetadata` or section CTAs. When mapping Payload `locale: 'all'` rich text, prefer `{en,ru,he}` locale keys even if a sibling empty `root` makes `isLexicalDoc(value)` true � otherwise �What's included� disappears (PIT-092).
 
 ---
 
-## PIT-092 — Order “What's included” vanishes after a plans cache bump
+## PIT-092 � Order �What's included� vanishes after a plans cache bump
 
 **Tags:** `i18n`, `cms`, `order`, `lexical`, `cache`  
-**Seen:** 2026-09-18 — after `order-plans-v4-smart-card-i18n`; `/order/ai-smart-card` kept Stack/CMS/AI but lost «Что входит в разработку?» / subscription details.
+**Seen:** 2026-09-18 � after `order-plans-v4-smart-card-i18n`; `/order/ai-smart-card` kept Stack/CMS/AI but lost ���� ������ � ����������?� / subscription details.
 
-**Symptom:** Plan feature rows still render. The accordion “What's included in development?” and expandable subscription copy do not.
+**Symptom:** Plan feature rows still render. The accordion �What's included in development?� and expandable subscription copy do not.
 
 **Cause:** `unstable_cache` key bump forced a cold Payload `locale: 'all'` read. Top-level localized Lexical (`includes`) often arrives as an empty `{ root }` shell **without** `{en,ru,he}` keys, while nested addon `full` still maps. `isLexicalDoc` treated the empty shell as the document, `hasIncludes` stayed false, and static `ORDER_PLANS` for solutions had no `includes` fallback. Empty locale rows also made `resolveLexical` return a blank doc and skip plain-text fallback.
 
@@ -1682,10 +1683,10 @@ Do not treat CMS strings as already-localized because EN looks fine. After renam
 **Prevent:**
 Never gate Lexical UI on `isLexicalDoc(localeAllValue)` or `lexicalToPlain` alone. After changing an `unstable_cache` key with `revalidate: false`, confirm the first fill is not an empty Lexical shell. Keep a static `includes` fallback on solution plans.
 
-## PIT-096 — Consult Sessions Messages spinner / empty JSON editor
+## PIT-096 � Consult Sessions Messages spinner / empty JSON editor
 
 **Tags:** `cms`, `admin`, `consultant`, `csp`  
-**Seen:** 2026-09-19 — Payload admin `consult-sessions` edit view, Messages field.
+**Seen:** 2026-09-19 � Payload admin `consult-sessions` edit view, Messages field.
 
 **Symptom:** Messages never appear (Monaco spinner or blank). Email / phone / locale on the same document load.
 
@@ -1694,26 +1695,26 @@ Never gate Lexical UI on `isLexicalDoc(localeAllValue)` or `lexicalToPlain` alon
 **Fix:** Custom Field/Cell `ConsultTranscriptField` reads `messages` from form/document state and renders the `{ role, parts }` array. Do not open Monaco for this field. `pnpm generate:importmap` after changing the admin component path.
 
 **Prevent:**
-Do not put visitor transcripts behind Payload's JSON/Monaco editor. Chat-shaped jsonb stays `type: 'json'` in the database; admin UI is a custom client Field. If another JSON field (e.g. `auditSummary`) also spins, either give it a custom viewer or allow the Monaco CDN in admin CSP — do not weaken public CSP.
+Do not put visitor transcripts behind Payload's JSON/Monaco editor. Chat-shaped jsonb stays `type: 'json'` in the database; admin UI is a custom client Field. If another JSON field (e.g. `auditSummary`) also spins, either give it a custom viewer or allow the Monaco CDN in admin CSP � do not weaken public CSP.
 
-## PIT-097 — Consultant replies in site locale, not the visitor's language
+## PIT-097 � Consultant replies in site locale, not the visitor's language
 
 **Tags:** `consultant`, `i18n`, `prompt`  
-**Seen:** 2026-09-19 — EN chrome on erythro.ai; Russian questions answered in English. «Сотрудничество» stayed generic (brief/roadmap) and skipped the Contacts SLA.
+**Seen:** 2026-09-19 � EN chrome on erythro.ai; Russian questions answered in English. ��������������� stayed generic (brief/roadmap) and skipped the Contacts SLA.
 
 **Symptom:** Greeting and chips follow the page locale. Typed RU/HE is answered in that chrome language. "How do we work" does not mention one business day, contract/payment boundary, or refuse the brief checklist.
 
 **Cause:** System prompt was `Reply in ${siteLocale} only`. Live CMS KB had no How we work card; the brief checklist sat in every turn, so collaboration leaked into "what kind of site".
 
-**Fix:** `detectReplyLocale` reads the last user message (Hebrew / Cyrillic / Latin) and loads KB + rules in that locale. Latin ≥ 2 with no Cyrillic/Hebrew is English — do not require 12 letters (RU UI + “How we work?” used to stay Russian). Assembler injects `howWeWorkMarkdown`. Prompt intent `collaboration_process` must not start the checklist.
+**Fix:** `detectReplyLocale` reads the last user message (Hebrew / Cyrillic / Latin) and loads KB + rules in that locale. Latin ? 2 with no Cyrillic/Hebrew is English � do not require 12 letters (RU UI + �How we work?� used to stay Russian). Assembler injects `howWeWorkMarkdown`. Prompt intent `collaboration_process` must not start the checklist.
 
 **Prevent:**
-Do not lock Gemini to the widget chrome locale. Do not keep the ТЗ checklist in-scope for process/FAQ turns. Contacts SLA ("one business day") belongs in How we work, not only on `/contacts`.
+Do not lock Gemini to the widget chrome locale. Do not keep the �� checklist in-scope for process/FAQ turns. Contacts SLA ("one business day") belongs in How we work, not only on `/contacts`.
 
-## PIT-098 — Mobile audit title and tabs vanish, then return on the next swipe
+## PIT-098 � Mobile audit title and tabs vanish, then return on the next swipe
 
 **Tags:** `audit`, `mobile`, `overflow`, `sticky`  
-**Seen:** 2026-09-26 — `/audit` on a phone. Scrolling hid the heading and tab row; the next swipe brought them back. Repeat.
+**Seen:** 2026-09-26 � `/audit` on a phone. Scrolling hid the heading and tab row; the next swipe brought them back. Repeat.
 
 **Symptom:** The block with the page title and Audit / How / Pricing tabs disappears while scrolling, then reappears on the following gesture.
 
@@ -1724,10 +1725,10 @@ Do not lock Gemini to the widget chrome locale. Do not keep the ТЗ checklist i
 **Prevent:**
 Do not put `overflow: hidden` on the mobile audit card. `overflow: clip` keeps the rounded top without a scrollport. Do not pin the title and tabs.
 
-## PIT-099 — PayPlus callback is not the payment, and the body is nested
+## PIT-099 � PayPlus callback is not the payment, and the body is nested
 
 **Tags:** `payplus`, `audit`, `webhook`, `payment`  
-**Seen:** 2026-09-26 — paid-audit checkout prepared for live keys.
+**Seen:** 2026-09-26 � paid-audit checkout prepared for live keys.
 
 **Symptom:** Success page says the audit is paid as soon as the browser returns. A forged or repeated callback marks `paid` and queues the worker again. PayPlus errors fall through to an unpaid contact submission.
 
@@ -1738,10 +1739,10 @@ Do not put `overflow: hidden` on the mobile audit card. `overflow: clip` keeps t
 **Prevent:**
 Do not mark paid from the success redirect or from callback fields alone. Do not send a free-text `items.name` (PayPlus creates a catalog product per charge). Do not set `PAYPLUS_ISSUE_INVOICE` until the invoice module is on. One charge only (`payments_selected: 1`) so the IPN amount matches the order. See `docs/architecture/payplus-audit-checkout.md`.
 
-## PIT-100 — Grow notify is unsigned, and the success redirect is empty
+## PIT-100 � Grow notify is unsigned, and the success redirect is empty
 
 **Tags:** `grow`, `meshulam`, `audit`, `webhook`, `payment`  
-**Seen:** 2026-09-29 — checkout moved from PayPlus to Grow Light API.
+**Seen:** 2026-09-29 � checkout moved from PayPlus to Grow Light API.
 
 **Symptom:** The browser lands on `/order/success?response=success` and the audit is treated as paid. A POST to `/api/payment/webhook` with `statusCode=2` marks `paid` and queues the worker. `approveTransaction` is skipped, so Grow's production review fails.
 
@@ -1752,126 +1753,128 @@ Do not mark paid from the success redirect or from callback fields alone. Do not
 **Prevent:**
 Do not mark paid from `response=success` or from the notify body. Do not log or reuse the process token as a public id. One payment (`paymentNum: 1`, `saveCardToken: 0`). Israeli mobile and a two-word name are required before the row is created. See `docs/architecture/grow-audit-checkout.md`.
 
-## PIT-104 — Payload 3.90 storage plugin reads `media._objectkey`; all CMS content falls back
+## PIT-104 � Payload 3.90 storage plugin reads `media._objectkey`; all CMS content falls back
 
 **Tags:** `payload`, `upgrade`, `migrations`, `r2`, `cache`
-**Seen:** 2026-10-07 — after PR #223 (Payload 3.90.2) reached production.
+**Seen:** 2026-10-07 � after PR #223 (Payload 3.90.2) reached production.
 
 **Symptom:** Images and all CMS content disappear from the site; the admin loads no data. Vercel runtime errors: `[getSiteContent] / [getShellSiteContent] / [getSeoSettings] / [cmsPages] ... fallback`, cause `column "_objectkey" does not exist` (42703) on `select ... from "media"`.
 
 **Cause:** `@payloadcms/plugin-cloud-storage` 3.90 injects a hidden `_objectKey` text field into every storage-backed upload collection. The upgrade PR added a migration only for `users.reset_password_requested_at`. Any query that populates media (every global with an image) failed. The fallbacks then landed in `unstable_cache` with no `revalidate`, so they stay after the DB is fixed until `site-content` is revalidated.
 
-**Fix:** Migration `20261007_031500_media_object_key` (`ALTER TABLE media ADD COLUMN IF NOT EXISTS _objectkey varchar`), the column in `payload-generated-schema.ts`, and the same `ALTER` applied on prod by hand. Existing rows keep `_objectKey = null`; URLs fall back to `prefix/filename`. Then save any global in the admin (or `POST /api/revalidate?secret=…`) to drop the cached fallback.
+**Fix:** Migration `20261007_031500_media_object_key` (`ALTER TABLE media ADD COLUMN IF NOT EXISTS _objectkey varchar`), the column in `payload-generated-schema.ts`, and the same `ALTER` applied on prod by hand. Existing rows keep `_objectKey = null`; URLs fall back to `prefix/filename`. Then save any global in the admin (or `POST /api/revalidate?secret=�`) to drop the cached fallback.
 
 **Prevent:**
 After a Payload or storage-plugin bump, diff the generated Drizzle schema against prod (`information_schema.columns`) for every collection, not only the one named in the changelog. Smoke one CMS page and `/api/media` on the preview before merging to `main`.
 
-## PIT-106 — Gemini 3.x: `temperature` / `thinking_budget` will 400
+## PIT-106 � Gemini 3.x: `temperature` / `thinking_budget` will 400
 
 **Tags:** `consultant`, `gemini`, `audit-agent`  
-**Seen:** 2026-10-07 — Google AI Studio notice «Update thinking_budget and sampling parameters»
+**Seen:** 2026-10-07 � Google AI Studio notice �Update thinking_budget and sampling parameters�
 
 **Symptom:** None yet on `gemini-3.6-flash` (custom sampling is ignored). Upcoming Gemini models will return `400 INVALID_ARGUMENT` for `temperature` / `top_p` / `top_k` and for `thinking_budget`.
 
 **Cause:** Since Gemini 3.6 Flash, sampling params are fixed to model defaults. `thinking_budget` is remapped to `thinking_level` only as a temporary fallback.
 
-**Fix:** Remove `temperature` from consultant `streamText` and from QA_Auditor `generationConfig`. Do not send `thinking_budget`. Consultant sets `thinking_level` by stage: anon `minimal` → OTP `low` → brief/phone `medium` (`consultThinkingLevel`).
+**Fix:** Remove `temperature` from consultant `streamText` and from QA_Auditor `generationConfig`. Do not send `thinking_budget`. Consultant sets `thinking_level` by stage: anon `minimal` > OTP `low` > brief/phone `medium` (`consultThinkingLevel`).
 
 **Prevent:** For Gemini 3.x GenerateContent / AI SDK calls, never set `temperature`, `top_p`, `top_k`, or `thinking_budget`. Steer depth with `thinking_level` only.
 
 ---
 
-## PIT-107 — Audit report URLs without `?k=` are enumerable by id
+## PIT-107 � Audit report URLs without `?k=` are enumerable by id
 
-**Symptom:** Changing `/audit/report/173` → `/audit/report/174` (or calling `/api/audit/report/[id]`) lets anyone open another client's status/HTML.
+**Symptom:** Changing `/audit/report/173` > `/audit/report/174` (or calling `/api/audit/report/[id]`) lets anyone open another client's status/HTML.
 
 **Cause:** Status and HTML routes were public unlisted links keyed only by sequential `contact-submissions.id`.
 
-**Fix:** Store `reportAccessToken` on each audit submission; require `?k=` on `/audit/report/[id]`, `/api/audit/report/[id]`, and `/api/audit/report/[id]/html` (404 on missing/wrong token). Hook generates token on create; migration backfills existing audit rows and rewrites status-page `reportUrl` values. Worker emails `/audit/report/[id]?k=…` only.
+**Fix:** Store `reportAccessToken` on each audit submission; require `?k=` on `/audit/report/[id]`, `/api/audit/report/[id]`, and `/api/audit/report/[id]/html` (404 on missing/wrong token). Hook generates token on create; migration backfills existing audit rows and rewrites status-page `reportUrl` values. Worker emails `/audit/report/[id]?k=�` only.
 
-**Prevent:** Do not link or email report pages without `k`. Admin links must use `reportAccessToken` (not a stale bare `reportUrl`). After changing token gating, **redeploy `audit-agent` on VPS** — an old worker overwrites `reportUrl` and emails `/audit/report/[id]` without `k`. Repair: migration rewrite + internal PATCH injects `k` when worker omits it.
+**Prevent:** Do not link or email report pages without `k`. Admin links must use `reportAccessToken` (not a stale bare `reportUrl`). After changing token gating, **redeploy `audit-agent` on VPS** � an old worker overwrites `reportUrl` and emails `/audit/report/[id]` without `k`. Repair: migration rewrite + internal PATCH injects `k` when worker omits it.
 
 ---
 
-## PIT-108 — Google Ads tag is on the page but conversions stay inactive
+## PIT-108 � Google Ads tag is on the page but conversions stay inactive
 
 **Tags:** `google-ads`, `gtag`, `csp`, `consent`  
-**Seen:** 2026-10-15 — erythro.ai, `AW-18453652197`
+**Seen:** 2026-10-15 � erythro.ai, `AW-18453652197`
 
-**Symptom:** Ads says the tag is missing, or the conversion stays «Неактивно» / «Неверная конфигурация». Tag Assistant shows page views and remarketing, or a CSP block on `www.google.com/pagead/1p-conversion`.
+**Symptom:** Ads says the tag is missing, or the conversion stays ���������� / ��������� �������������. Tag Assistant shows page views and remarketing, or a CSP block on `www.google.com/pagead/1p-conversion`.
 
-**Cause:** The base tag loaded only after cookie Accept, so the Ads crawler never saw `AW-…` in HTML. The conversion event was bound to the wrong page (`/order/…` instead of the campaign landing `/audit`). CSP allowed `www.google.com` but not the redirect hop (`www.google.co.il` and other `*.google.com`); Chrome reports the first URL, not the blocked hop. A second primary action (GA4 import or a page-load «purchase» on the landing) marks the goal misconfigured.
+**Cause:** The base tag loaded only after cookie Accept, so the Ads crawler never saw `AW-�` in HTML. The conversion event was bound to the wrong page (`/order/�` instead of the campaign landing `/audit`). CSP allowed `www.google.com` but not the redirect hop (`www.google.co.il` and other `*.google.com`); Chrome reports the first URL, not the blocked hop. A second primary action (GA4 import or a page-load �purchase� on the landing) marks the goal misconfigured.
 
 **Fix:** One raw gtag in `<head>` with Consent Mode denied by default; grant `ad_*` and `analytics_storage` on Accept. Fire `gtag('event','conversion')` only after a successful submit or paid return, with `transaction_id`. Allow the Ads redirect hosts in `script-src` and `connect-src`. Keep one primary action per goal.
 
-**Prevent:** Follow `docs/architecture/google-ads-conversions.md`. Do not paste a second Google tag. Do not count a landing-page view as a purchase. Confirm in Tag Assistant: a «Конверсия» hit and an empty console, then wait hours before treating «Неактивно» as a code bug.
+**Prevent:** Follow `docs/architecture/google-ads-conversions.md`. Do not paste a second Google tag. Do not count a landing-page view as a purchase. Confirm in Tag Assistant: a ����������� hit and an empty console, then wait hours before treating ���������� as a code bug.
 
-**Organic defer (2026-10-26):** Marketing pages without ad params may delay `gtag.js` / `fbevents` until cookie Accept or the first conversion (`requestAnalyticsScripts`). **Do not** defer on paid query params, ads LP hosts, `/lp/audit/*`, `/audit`, or `/order/*` — those stay eager in head (same Consent Mode denied → grant on Accept). See `needsEagerAdAnalytics` / `AnalyticsBootstrap`.
+**Organic defer (2026-10-26):** Marketing pages without ad params may delay `gtag.js` / `fbevents` until cookie Accept or the first conversion (`requestAnalyticsScripts`). **Do not** defer on paid query params, ads LP hosts, `/lp/audit/*`, `/audit`, or `/order/*` � those stay eager in head (same Consent Mode denied > grant on Accept). See `needsEagerAdAnalytics` / `AnalyticsBootstrap`.
 
 ---
 
-## PIT-109 — Portfolio CMS projects 404 on `/portfolio/[slug]` while cards may load
+## PIT-109 � Portfolio CMS projects 404 on `/portfolio/[slug]` while cards may load
 
 **Tags:** `portfolio`, `payload`, `access`, `isr`, `slug`  
-**Seen:** 2026-10-15 — after `pnpm import:project` for `ai-audit-agent` / `ai-consultant`
+**Seen:** 2026-10-15 � after `pnpm import:project` for `ai-audit-agent` / `ai-consultant`
 
 **Symptom:** Projects exist in Payload admin and appear on `/portfolio` cards, but `https://erythro.ai/portfolio/<slug>` returns 404. Older CMS projects (e.g. `montblanc`) still open.
 
 **Cause (stack):**
-1. `portfolio-projects` `access.read` requires `req.user` — detail fetch must use `overrideAccess: true` (cards already did).
+1. `portfolio-projects` `access.read` requires `req.user` � detail fetch must use `overrideAccess: true` (cards already did).
 2. Imported slugs had a **trailing space** (`"ai-audit-agent "`), so URL `/portfolio/ai-audit-agent` never matched. Cards linked with the spaced slug from CMS; typed/canonical URLs 404'd. `unstable_cache` kept the bad list until the cache key bumped.
 3. A thrown `mapPortfolioDoc` on one row used to replace the **entire** CMS list with the static seed.
 
 **Fix:** `getPayloadLocal()` + `overrideAccess`; trim `slug` in `mapPortfolioDoc`; map per-doc with isolated try/catch; cache keys `portfolio-projects-v10-r2` / cards `v3`. Repair rows: `pnpm exec tsx scripts/fix-portfolio-slugs.ts`. Import writes `slug.trim()`.
 
-**Prevent:** Always trim portfolio slugs on write and read. After import, revalidate live (`REVALIDATION_TOKEN` + real `NEXT_PUBLIC_SITE_URL`) or Save in admin — local `revalidateTag` does not reach Vercel.
+**Prevent:** Always trim portfolio slugs on write and read. After import, revalidate live (`REVALIDATION_TOKEN` + real `NEXT_PUBLIC_SITE_URL`) or Save in admin � local `revalidateTag` does not reach Vercel.
 
 ---
 
-## PIT-112 — Ads audit LP language jumps from cookie / localStorage
+## PIT-112 � Ads audit LP language jumps from cookie / localStorage
 
 **Tags:** `ads`, `i18n`, `audit`, `landing`, `cdn`  
-**Seen:** 2026-10-18 — campaign Final URL on shared `/audit`
+**Seen:** 2026-10-18 � campaign Final URL on shared `/audit`
 
 **Symptom:** User from an EN campaign lands on the audit page and sees RU (or HE), because `NEXT_LOCALE` / `erythro-locale` from a previous visit wins. Ads Quality Score and form labels mismatch the campaign language.
 
-**Cause:** Main site locale is cookie/storage-driven (and middleware must not `Set-Cookie` — PIT-056). One URL cannot be a hard language lock.
+**Cause:** Main site locale is cookie/storage-driven (and middleware must not `Set-Cookie` � PIT-056). One URL cannot be a hard language lock.
 
-**Fix:** Separate LPs on `audit-en` / `audit-ru` / `audit-he`.erythro.ai → rewrite to `/lp/audit/{locale}` with host/path lock in `LOCALE_BOOTSTRAP_SCRIPT` + `useSitePrefs({ lockedLocale })`. See `docs/architecture/audit-ads-landing.md`.
+**Fix:** Separate LPs on `audit-en` / `audit-ru` / `audit-he`.erythro.ai > rewrite to `/lp/audit/{locale}` with host/path lock in `LOCALE_BOOTSTRAP_SCRIPT` + `useSitePrefs({ lockedLocale })`. See `docs/architecture/audit-ads-landing.md`.
 
-**Also (2026-10-18 / 2026-10-19):** Brief Hotnet NXDOMAIN on `audit-ru` led to a planned `audit-rus` label — but **`audit-rus` was never published in CF DNS**. Public RU host is **`audit-ru.erythro.ai`** (live). `audit-rus` is middleware alias only. Language switcher must use `AUDIT_LP_HOST_BY_LOCALE` (not invent `rus` in the path).
+**Also (2026-10-18 / 2026-10-19):** Brief Hotnet NXDOMAIN on `audit-ru` led to a planned `audit-rus` label � but **`audit-rus` was never published in CF DNS**. Public RU host is **`audit-ru.erythro.ai`** (live). `audit-rus` is middleware alias only. Language switcher must use `AUDIT_LP_HOST_BY_LOCALE` (not invent `rus` in the path).
 
-**Prevent:** Do not point Ads Final URL at `/audit`. Do not “fix” locale by setting `NEXT_LOCALE` in middleware. Prefer `audit-ru` (not `audit-rus`) in Ads.
+**Prevent:** Do not point Ads Final URL at `/audit`. Do not �fix� locale by setting `NEXT_LOCALE` in middleware. Prefer `audit-ru` (not `audit-rus`) in Ads.
 
 ---
 
-## PIT-111 — `vercel env pull` writes `[SENSITIVE]` and breaks import / revalidate
+## PIT-111 � `vercel env pull` writes `[SENSITIVE]` and breaks import / revalidate
 
 **Tags:** `vercel`, `env`, `import-project`, `portfolio`  
-**Seen:** 2026-10-17 — `pnpm import:project -- content/imports/rosso-garage --create`
+**Seen:** 2026-10-17 � `pnpm import:project -- content/imports/rosso-garage --create`
 
-**Symptom:** CLI prints `Database host: (unparseable DATABASE_URL)` / `getaddrinfo ENOTFOUND base`, or revalidate fails with `Failed to parse URL from [SENSITIVE]/api/revalidate…`. Project may still be written if secrets were later filled from `.env`.
+**Symptom:** CLI prints `Database host: (unparseable DATABASE_URL)` / `getaddrinfo ENOTFOUND base`, or revalidate fails with `Failed to parse URL from [SENSITIVE]/api/revalidate�`. Project may still be written if secrets were later filled from `.env`.
 
 **Cause:** Vercel CLI 64+ cannot pull many Production secrets and writes the literal placeholder `[SENSITIVE]` into `.env.production.local`. `dotenv` loads that file first; later `.env` does not override. Hostname `"base"` is the failed parse of `[SENSITIVE]`.
 
 **Fix:** `scripts/import-project/lib/load-env.ts` fills `[SENSITIVE]` from `.env` / `.env.local`, then deletes leftover placeholders so `NEXT_PUBLIC_SITE_URL` falls back to `https://erythro.ai`. Keep real `DATABASE_URL` / `PAYLOAD_SECRET` / R2 keys in `.env`. For live page cache: real `REVALIDATION_TOKEN` or **Save once** in production admin (PIT-109).
 
+**2026-11-10:** the filler was missing from `load-env.ts` again (import of ORA 60A hit `ENOTFOUND base`). Restored. A token that does not match Production still returns 401 from `/api/revalidate`; Save in admin is what busts the live portfolio cache.
+
 **Prevent:** After `vercel env pull`, never trust Production-only secrets in that file alone. Do not commit `.env*`.
 
 ---
 
-## PIT-110 — Supabase default grants expose Payload `public` to `anon` (hash/salt landmine)
+## PIT-110 � Supabase default grants expose Payload `public` to `anon` (hash/salt landmine)
 
 **Tags:** `supabase`, `security`, `postgrest`, `payload`, `rls`  
-**Seen:** 2026-10-15 — after pool-exhaustion alert; REST probe `/rest/v1/users`
+**Seen:** 2026-10-15 � after pool-exhaustion alert; REST probe `/rest/v1/users`
 
-**Symptom:** Monitoring can hit `/rest/v1/users`. Even with PostgREST exposed schemas empty (`pgrst_no_exposed_schemas` → 404), `anon`/`authenticated` still had full table grants on Payload tables and `USAGE` via `PUBLIC` on schema `public`. `users` had RLS off and columns `email`/`hash`/`salt`/reset tokens — re-enabling exposed schema `public` would leak admin credentials.
+**Symptom:** Monitoring can hit `/rest/v1/users`. Even with PostgREST exposed schemas empty (`pgrst_no_exposed_schemas` > 404), `anon`/`authenticated` still had full table grants on Payload tables and `USAGE` via `PUBLIC` on schema `public`. `users` had RLS off and columns `email`/`hash`/`salt`/reset tokens � re-enabling exposed schema `public` would leak admin credentials.
 
-**Cause:** Supabase defaults (`GRANT` to `anon`/`authenticated` + schema `USAGE` for `PUBLIC`). App never uses PostgREST — only Payload via `DATABASE_URL` as `postgres`.
+**Cause:** Supabase defaults (`GRANT` to `anon`/`authenticated` + schema `USAGE` for `PUBLIC`). App never uses PostgREST � only Payload via `DATABASE_URL` as `postgres`.
 
 **Fix (applied):** Migrations `revoke_anon_authenticated_public_privileges` + `revoke_public_schema_usage_from_public`:
 - `REVOKE ALL ON ALL TABLES/SEQUENCES/FUNCTIONS IN SCHEMA public FROM anon, authenticated`
-- `ALTER DEFAULT PRIVILEGES FOR ROLE postgres … REVOKE … FROM anon, authenticated`
+- `ALTER DEFAULT PRIVILEGES FOR ROLE postgres � REVOKE � FROM anon, authenticated`
 - `REVOKE USAGE ON SCHEMA public FROM PUBLIC` (keep explicit `USAGE` for `postgres`, `service_role`, `authenticator`)
 - Do **not** touch `storage` / `auth` / `service_role`
 
@@ -1879,14 +1882,14 @@ After a Payload or storage-plugin bump, diff the generated Drizzle schema agains
 
 ---
 
-## PIT-113 — Ads Pro-offer email sends but status stays `scheduled` (`Html Result` invalid)
+## PIT-113 � Ads Pro-offer email sends but status stays `scheduled` (`Html Result` invalid)
 
 **Tags:** `audit`, `payload`, `html_result`, `team-smtp`, `meta-ads`  
-**Seen:** 2026-10-19 — `POST /api/audit/internal/[id]/pro-offer` and reconcile sweep
+**Seen:** 2026-10-19 � `POST /api/audit/internal/[id]/pro-offer` and reconcile sweep
 
-**Symptom:** `team@` Pro ₪390 mail arrives (sometimes twice), Vercel logs `The following field is invalid: Audit pipeline > Html Result`, API returns 500. `pro_offer_status` never becomes `sent`.
+**Symptom:** `team@` Pro ?390 mail arrives (sometimes twice), Vercel logs `The following field is invalid: Audit pipeline > Html Result`, API returns 500. `pro_offer_status` never becomes `sent`.
 
-**Cause:** Same as PIT-035: `payload.update` on `contact-submissions` re-validates existing large `html_result`. Mail is sent first; status write fails afterward → reconcile retries.
+**Cause:** Same as PIT-035: `payload.update` on `contact-submissions` re-validates existing large `html_result`. Mail is sent first; status write fails afterward > reconcile retries.
 
 **Fix:** Write pro-offer columns via SQL (`patchProOfferFieldsSql` in `src/lib/auditProOffer.ts`), same pattern as `/api/audit/internal/[id]` PATCH. If a row already mailed but stuck on `scheduled`, SQL-set `pro_offer_status='sent'` (+ sent/expires/reminder timestamps).
 
@@ -1894,10 +1897,10 @@ After a Payload or storage-plugin bump, diff the generated Drizzle schema agains
 
 ---
 
-## PIT-114 — Unpaid Pro checkout still gets a report (reconcile queues `pending`)
+## PIT-114 � Unpaid Pro checkout still gets a report (reconcile queues `pending`)
 
 **Tags:** `audit`, `grow`, `make`, `reconcile`, `payment`  
-**Seen:** 2026-10-19 — customer opens Grow, aborts payment, returns to site; Pro report arrives anyway
+**Seen:** 2026-10-19 � customer opens Grow, aborts payment, returns to site; Pro report arrives anyway
 
 **Symptom:** `POST /api/payment/create` makes `paymentStatus=pending` + `auditStatus=new`. Customer never pays. Within ~2 minutes Vercel cron `/api/audit/reconcile` re-queues every stale `new` audit and the worker sends the report.
 
@@ -1909,10 +1912,10 @@ After a Payload or storage-plugin bump, diff the generated Drizzle schema agains
 
 ---
 
-## PIT-115 — Hostinger Sent empty after team@ Pro emails (SMTP only)
+## PIT-115 � Hostinger Sent empty after team@ Pro emails (SMTP only)
 
 **Tags:** `email`, `hostinger`, `smtp`, `imap`, `pro-offer`  
-**Seen:** 2026-10-20 — Pro/nudge/reminder sent via `TEAM_SMTP_PASS`, webmail Sent empty
+**Seen:** 2026-10-20 � Pro/nudge/reminder sent via `TEAM_SMTP_PASS`, webmail Sent empty
 
 **Symptom:** Clients receive Pro funnel mail from `team@erythro.ai`, but Hostinger **Sent** shows nothing.
 
@@ -1924,33 +1927,33 @@ After a Payload or storage-plugin bump, diff the generated Drizzle schema agains
 
 ---
 
-## PIT-116 — GA4 Key Events stay at 0 despite active form submissions and Ads `conversion` hits
+## PIT-116 � GA4 Key Events stay at 0 despite active form submissions and Ads `conversion` hits
 
 **Tags:** `ga4`, `google-ads`, `gtag`, `consent`, `conversions`  
-**Seen:** 2026-10-20 — GA4 property `543568002` (`G-F3BTVWGDRS`), `keyEvents = 0` across 789 sessions and 54 `form_start` events
+**Seen:** 2026-10-20 � GA4 property `543568002` (`G-F3BTVWGDRS`), `keyEvents = 0` across 789 sessions and 54 `form_start` events
 
 **Symptom:** GA4 reports `0` Key Events (`qualify_lead`, `close_convert_lead`, `purchase`), and only 1 automatic `form_submit` across months of traffic, even though leads are arriving in Payload CMS / CRM.
 
 **Cause (stack):**
-1. `adsConversion.ts` fired `gtag('event', 'conversion', { send_to: 'AW-18453652197/…' })`. Because `send_to` targeted only Google Ads (`AW-…`), GA4 (`G-F3BTVWGDRS`) never received any lead or purchase event, and AJAX `fetch('/api/contact')` does not reliably trigger GA4 Enhanced Measurement `form_submit`.
-2. Consent Mode race: `gtag('config', 'G-F3BTVWGDRS')` lived only inside `AnalyticsLoader` (`<Script strategy="afterInteractive">` rendered after cookie banner accept). When a user submitted a form with the form's privacy checkbox without clicking the cookie banner first, `setConsentValue(CONSENT_ACCEPTED)` triggered an async React state update while `gtag('event', …)` ran synchronously before `consent update` or `gtag('config', 'G-…')` executed.
+1. `adsConversion.ts` fired `gtag('event', 'conversion', { send_to: 'AW-18453652197/�' })`. Because `send_to` targeted only Google Ads (`AW-�`), GA4 (`G-F3BTVWGDRS`) never received any lead or purchase event, and AJAX `fetch('/api/contact')` does not reliably trigger GA4 Enhanced Measurement `form_submit`.
+2. Consent Mode race: `gtag('config', 'G-F3BTVWGDRS')` lived only inside `AnalyticsLoader` (`<Script strategy="afterInteractive">` rendered after cookie banner accept). When a user submitted a form with the form's privacy checkbox without clicking the cookie banner first, `setConsentValue(CONSENT_ACCEPTED)` triggered an async React state update while `gtag('event', �)` ran synchronously before `consent update` or `gtag('config', 'G-�')` executed.
 3. Three form surfaces (`/order/free-start` & `/order/enterprise-custom` in `OrderClient.tsx`, `/contacts` in `ContactsBody.tsx`, and `ContactModal.tsx`) had no conversion tracking calls on submit success.
 
-**Fix:** `ensureAnalyticsConsentAndGaConfig()` in `src/lib/adsConversion.ts` synchronously calls `gtag('consent', 'update', { …granted })` and initializes `gtag('config', 'G-F3BTVWGDRS')` (guarded by `window.__ERYTHRO_GA_CONFIGURED__`, shared with `AnalyticsLoader.tsx`). `AnalyticsBootstrap.tsx` enables `url_passthrough: true` and snapshots initial entry `utm_*` params into `window.__ERYTHRO_INITIAL_UTM__` (`readCampaignConfigParams()`) so GA4 receives explicit `campaign_name` / `campaign_source` / `campaign_medium` even when `gclid` is present or consent is accepted later. Added `trackGaLead` (`qualify_lead`, plus `close_convert_lead` for package orders) and `trackGaPurchase` (`purchase` + `close_convert_lead`), wired into `trackFreeAuditLead`, `trackOrderLead`, `trackContactLead`, and `trackAdsPurchase` across all 5 form surfaces and `PaymentReturn.tsx`. Also cleared conflicting account-level `customer.tracking_url_template` in Google Ads (`106-795-7298`) that appended a second `?utm_source=…` onto `ad.finalUrls`.
+**Fix:** `ensureAnalyticsConsentAndGaConfig()` in `src/lib/adsConversion.ts` synchronously calls `gtag('consent', 'update', { �granted })` and initializes `gtag('config', 'G-F3BTVWGDRS')` (guarded by `window.__ERYTHRO_GA_CONFIGURED__`, shared with `AnalyticsLoader.tsx`). `AnalyticsBootstrap.tsx` enables `url_passthrough: true` and snapshots initial entry `utm_*` params into `window.__ERYTHRO_INITIAL_UTM__` (`readCampaignConfigParams()`) so GA4 receives explicit `campaign_name` / `campaign_source` / `campaign_medium` even when `gclid` is present or consent is accepted later. Added `trackGaLead` (`qualify_lead`, plus `close_convert_lead` for package orders) and `trackGaPurchase` (`purchase` + `close_convert_lead`), wired into `trackFreeAuditLead`, `trackOrderLead`, `trackContactLead`, and `trackAdsPurchase` across all 5 form surfaces and `PaymentReturn.tsx`. Also cleared conflicting account-level `customer.tracking_url_template` in Google Ads (`106-795-7298`) that appended a second `?utm_source=�` onto `ad.finalUrls`.
 
-**Prevent:** Never rely on `send_to: 'AW-…'` or browser-auto `form_submit` to populate GA4 Key Events on AJAX forms. Always pair Ads conversion calls with explicit GA4 Key Event calls (`qualify_lead`, `close_convert_lead`, `purchase`) after synchronous consent + GA4 config initialization.
+**Prevent:** Never rely on `send_to: 'AW-�'` or browser-auto `form_submit` to populate GA4 Key Events on AJAX forms. Always pair Ads conversion calls with explicit GA4 Key Event calls (`qualify_lead`, `close_convert_lead`, `purchase`) after synchronous consent + GA4 config initialization.
 
 ---
 
-## PIT-117 — Mobile Facebook / Meta Ads bounce (3.1s average duration) and m.facebook.com / referral misattribution
+## PIT-117 � Mobile Facebook / Meta Ads bounce (3.1s average duration) and m.facebook.com / referral misattribution
 
 **Tags:** meta-ads, ga4, splash, mobile, bclid, ttribution  
-**Seen:** 2026-10-20 — GA4 showed 15 m.facebook.com / referral sessions with 6.7% engagement and 3.1s duration, while udit-he.erythro.ai had 100% engagement and 50% lead conversion
+**Seen:** 2026-10-20 � GA4 showed 15 m.facebook.com / referral sessions with 6.7% engagement and 3.1s duration, while udit-he.erythro.ai had 100% engagement and 50% lead conversion
 
 **Symptom:** Traffic from Facebook mobile In-App Browser (m.facebook.com, l.facebook.com, lm.facebook.com) to /, /audit, and /portfolio/* bounced within ~3 seconds and was bucketed into Organic Social ((referral)) instead of Paid Social (b / paid), and Meta Pixel missed PageView when consent was granted after initial load.
 
 **Cause (stack):**
-1. SplashHost.tsx only skipped the full-screen red <SplashScreen /> overlay on /lp/audit/* (udit-*.erythro.ai). Any ad pointing to /audit, /order/*, or carrying ?fbclid= / ?gclid= still rendered the full-screen SplashScreen overlay while JS bundles hydrated + animated for 1.5–3.5s in mobile WebViews.
+1. SplashHost.tsx only skipped the full-screen red <SplashScreen /> overlay on /lp/audit/* (udit-*.erythro.ai). Any ad pointing to /audit, /order/*, or carrying ?fbclid= / ?gclid= still rendered the full-screen SplashScreen overlay while JS bundles hydrated + animated for 1.5�3.5s in mobile WebViews.
 2. Meta Ads creatives had url_tags: None, so mobile clicks arrived with only ?fbclid=... and no utm_source / utm_medium.
 3. AnalyticsBootstrap.tsx calls bq('consent', 'revoke') before bq('track', 'PageView'), and AnalyticsLoader.tsx did not re-fire bq('track', 'PageView') after bq('consent', 'grant').
 
@@ -1965,10 +1968,10 @@ eadCampaignConfigParams().
 
 ---
 
-## PIT-118 — GSC sitemap / canonical conflicts (`/order/audit-manual`, `/portfolio/next-project`, `/order/ai-business-card`) and dev-host GA4 pollution
+## PIT-118 � GSC sitemap / canonical conflicts (`/order/audit-manual`, `/portfolio/next-project`, `/order/ai-business-card`) and dev-host GA4 pollution
 
 **Tags:** `gsc`, `sitemap`, `seo`, `canonical`, `redirects`, `ga4`  
-**Seen:** 2026-10-20 — GSC URL Inspection & GA4 hostname audit (`properties/543568002`)
+**Seen:** 2026-10-20 � GSC URL Inspection & GA4 hostname audit (`properties/543568002`)
 
 **Symptom:**
 1. `/order/audit-manual` was listed in `sitemap.xml` even though it redirected (`307`) to `/audit` (`Page with redirect` in GSC).
@@ -1979,21 +1982,21 @@ eadCampaignConfigParams().
 
 **Fix:**
 1. Added `isNonSitemapOrderSlug()` in `src/lib/orderPlans.ts` and `isHiddenPortfolioSlug()` (`next-project`) in `src/lib/portfolioProjects.ts`; filtered them out of `sitemap.xml`, `sitemapEntries.ts`, and `cmsPages.ts` (`v11` / `v4` cache bump).
-2. Added `sanitizeOrderHref()` in `src/lib/copyHygiene.ts` to rewrite `/order/ai-business-card` → `/order/ai-smart-card` in `Header` submenus and solution cards, plus `308` permanent redirects in `next.config.ts` and `src/app/(frontend)/order/[slug]/page.tsx` for `/order/ai-business-card` → `/order/ai-smart-card`, `/order/audit-manual` → `/audit`, `/portfolio/Interior` & `/portfolio/interior` → `/portfolio/pro-interior`, and `/portfolio/next-project` → `/portfolio`.
+2. Added `sanitizeOrderHref()` in `src/lib/copyHygiene.ts` to rewrite `/order/ai-business-card` > `/order/ai-smart-card` in `Header` submenus and solution cards, plus `308` permanent redirects in `next.config.ts` and `src/app/(frontend)/order/[slug]/page.tsx` for `/order/ai-business-card` > `/order/ai-smart-card`, `/order/audit-manual` > `/audit`, `/portfolio/Interior` & `/portfolio/interior` > `/portfolio/pro-interior`, and `/portfolio/next-project` > `/portfolio`.
 3. Added `isProductionAnalyticsHost()` in `src/lib/vercelHost.ts` and guarded `AnalyticsBootstrap.tsx` / `AnalyticsLoader.tsx` so live GA4 / Google Ads / Meta Pixel hits only fire on `erythro.ai` and `*.erythro.ai`. Also upgraded GA4 Data Retention to `FOURTEEN_MONTHS` via GA4 Admin API.
 
 **Prevent:** Never include contact-only order plans (`checkoutMode === 'contact'`) or CMS placeholder slugs in `sitemap.xml`; always pair slug aliases with a `308` redirect + internal link hygiene; guard analytics bootstrap to canonical production hostnames.
 
 ---
 
-## PIT-119 — Order plan «Далее» on AI-визитка jumps to Бесплатный старт
+## PIT-119 � Order plan ������ on AI-������� jumps to ���������� �����
 
 **Tags:** `order`, `nav`, `slug`, `payload`, `cms`  
-**Seen:** 2026-10-20 — `/order/ai-smart-card` ProjectNav
+**Seen:** 2026-10-20 � `/order/ai-smart-card` ProjectNav
 
-**Symptom:** On `/order/ai-smart-card`, **Далее** goes to `/order/free-start` and **Назад** to `/order/enterprise-custom` (circular wrap as if Smart Card were the last solution plan). Expected: prev = Free Start, next = Business Automation.
+**Symptom:** On `/order/ai-smart-card`, **�����** goes to `/order/free-start` and **�����** to `/order/enterprise-custom` (circular wrap as if Smart Card were the last solution plan). Expected: prev = Free Start, next = Business Automation.
 
-**Cause:** CMS `solution-plans` row for Smart Card had slug `"ai-smart-card "` (trailing space). `mapOrderFromPlanDoc` kept the spaced slug; `extraStatic` then appended a clean static `ai-smart-card` because `cmsSlugs` only had the spaced key. `/order/ai-smart-card` resolved to that duplicate at the **end** of the nav list → wrap to `free-start`. Same class of bug as portfolio trailing spaces (PIT-109). Null solution slugs (`free-start`, `business-automation`, `enterprise-custom`) were masked by index fallback until order drifted.
+**Cause:** CMS `solution-plans` row for Smart Card had slug `"ai-smart-card "` (trailing space). `mapOrderFromPlanDoc` kept the spaced slug; `extraStatic` then appended a clean static `ai-smart-card` because `cmsSlugs` only had the spaced key. `/order/ai-smart-card` resolved to that duplicate at the **end** of the nav list > wrap to `free-start`. Same class of bug as portfolio trailing spaces (PIT-109). Null solution slugs (`free-start`, `business-automation`, `enterprise-custom`) were masked by index fallback until order drifted.
 
 **Fix:**
 1. Trim slug in `mapOrderFromPlanDoc` + `getOrderPlanBySlug`; cache key `order-plans-v9-trim-slug`.
@@ -2001,14 +2004,14 @@ eadCampaignConfigParams().
 3. Prod DB: set missing/ spaced slugs (`free-start`, `ai-smart-card`, `business-automation`, `enterprise-custom`).
 4. Revalidate `payload-content` (or redeploy) so Vercel Data Cache drops the spaced list.
 
-**Prevent:** Always trim order-plan slugs on read and write. After CMS slug edits from scripts/SQL, revalidate live — local `revalidateTag` does not reach Vercel.
+**Prevent:** Always trim order-plan slugs on read and write. After CMS slug edits from scripts/SQL, revalidate live � local `revalidateTag` does not reach Vercel.
 
 ---
 
-## PIT-120 — Ads traffic on `/audit` must land on dedicated language LPs
+## PIT-120 � Ads traffic on `/audit` must land on dedicated language LPs
 
 **Tags:** `ads`, `middleware`, `audit`, `utm`, `landing`  
-**Seen:** 2026-10-20 — Google/Meta Final URL still hitting `https://erythro.ai/audit?…`
+**Seen:** 2026-10-20 � Google/Meta Final URL still hitting `https://erythro.ai/audit?�`
 
 **Symptom:** Paid clicks open the main-site `/audit` (cookie/splash/locale hop) instead of the fast dedicated LP (`audit-en|ru|he.erythro.ai`). Bounce and mis-locale; PIT-112 Final URL guidance alone is not enough when old ads or shared links still point at `/audit`.
 
@@ -2016,11 +2019,11 @@ eadCampaignConfigParams().
 
 **Fix:** In `src/middleware.ts`, when pathname is `/audit` and campaign/lang resolves to `ru|en|he`, **307** to `https://audit-{locale}.erythro.ai/` preserving the query string; set `X-Robots-Tag: noindex, nofollow`. Prefer Final URL = dedicated host (PIT-112); this redirect is the safety net.
 
-**Prevent:** Keep ads Final URLs on `audit-{locale}.erythro.ai`. Do not remove the middleware redirect while legacy `/audit?utm_…` links exist.
+**Prevent:** Keep ads Final URLs on `audit-{locale}.erythro.ai`. Do not remove the middleware redirect while legacy `/audit?utm_�` links exist.
 
 ---
 
-## PIT-121 — Pro-offer email: logo missing (broken image) in Gmail/Outlook
+## PIT-121 � Pro-offer email: logo missing (broken image) in Gmail/Outlook
 
 **Symptom:** Pro/nudge email header shows broken-image icons instead of the logo; `https://erythro.ai/images/logo/letterhead-full.svg` returns 200 `image/svg+xml`.
 
@@ -2030,61 +2033,61 @@ eadCampaignConfigParams().
 
 ---
 
-## PIT-122 — n8n autoresponder replies to DMARC aggregate reports → Microsoft `550 5.4.1`
+## PIT-122 � n8n autoresponder replies to DMARC aggregate reports > Microsoft `550 5.4.1`
 
 **Tags:** `n8n`, `email`, `autoresponder`, `dmarc`, `hostinger`  
-**Seen:** 2026-10-21 — `order@erythro.ai` → `dmarcreport@microsoft.com`
+**Seen:** 2026-10-21 � `order@erythro.ai` > `dmarcreport@microsoft.com`
 
 **Symptom:** Hostinger NDR after a Microsoft DMARC aggregate lands in `order@`: *Recipient address rejected: Access denied* (`550 5.4.1`) while communicating with `microsoft-com.mail.protection.outlook.com`. Message deleted from queue. The XML report itself was already delivered.
 
-**Cause:** `rua=mailto:order@erythro.ai` receives reports From `dmarcreport@microsoft.com`. That mailbox is outbound-only. n8n `Process & Sign Autoresponder` skipped `no-reply` / `mailer-daemon` / `bounce` but not `dmarcreport@`, and DMARC subjects lack `Re:` so thread detection did not fire → branded auto-reply → Microsoft rejects → Hostinger NDR noise.
+**Cause:** `rua=mailto:order@erythro.ai` receives reports From `dmarcreport@microsoft.com`. That mailbox is outbound-only. n8n `Process & Sign Autoresponder` skipped `no-reply` / `mailer-daemon` / `bounce` but not `dmarcreport@`, and DMARC subjects lack `Re:` so thread detection did not fire > branded auto-reply > Microsoft rejects > Hostinger NDR noise.
 
 **Fix:** In `infra/n8n/workflows/email-autoresponder.json` skip:
 1. `dmarcreport@` / `dmarcreportfeedback@` in the automated-sender regex;
-2. local-part `dmarc` / `rua` / `ruf` (and `dmarc-report` variants) → `report_sender`;
-3. subject `Report Domain:` or `DMARC … report` → `dmarc_report_mail`.
+2. local-part `dmarc` / `rua` / `ruf` (and `dmarc-report` variants) > `report_sender`;
+3. subject `Report Domain:` or `DMARC � report` > `dmarc_report_mail`.
 Redeploy the live workflow (`scripts/deploy_n8n_email_autoresponder.py` or Import from File).
 
-**Prevent:** Any mailbox used as DMARC `rua`/`ruf` must treat report senders as automated — never auto-reply to them.
+**Prevent:** Any mailbox used as DMARC `rua`/`ruf` must treat report senders as automated � never auto-reply to them.
 
-## PIT-123 — Duplicate team@ Pro offer: worker timer + Vercel cron + n8n walker race
+## PIT-123 � Duplicate team@ Pro offer: worker timer + Vercel cron + n8n walker race
 
 **Tags:** `email`, `pro-offer`, `race`, `vercel-cron`, `audit-agent`  
-**Seen:** 2026-10-23 — submission 202, `pizza280784@gmail.com` (2 identical «הצעה מיוחדת עבור …» mails, 03:06 and 03:07 UTC; two copies in Hostinger Sent)
+**Seen:** 2026-10-23 � submission 202, `pizza280784@gmail.com` (2 identical �???? ?????? ???? �� mails, 03:06 and 03:07 UTC; two copies in Hostinger Sent)
 
 **Symptom:** Two identical Pro-offer emails for one free audit. `contact_submissions` shows a single row with `pro_offer_status = sent`.
 
-**Cause:** `trySendAuditProOffer` (and nudge / reminder / paid_dev) did read-status → SMTP + IMAP APPEND → write status. The status stayed `scheduled` for the whole send (5–16 s). The audit-agent `setTimeout` (+15m) and Vercel cron `/api/audit/reconcile` (every 2 min, fires at `:50`) both fire right after `pro_offer_due_at`. Vercel logs: cron `GET /api/audit/reconcile` at 03:06:50 (20.8 s) and agent `POST /api/audit/internal/202/pro-offer` at 03:06:51 — both saw `scheduled`. ~5–13% of sends were exposed (send time / cron interval); submission 201 escaped by chance.
+**Cause:** `trySendAuditProOffer` (and nudge / reminder / paid_dev) did read-status > SMTP + IMAP APPEND > write status. The status stayed `scheduled` for the whole send (5�16 s). The audit-agent `setTimeout` (+15m) and Vercel cron `/api/audit/reconcile` (every 2 min, fires at `:50`) both fire right after `pro_offer_due_at`. Vercel logs: cron `GET /api/audit/reconcile` at 03:06:50 (20.8 s) and agent `POST /api/audit/internal/202/pro-offer` at 03:06:51 � both saw `scheduled`. ~5�13% of sends were exposed (send time / cron interval); submission 201 escaped by chance.
 
-**Fix:** Atomic claim before SMTP — `UPDATE contact_submissions SET pro_offer_lock_at = now() WHERE id = … AND <status guard per kind> AND (pro_offer_lock_at IS NULL OR pro_offer_lock_at < now() - 10 min) RETURNING id` (`claimProOfferSend`, migration `20261023_120000`). Lock is cleared in the same SQL as the final status write, released on SMTP failure, and expires after 10 min if the process dies. The status guard is part of the claim so a caller with a stale read cannot claim after another finished. Also: no 465→587 retry after a failure at `DATA` (message may already be accepted — retry would send a second copy).
+**Fix:** Atomic claim before SMTP � `UPDATE contact_submissions SET pro_offer_lock_at = now() WHERE id = � AND <status guard per kind> AND (pro_offer_lock_at IS NULL OR pro_offer_lock_at < now() - 10 min) RETURNING id` (`claimProOfferSend`, migration `20261023_120000`). Lock is cleared in the same SQL as the final status write, released on SMTP failure, and expires after 10 min if the process dies. The status guard is part of the claim so a caller with a stale read cannot claim after another finished. Also: no 465>587 retry after a failure at `DATA` (message may already be accepted � retry would send a second copy).
 
-**Prevent:** Any "check state, then send, then mark" email path must claim the row atomically in SQL first. Never rely on a single timer — several triggers (timer, cron, walker) are by design. Test with concurrent callers (`tests/int/auditProOfferClaim.int.spec.ts`).
+**Prevent:** Any "check state, then send, then mark" email path must claim the row atomically in SQL first. Never rely on a single timer � several triggers (timer, cron, walker) are by design. Test with concurrent callers (`tests/int/auditProOfferClaim.int.spec.ts`).
 
-## PIT-124 — QA Auditor false negative on custom AI chat / consultant widgets
+## PIT-124 � QA Auditor false negative on custom AI chat / consultant widgets
 
 **Tags:** `qa-auditor`, `playwright`, `lead-capture`, `chat-widget`, `ai-consultant`  
-**Seen:** 2026-10-25 — erythro.ai audit missed active custom AI consultant (`ErythroConsultant` / `.chat-launcher`)
+**Seen:** 2026-10-25 � erythro.ai audit missed active custom AI consultant (`ErythroConsultant` / `.chat-launcher`)
 
-**Symptom:** Audited site has an active AI consultant or custom chat widget, but the audit report shows `Живой чат — нет` / `hasChatWidget: false`, penalizing lead capture and recommending adding a live chat.
+**Symptom:** Audited site has an active AI consultant or custom chat widget, but the audit report shows `����� ��� � ���` / `hasChatWidget: false`, penalizing lead capture and recommending adding a live chat.
 
-**Cause:** Chat detection in `AuditCollector.java` checked only known 3rd-party SaaS iframe URLs (`tawk`, `crisp`, `intercom`, `zendesk`, `jivosite`, `livechat`) and generic `.chat-widget` / `.chatbot` classes. Custom React/Next.js widgets often use `.chat-launcher`, `.consultant-widget`, or lazy-mount on clicking a button with `aria-label="ИИ консультант"`.
+**Cause:** Chat detection in `AuditCollector.java` checked only known 3rd-party SaaS iframe URLs (`tawk`, `crisp`, `intercom`, `zendesk`, `jivosite`, `livechat`) and generic `.chat-widget` / `.chatbot` classes. Custom React/Next.js widgets often use `.chat-launcher`, `.consultant-widget`, or lazy-mount on clicking a button with `aria-label="�� �����������"`.
 
 **Fix:** In `AuditCollector.java` (both `lead_capture` and `AGENT_PAGE_SNAPSHOT_SCRIPT`), expand `chatSelectors` to include:
 - `[class*="chat-launcher"]`, `[id*="chat-launcher"]`, `[class*="chat-trigger"]`, `[class*="chat-button"]`, `[class*="consultant"]`, `[id*="consultant"]`, `[class*="assistant"]`, `[id*="assistant"]`, `[class*="ai-chat"]`, `[id*="ai-chat"]`, `[data-chat]`, `[data-chatbot]`, `[data-consultant]`
 
 And add multilingual semantic scanning of `aria-label`, `title`, and `innerText` on interactive elements (`button, a, [role="button"]`) matching:
-`/(?:ai[- ]?(?:chat|assistant|consultant)|chat[- ]?(?:bot|widget|launcher)|(?:ии|ai)[- ]?(?:чат|консультант|ассистент)|(?:чат|онлайн[- ]?чат)|יועץ[- ]?ai|צ['׳]אט)/i`
+`/(?:ai[- ]?(?:chat|assistant|consultant)|chat[- ]?(?:bot|widget|launcher)|(?:��|ai)[- ]?(?:���|�����������|���������)|(?:���|������[- ]?���)|????[- ]?ai|?['?]??)/i`
 
 **Prevent:** Whenever new interactive contact launchers or custom AI widgets are added to the site design, verify that the QA auditor's DOM selector and keyword patterns recognize them.
 
 ---
 
-## PIT-125 — QA Auditor false positives on browser/third-party console and runtime noise
+## PIT-125 � QA Auditor false positives on browser/third-party console and runtime noise
 
 **Tags:** `qa-auditor`, `playwright`, `console-logs`, `pageerror`, `turnstile`, `csp`  
-**Seen:** 2026-10-25 — erythro.ai audit flagged 1 critical PageError (React #418 hydration mismatch) and 71 console noise messages, penalizing security/lead score and generating false critical alerts.
+**Seen:** 2026-10-25 � erythro.ai audit flagged 1 critical PageError (React #418 hydration mismatch) and 71 console noise messages, penalizing security/lead score and generating false critical alerts.
 
-**Symptom:** Audit report flags critical JavaScript crashes (`JavaScript падает в браузере и блокирует кнопки`, `PageError в рантайме`) and numerous console errors/warnings, although forms, interactive buttons, and all 10/10 funnel pages work properly in reality.
+**Symptom:** Audit report flags critical JavaScript crashes (`JavaScript ������ � �������� � ��������� ������`, `PageError � ��������`) and numerous console errors/warnings, although forms, interactive buttons, and all 10/10 funnel pages work properly in reality.
 
 **Cause:** 
 1. Cloudflare Turnstile inside its isolated sandbox iframe (`challenges.cloudflare.com`) tests browser environment capabilities by sending internal probes: `data:,` CSP reports, WebGPU/WebGL adapter queries (`powerPreference ignored`, `No available adapters`, `SwiftShader fallback`), audio/video decoder capability probes, and cross-origin `postMessage` origin checks.
@@ -2106,20 +2109,20 @@ And add multilingual semantic scanning of `aria-label`, `title`, and `innerText`
 
 ---
 
-## PIT-126 — Facebook `?fbclid=` leaves a solid-red orphaned splash (portfolio / home “won’t open”)
+## PIT-126 � Facebook `?fbclid=` leaves a solid-red orphaned splash (portfolio / home �won�t open�)
 
 **Tags:** `meta-ads`, `splash`, `fbclid`, `hydration`, `isr`, `portfolio`  
-**Seen:** 2026-10-25 — Meta lead rollback; `https://erythro.ai/portfolio/rosso-garage?fbclid=…` shows only the red brand plate forever
+**Seen:** 2026-10-25 � Meta lead rollback; `https://erythro.ai/portfolio/rosso-garage?fbclid=�` shows only the red brand plate forever
 
-**Symptom:** Paid Facebook clicks (and any URL with `fbclid` / `gclid` / `utm_*`) appear to “not open”: HTTP 200, content in the accessibility tree, but the viewport stays solid red. Meta Quality / lead delivery rolls back. Reproducible in a normal browser with the same query string.
+**Symptom:** Paid Facebook clicks (and any URL with `fbclid` / `gclid` / `utm_*`) appear to �not open�: HTTP 200, content in the accessibility tree, but the viewport stays solid red. Meta Quality / lead delivery rolls back. Reproducible in a normal browser with the same query string.
 
 **Cause (stack):**
-1. Root layout is ISR-static (`revalidate = 60`) and SSR’s `SplashHost` without the request query → `shouldSkipSplashSurface(pathname)` is `false` → full-screen `.splash-bg` is in the HTML.
-2. On the client, `fbclid` makes `skipSplash=true` → host returns `null`. Hydration mismatch can leave the SSR plate on `<body>` with **no React fiber** (orphan). GSAP never owns it; `opacity` stays `1`.
-3. PIT-117 added skip-by-query logic, but `SplashHost` only passed `pathname` (not `useSearchParams()`), and there was no pre-paint hide / orphan sweep — so Meta in-app browsers still hit the stuck plate.
+1. Root layout is ISR-static (`revalidate = 60`) and SSR�s `SplashHost` without the request query > `shouldSkipSplashSurface(pathname)` is `false` > full-screen `.splash-bg` is in the HTML.
+2. On the client, `fbclid` makes `skipSplash=true` > host returns `null`. Hydration mismatch can leave the SSR plate on `<body>` with **no React fiber** (orphan). GSAP never owns it; `opacity` stays `1`.
+3. PIT-117 added skip-by-query logic, but `SplashHost` only passed `pathname` (not `useSearchParams()`), and there was no pre-paint hide / orphan sweep � so Meta in-app browsers still hit the stuck plate.
 
 **Fix:**
-1. `SplashHost` reads `useSearchParams()` (inside `Suspense`) and passes `?…` into `shouldSkipSplashSurface`.
+1. `SplashHost` reads `useSearchParams()` (inside `Suspense`) and passes `?�` into `shouldSkipSplashSurface`.
 2. `SPLASH_SKIP_BOOTSTRAP_SCRIPT` in the layout sets `html[data-erythro-skip-splash]` + `window.__erythroSplashDone` before paint; CSS hides `.splash-bg` under that flag.
 3. On skip, `sweepOrphanedSplashPlates()` removes any leftover `.splash-bg` nodes.
 
@@ -2127,14 +2130,14 @@ And add multilingual semantic scanning of `aria-label`, `title`, and `innerText`
 
 ---
 
-## PIT-133 — Flat R2 media: `_objectkey = filename` doubles the public URL
+## PIT-133 � Flat R2 media: `_objectkey = filename` doubles the public URL
 
 **Tags:** `r2`, `media`, `payload`, `storage-s3`
-**Seen:** 2026-10-26 — service header strips after SQL compress to WebP
+**Seen:** 2026-10-26 � service header strips after SQL compress to WebP
 
-**Symptom:** Hero `<img src>` becomes `https://…r2.dev/header_14.webp/header_14.webp` (404, `naturalWidth: 0`). DB `media.url` looks correct.
+**Symptom:** Hero `<img src>` becomes `https://�r2.dev/header_14.webp/header_14.webp` (404, `naturalWidth: 0`). DB `media.url` looks correct.
 
-**Cause:** `@payloadcms/plugin-cloud-storage` afterRead builds the folder as `prefix + _objectKey`, then `generateFileURL` appends `filename`. Flat keys in this project historically keep `_objectkey` NULL. Setting `_objectkey` to `header_14.webp` made the folder equal the filename → doubled path.
+**Cause:** `@payloadcms/plugin-cloud-storage` afterRead builds the folder as `prefix + _objectKey`, then `generateFileURL` appends `filename`. Flat keys in this project historically keep `_objectkey` NULL. Setting `_objectkey` to `header_14.webp` made the folder equal the filename > doubled path.
 
 **Fix:** `UPDATE media SET _objectkey = NULL` for those rows. Compress script must not write `_objectkey` for flat keys. Harden `generateFileURL` so `prefix === filename` does not double.
 
@@ -2142,135 +2145,247 @@ And add multilingual semantic scanning of `aria-label`, `title`, and `innerText`
 
 ---
 
-## PIT-134 — Audit report CTA opens order page in the wrong language
+## PIT-134 � Audit report CTA opens order page in the wrong language
 
 **Tags:** `audit`, `report`, `i18n`, `he`, `order`, `cta`
-**Seen:** 2026-10-26 — HE HTML sample → «Audit Pro» opened `/order/audit-pro` in Russian
+**Seen:** 2026-10-26 � HE HTML sample > �Audit Pro� opened `/order/audit-pro` in Russian
 
 **Symptom:** From a Hebrew (or English) HTML report, checkout CTAs land on the order page in another locale (often RU from cookie / prefs).
 
 **Cause:** Links were bare `https://erythro.ai/order/audit-pro` (and diagnostic). `/order/[slug]` prefers `?lang=` then cookie; without `?lang=` the visitor's existing locale wins.
 
-**Fix:** Always append `?lang=he|en|ru` matching the report language — samples, v2 templates, `render-v2-reports.mjs` (`orderCheckoutUrl`), and `AuditReportI18n.unlockProUrl(lang)`.
+**Fix:** Always append `?lang=he|en|ru` matching the report language � samples, v2 templates, `render-v2-reports.mjs` (`orderCheckoutUrl`), and `AuditReportI18n.unlockProUrl(lang)`.
 
 **Prevent:** Never hardcode order checkout URLs without `?lang=` in report HTML/generators. Redeploy audit-agent after Java/template changes so live client reports pick it up.
 
 ---
 
 
-## PIT-148 — AI card on a Cloudflare WordPress site: real llms.txt "missing", second Content-Signal in Step 1, "AI does not see the brand"
+## PIT-156 — n8n Code node second output / dead Meta CAPI branch on autoresponder
+
+**Tags:** 
+8n, email, utoresponder, connections, meta-capi
+**Seen:** 2026-11-08 — UI warnings on live workflows after n8n 2.45.x; Email Autoresponder had Is Audit Lead? on Code output[1]
+
+**Symptom:** Yellow warning on the canvas. Process & Sign Autoresponder (Code, one main output) was wired as two branches: out[0] → Should Send Reply?, out[1] → Is Audit Lead? → Trigger Meta CAPI. The CAPI branch never received items. Form Lead CAPI already runs on Vercel (/api/contact).
+
+**Cause:** Fan-out must put both targets on **the same** Code output (main: [[{A}, {B}]]), not on a second output index. Live had drifted from repo (infra/n8n/workflows/email-autoresponder.json) with a dead CAPI add-on. CLI update:workflow --active=true is deprecated on 2.45+ and may require publish:workflow + container restart for IMAP triggers to load the published version.
+
+**Fix:** Redeploy repo autoresponder (SMTP path unchanged; drop dead CAPI nodes). Backup first under /root/n8n/backups/<stamp>/. After import: confirm ctive=true, only one Process branch → Should Send Reply?, then docker compose restart n8n and /healthz 200. Keep Meta CAPI as the separate webhook workflow / Vercel path — do not re-attach unsigned CAPI from IMAP without event_id dedup.
+
+**Prevent:** Diff live vs repo before n8n import. Never add a second Code output for fan-out. Prefer credentials over hardcoded tokens in HTTP nodes (Stage 2).
+
+---
+
+## PIT-154 — Home AI Visibility pin ends too early (section scrolls up under Cases)
+
+**Tags:** `gsap`, `scroll`, `home`, `ai-audit`, `pin`
+**Seen:** 2026-11-01 — erythro.ai home, desktop: AI Visibility («נראות ב-AI» / `#ai-audit`) slides up instead of staying while Cases overlays
+
+**Symptom:** After the AI Visibility settle, further scroll makes the block leave the viewport upward. Cases («наши работы») does not cleanly slide over a pinned plate the way Services slides over Cases.
+
+**Cause:** `ai-audit-pin` used `end: '+=180%'` with `pinSpacing: false`, while Cases still has a `160vh` lead-in spacer. Pin release happens almost as soon as the Cases panel arrives, so the section returns to document flow and rides up. The working Cases → Services pair uses `cases-pin` `end: '+=260%'` against the same `160vh` Services lead-in.
+
+**Fix:** In `AiAuditHomeSection.tsx`, set `end: '+=260%'` and add an empty scrub hold after the settle tween so clip-open + settle finish during the Cases lead-in; the rest of the pin is overlay room only.
+
+**Prevent:** For every `pinSpacing: false` home stack pair, pin `end` must cover the next section's lead-in **plus** overlay (~`+=260%` when lead-in is `160vh`). Do not shorten the upstream pin without shrinking the downstream spacer.
+
+---
+
+## PIT-153 � Top-3 ordered by internal weight, GA4 shown with two statuses, "1." in the accessibility card (MI-002, MI-006, MI-011)
+
+**Tags:** `audit`, `render-v2`, `top-3`, `status`, `wording`
+**Seen:** 2026-10-28�30 � reports 238, 239, 240 (HE), 243 (fast-taxi.co.il, Free HE); each reached 3 repeats (MI-011: 1, linked to MI-002)
+
+**Symptom:** (1) Top-3: a "growth point" card stood above "needs attention", and a worse finding (security headers 0/6, slow LCP) was left out; the action plan listed a different order. (2) Same report, same check: GA4 "Critical" in the checklist, "Growth opportunity" in the top-3 card and in plan Step 5. (3) Accessibility card: "axe-core found critical/serious violations: 1." read like broken list numbering.
+
+**Cause:** (1) `ReportFindingsCatalog.toTopVulnerabilities` picked 3 by the internal `BizFinding.severity` weight, while the card shows the status of its pillar (`sevForPillar` in `render-v2-reports.mjs`). (2) The GA4 finding is classified into the `seo` step (`classifyActionPillar`), the checklist row into the `ai` pillar (`classifyCheck`), so the card took the SEO scale's colour, not the row's. (3) The count was the last word of the sentence.
+
+**Fix:** Java also writes `executive_scorecard.top_candidates` (real findings in weight order, one AI card, no pads). render-v2 picks the top-3 from it by the shown status (ties by weight), AI Visibility stays in (replaces the least severe), growth pads still fill a short list; `finds` is built once, before the checklist, so Step 1 / Free's open step follow the same order. `sevIdx` takes the GA4 finding's status from the GA4 checklist row. The accessibility count sits inside the sentence: "(WCAG rules: N)" in RU/EN/HE. Old `audit_data.json` without `top_candidates` keeps Java's top-3.
+
+**Prevent:** Anything the report orders or colours must use the status the reader sees, not an internal weight; a finding and its checklist row must share one status source. Do not end a sentence with a bare number.
+
+---
+
+## PIT-152 � Hebrew hero animation shows Latin words mirrored ("AI" > "IA")
+
+**Tags:** `frontend`, `rtl`, `bidi`, `hero`, `animation`
+**Seen:** 2026-10-30 � erythro.ai `?lang=he`, hero phrase �????????? AI� (CMS text is correct)
+
+**Symptom:** In the hero text animation the Latin word reads backwards: �????????? IA�. Plain text elsewhere on the page is fine.
+
+**Cause:** `HeroMotionText.tsx` splits phrases into per-letter `display:inline-block` / flex spans for the kinetic effects. Each such span is an atomic, bidi-neutral item; an RTL container lays them out right-to-left, so the letters of a Latin run come out in reverse (same for `?-AI`, `24/7`).
+
+**Fix:** `appendGlyphs()` � in RTL phrases each Latin/digit run goes into its own `display:inline-flex;direction:ltr;unicode-bidi:isolate` box; used by every per-letter split (`renderChars`, `explodeToChars`, the AI-plate word and its white cover, the flip frame). The letter-by-letter frame sets `direction:ltr` on a Latin word's box. Checked in Chrome against native text layout.
+
+**Follow-up (outline behind the text):** the background outline is one SVG `<text>` inside the `dir="ltr"` stage, so the LTR paragraph put the words of �????????? AI� in LTR order (Hebrew word left, AI right) � swapped against the foreground. `buildMaskedOutline` wraps Hebrew phrases in RLE�PDF (U+202B�U+202C) for the stroke and the mask text: word order as Hebrew reads, `x`/`getBBox` unchanged (checked in Chrome: bbox x 0, width 326 before and after; Hebrew-only phrases unchanged).
+
+**Prevent:** Never split mixed-script text into per-letter inline-block/flex items without grouping LTR runs; compare the visual order with the browser's own rendering of the same string.
+
+---
+
+## PIT-151 � Vercel build fails in next/font: Google returns extensionless font URLs
+
+**Tags:** `build`, `vercel`, `next`, `fonts`, `pnpm-patch`
+**Seen:** 2026-10-30 � preview builds of PR #350 failed twice; a no-cache redeploy passed
+
+**Symptom:** `next build` > `src/lib/fonts.ts � An error occurred in next/font. TypeError: Cannot read properties of null (reading '1')` at `@next/font/dist/google/loader.js:122` (Heebo). Not every build: the same request to Google sometimes returns normal `�/s/heebo/v28/�.woff2` URLs and sometimes `https://fonts.gstatic.com/l/font?kit=�&skey=�&v=v28` without an extension.
+
+**Cause:** next 15.5.27 takes the file type with `/\.(woff|woff2|eot|ttf|otf)$/.exec(url)[1]`; an extensionless URL gives `null`. Fixed upstream in next 16.4.3 (vercel/next.js#99114); 15.5.28 (backport tag) does not have it. Payload 3.90.2 officially supports next `>=16.3.3`, not 15.5 (we run 15.5 via `pnpm.peerDependencyRules.allowedVersions`).
+
+**Fix:** `patches/next@15.5.27.patch` (`pnpm.patchedDependencies`) � backport of the 16.4.3 change: `findFontFilesInCss` returns `ext` from the URL path, else from the CSS `format()` hint, else `woff2`; `loader.js` uses it. Guard test `tests/int/nextFontGooglePatch.int.spec.ts`. On Windows with a non-ASCII user folder `pnpm patch-commit` writes `"a/C:/Users/�/patch-commit/<hash>/dist/�"` headers and then fails with `ERR_PNPM_INVALID_PATCH` � rewrite them to `a/dist/�` and run `pnpm install`.
+
+**Prevent:** Remove the patch when moving to next 16.4.3+ (the guard test keeps passing there). A build that fails in `next/font` with this stack is the Google flake, not the PR.
+
+---
+
+## PIT-150 � Paid Diagnostic/Pro for a site the lab cannot open
+
+**Tags:** `audit`, `payment`, `worker`, `bot-protection`, `reconcile`
+**Seen:** 2026-10-30 � follow-up to PIT-149 (report 244): Free may get the "audit not completed" page, a client who paid must not
+
+**Symptom (risk):** A client pays ?99/?490, the worker meets a bot challenge (AWS WAF, Cloudflare�) and the paid result is the PIT-149 page "we could not check your site".
+
+**Cause:** The challenge was only seen after payment, and the site's own website check runs on Vercel, whose IPs a WAF may let through while it blocks the VPS lab IP.
+
+**Fix:**
+- Worker `POST /api/check-access` (secret + optional HMAC) runs `detectBotChallenge` from the lab IP.
+- Site: `src/lib/auditLabAccess.ts` (`checkLabAccess`, `isPaidAuditCheckoutSlug`). `/api/audit/check-website` with a paid `planSlug` asks the worker; `bot_protected` > field error "add IP 46.202.155.56 to the allowlist, then click again" (`useAuditFieldChecks(..., { planSlug })`, `OrderClient`, `AuditLpPaidForm`). `/api/payment/create` re-checks on the server and answers `409 code: bot_protected`. An unanswered worker never blocks the checkout.
+- Worker, paid run still blocked (protection turned on after payment): `waitForLabAccess` � order stays `in_progress` with `auditSummary.waitingAccess {since, lastCheck, checks, clientNotified}`; first time the client gets "payment received � open access" (no report, no PDF) and team@erythro.ai gets an alert; after 72 h > `failed` + second team alert.
+- Site cron `reconcileStuckAudits`: `waitingAccess` orders are re-queued every 30 min without spending `MAX_RECONCILE_RETRIES`.
+
+**Prevent:** Anything the client pays for must be checked before payment from the machine that will do the work, not from the web front. A paid result is never a "could not do it" page: wait, retry, tell the team.
+
+---
+
+## PIT-149 � Site behind a bot challenge audited as its empty challenge page
+
+**Tags:** `audit`, `worker`, `waf`, `bot-protection`, `report`
+**Seen:** 2026-10-30 � reports 244 and 200, shirielectric.co.il (Konimbo shop on CloudFront)
+
+**Symptom:** Free report: "�� ����� ��� ����� ������� ������ � ��������", "���� � ������ � ��������", "����� ��� ������ �������� 1/1", security headers 0/6, robots.txt and sitemap 202, AI 14/100, technologies only "Amazon CloudFront". From a normal IP the site is a shop with 4 forms and WhatsApp. Only the Lighthouse numbers were right (Google PSI fetches from its own IPs).
+
+**Cause:** From the VPS IP the site answers `HTTP 202`, `x-amzn-waf-action: challenge`, `Server: CloudFront`, empty body (AWS WAF bot challenge). Nothing in the worker or the collector recognised a site-wide challenge; every check ran against the empty page and produced findings.
+
+**Fix:** `services/audit-agent/src/botChallenge.js` � before the Java audit the worker GETs the homepage like a browser (redirects followed with the SSRF guard on each hop) and `classifyChallenge` looks only for strong signals: `x-amzn-waf-action: challenge|captcha`, `cf-mitigated: challenge`, or a challenge page (Cloudflare "Just a moment" / challenge-platform, DataDome, Imperva, Sucuri, Akamai) with status 202/403/429/503. On a challenge `runAuditJob` skips the audit, renders `render-blocked-report.mjs` (report styles, RU/EN/HE: "site is behind bot protection", lab IP 46.202.155.56 for an allowlist, WhatsApp, email), stores it as the report (`auditStatus: report_sent`, no `auditScore`, `auditSummary.blocked`), sends the "����� �� ��������" email without PDF and schedules no Pro offer. A network error is not a challenge: the normal audit runs.
+
+**Prevent:** An audit that could not see the site must not produce findings. When adding a check, ask what it reports if the page is a WAF/captcha page; compare against a fetch from a normal IP when a report looks implausible (no forms on a shop, 0/6 headers, everything 202).
+
+---
+
+## PIT-148 � AI card on a Cloudflare WordPress site: real llms.txt "missing", second Content-Signal in Step 1, "AI does not see the brand"
 
 **Tags:** `audit`, `ai-visibility`, `robots`, `render-v2`, `report-text`
-**Seen:** 2026-10-30 — report 243, fast-taxi.co.il, Free HE
+**Seen:** 2026-10-30 � report 243, fast-taxi.co.il, Free HE
 
-**Symptom:** Top finding 01 "עוזרי AI לא מוצאים את האתר — Критично", AI Visibility 29/100. Gaps listed `/llms.txt` and "robots Disallow: / לבוטי AI"; text said ChatGPT, Claude and Gemini do not see the brand. Step 1 told the owner to add `Content-Signal: search=yes, ai-input=yes, ai-train=no` to robots.txt. On the site: `/llms.txt` is 200 `text/plain`, 37 KB, valid llmstxt.org; robots.txt is Cloudflare Managed and already has `Content-Signal: search=yes,ai-train=no,use=reference`; it blocks training crawlers (GPTBot, ClaudeBot, Google-Extended…), ChatGPT-User and PerplexityBot are open.
+**Symptom:** Top finding 01 "????? AI ?? ?????? ?? ???? � ��������", AI Visibility 29/100. Gaps listed `/llms.txt` and "robots Disallow: / ????? AI"; text said ChatGPT, Claude and Gemini do not see the brand. Step 1 told the owner to add `Content-Signal: search=yes, ai-input=yes, ai-train=no` to robots.txt. On the site: `/llms.txt` is 200 `text/plain`, 37 KB, valid llmstxt.org; robots.txt is Cloudflare Managed and already has `Content-Signal: search=yes,ai-train=no,use=reference`; it blocks training crawlers (GPTBot, ClaudeBot, Google-Extended�), ChatGPT-User and PerplexityBot are open.
 
 **Cause:** (1) `fetchLlmsTxt` checked `body.stripLeading().startsWith("#")`; the file starts with a UTF-8 BOM, Java keeps U+FEFF and `stripLeading` does not remove it. (2) `renderCodeBox` picked `codeExisting` (the Content-Signal line) whenever robots.txt existed, without looking at `vercel_level1.content_signals.present`. (3) `parseRobotsAiAccess` set `severe_block` for any blocked AI bot, training crawlers included; the card text and the Pro engine cards called a training-only block invisibility ("ChatGPT Search (GPTBot)").
 
-**Fix:** `textBody()` strips a leading BOM for robots.txt, llms.txt, sitemap and markdown bodies. Bots split into `AI_ANSWER_BOTS` (ChatGPT-User, PerplexityBot) and `AI_TRAINING_BOTS`; `severe_block` only when an answer bot is blocked, `answer_blocked_bots` / `training_blocked_bots` in data, the checklist adds "обучение моделей закрыто (это не мешает ответам AI)". The AI finding says "не находят" only with a severe block, otherwise "ИИ-ассистентам не хватает данных о сайте". Step 1 with an existing robots.txt gives only what is missing: Content-Signal and/or a `Sitemap:` line, else an `/llms.txt` skeleton, else `link rel=describedby`, else no code. Pro engine cards: answer bot decides "Blocked", training-only shows "Обучение закрыто" (Gemini: Google-Extended affects Gemini app answers, not Search / AI Overviews).
+**Fix:** `textBody()` strips a leading BOM for robots.txt, llms.txt, sitemap and markdown bodies. Bots split into `AI_ANSWER_BOTS` (ChatGPT-User, PerplexityBot) and `AI_TRAINING_BOTS`; `severe_block` only when an answer bot is blocked, `answer_blocked_bots` / `training_blocked_bots` in data, the checklist adds "�������� ������� ������� (��� �� ������ ������� AI)". The AI finding says "�� �������" only with a severe block, otherwise "��-����������� �� ������� ������ � �����". Step 1 with an existing robots.txt gives only what is missing: Content-Signal and/or a `Sitemap:` line, else an `/llms.txt` skeleton, else `link rel=describedby`, else no code. Pro engine cards: answer bot decides "Blocked", training-only shows "�������� �������" (Gemini: Google-Extended affects Gemini app answers, not Search / AI Overviews).
 
 **Prevent:** Read text files from the web through `textBody()`. A code snippet for a file the site already has must be built from what the collector found in that file, never a fixed line. "Training closed" and "invisible to AI" are different findings: check which bot is blocked before writing a claim about answers.
 
 ---
 
-## PIT-147 — Worker redeployed from a CRLF worktree: render-v2 crashes, clients get the old Java report
+## PIT-147 � Worker redeployed from a CRLF worktree: render-v2 crashes, clients get the old Java report
 
 **Tags:** `audit`, `deploy`, `vps`, `render-v2`, `line-endings`
-**Seen:** 2026-10-30 — AUD-242 (bedek2.co.il, Free HE) arrived in the old Java template after the 08:07 UTC worker redeploy
+**Seen:** 2026-10-30 � AUD-242 (bedek2.co.il, Free HE) arrived in the old Java template after the 08:07 UTC worker redeploy
 
-**Symptom:** Worker log: `Error: anchor end not found:     </div>\n  </section>` from `render-v2-reports.mjs`, then `render-v2-reports.mjs завершился с кодом: 1`; the run still ends `ok`, the email goes out with the fallback Java HTML (old design). Code in the container matched `main`.
+**Symptom:** Worker log: `Error: anchor end not found:     </div>\n  </section>` from `render-v2-reports.mjs`, then `render-v2-reports.mjs ���������� � �����: 1`; the run still ends `ok`, the email goes out with the fallback Java HTML (old design). Code in the container matched `main`.
 
 **Cause:** `deploy_audit_agent_only.py` was run from a fresh git worktree (`C:/dev/erythro-ai-ga4-text`). With `core.autocrlf=true` the worktree checkout wrote every text file with CRLF, and the script tars files as they are on disk. `render-v2-reports.mjs` cuts template blocks with LF anchors (`'    </div>\n  </section>'`); in CRLF templates `indexOf` fails. The main checkout happened to have LF templates, so earlier deploys from it worked.
 
 **Fix:** Redeployed from `git -c core.autocrlf=false archive origin/main services/audit-agent scripts/deploy_audit_agent_only.py` (LF) with `VPS_PASSWORD` from the main `.env.local`. Container templates = `origin/main` blobs, 0 CRLF files. Checked on the AUD-242 data in a copy inside the old container: CRLF templates crash, LF templates render all reports.
 
-**Prevent:** Deploy the worker only from LF files (a `git archive` with `core.autocrlf=false`, or a checkout whose templates have no `\r`). After every worker redeploy run one audit and grep the log for `render-v2-reports.mjs завершился с кодом`. Long-term: `.gitattributes` `eol=lf` for `services/audit-agent/**`, or normalize `\r\n` in render-v2 before matching anchors.
+**Prevent:** Deploy the worker only from LF files (a `git archive` with `core.autocrlf=false`, or a checkout whose templates have no `\r`). After every worker redeploy run one audit and grep the log for `render-v2-reports.mjs ���������� � �����`. Long-term: `.gitattributes` `eol=lf` for `services/audit-agent/**`, or normalize `\r\n` in render-v2 before matching anchors.
 
 ---
 
-## PIT-146 — English "stub" and an "in head" claim inside RU/HE text of the GA4 / Consent Mode check
+## PIT-146 � English "stub" and an "in head" claim inside RU/HE text of the GA4 / Consent Mode check
 
 **Tags:** `audit`, `i18n`, `ga4`, `consent-mode`, `report-text`
-**Seen:** 3 times — myblindspot.eu RU, report 238 (sirton.co.il HE), report 240 (bigcars.co.il HE); logged as MI-003 in `docs/audit/minor-issues.md`
+**Seen:** 3 times � myblindspot.eu RU, report 238 (sirton.co.il HE), report 240 (bigcars.co.il HE); logged as MI-003 in `docs/audit/minor-issues.md`
 
-**Symptom:** The "GA4 / dataLayer readiness" row read "dataLayer + consent stub (Consent Mode default) (GA4 G- ID נמצא)" and in the recommendation "Consent Mode stub כבר ב-<head>" — English words inside RU/HE text, and a claim that the default sits in `<head>` even when it comes from an app bundle or a consent plugin (AUD-231).
+**Symptom:** The "GA4 / dataLayer readiness" row read "dataLayer + consent stub (Consent Mode default) (GA4 G- ID ????)" and in the recommendation "Consent Mode stub ??? ?-<head>" � English words inside RU/HE text, and a claim that the default sits in `<head>` even when it comes from an app bundle or a consent plugin (AUD-231).
 
 **Cause:** The RU/HE strings in `AuditCollector` (check row), `A44Recommendations.ga4`, `ReportFindingsCatalog` (GA4 finding) and `ReportScopeOfWork` were translated word by word from the English "consent stub" / "stub only".
 
-**Fix:** Localized wording without "stub": "Consent Mode по умолчанию" / "ברירת מחדל של Consent Mode"; the good state no longer says "in <head>" (the recommendation to add it still says <head>); "stub only" → "G- ID не найден" / "no G- ID" / "לא נמצא G- ID". Generated `audit_template_*` copies are not edited by hand — they refresh on the next render.
+**Fix:** Localized wording without "stub": "Consent Mode �� ���������" / "????? ???? ?? Consent Mode"; the good state no longer says "in <head>" (the recommendation to add it still says <head>); "stub only" > "G- ID �� ������" / "no G- ID" / "?? ???? G- ID". Generated `audit_template_*` copies are not edited by hand � they refresh on the next render.
 
 **Prevent:** No English technical slang in RU/HE strings unless it is a name (Consent Mode, dataLayer). A "found" message must not assert where the code lives unless the collector measured it. Redeploy the VPS audit worker after Java text changes; samples on the site refresh only when rebuilt.
 
 ---
 
-## PIT-145 — Pro hid the open sign-up behind another lead form (start form + /whitepaper)
+## PIT-145 � Pro hid the open sign-up behind another lead form (start form + /whitepaper)
 
 **Tags:** `audit`, `diagnostic`, `pro`, `lead-capture`, `render-v2`
-**Seen:** 2026-10-27 — myblindspot.eu, Diagnostic vs Pro RU (local runs on the worker's code)
+**Seen:** 2026-10-27 � myblindspot.eu, Diagnostic vs Pro RU (local runs on the worker's code)
 
-**Symptom:** Both tiers submitted the homepage start form and reached `/signup?domain=…` (name, email, password, no anti-spam, no OAuth). Diagnostic (5 pages) reported it: finding "Форма регистрации после формы запуска открыта для ботов", "Форма запуска → регистрация" in "Путь к заявке". Pro (10 pages) also crawled `/whitepaper`, a real email form without anti-spam, and said nothing about the sign-up: only "Лид-формы открыты для ботов", lead check "На главной форм нет". The dearer tier reported less. The checklist also had two identical rows "Страница воронки · /signup" (`/signup` and `/signup?next=…`).
+**Symptom:** Both tiers submitted the homepage start form and reached `/signup?domain=�` (name, email, password, no anti-spam, no OAuth). Diagnostic (5 pages) reported it: finding "����� ����������� ����� ����� ������� ������� ��� �����", "����� ������� > �����������" in "���� � ������". Pro (10 pages) also crawled `/whitepaper`, a real email form without anti-spam, and said nothing about the sign-up: only "���-����� ������� ��� �����", lead check "�� ������� ���� ���". The dearer tier reported less. The checklist also had two identical rows "�������� ������� � /signup" (`/signup` and `/signup?next=�`).
 
-**Cause:** PIT-144 gated the step behind the start form on "no other lead form": `entryOnly = effectiveForms == 0 && …` in the lead check, `entryFormOnly` for the findings context (`ReportFindingsCatalog`), `entryForm = !hasForm && …` in `leadPathFromData`. Any lead form anywhere on the funnel switched the whole start-form branch off. Funnel page rows were labelled by path only.
+**Cause:** PIT-144 gated the step behind the start form on "no other lead form": `entryOnly = effectiveForms == 0 && �` in the lead check, `entryFormOnly` for the findings context (`ReportFindingsCatalog`), `entryForm = !hasForm && �` in `leadPathFromData`. Any lead form anywhere on the funnel switched the whole start-form branch off. Funnel page rows were labelled by path only.
 
-**Fix:** The step is read whenever the homepage has a start form (`entryStepSeen` / `entryStep` gated on `entryFormsCount > 0`), next to the other forms: the lead check appends the step detail and takes the worse status (`statusRank`), `rec_variant` follows the worse one; the start-form findings no longer require `entryFormOnly` (the lead score is unchanged); "Путь к заявке" shows both channels ("Форма на странице", "Форма запуска → регистрация"), names both in the verdict and takes the weaker anti-spam. "На главной лид-формы нет (только форма запуска)". Funnel rows whose path repeats show their query.
+**Fix:** The step is read whenever the homepage has a start form (`entryStepSeen` / `entryStep` gated on `entryFormsCount > 0`), next to the other forms: the lead check appends the step detail and takes the worse status (`statusRank`), `rec_variant` follows the worse one; the start-form findings no longer require `entryFormOnly` (the lead score is unchanged); "���� � ������" shows both channels ("����� �� ��������", "����� ������� > �����������"), names both in the verdict and takes the weaker anti-spam. "�� ������� ���-����� ��� (������ ����� �������)". Funnel rows whose path repeats show their query.
 
-**Prevent:** A branch that adds information must not be switched off by an unrelated signal. When a paid tier crawls more pages, it must report at least what the cheaper tier reports — compare Diagnostic and Pro on the same site after lead-capture changes.
+**Prevent:** A branch that adds information must not be switched off by an unrelated signal. When a paid tier crawls more pages, it must report at least what the cheaper tier reports � compare Diagnostic and Pro on the same site after lead-capture changes.
 
 ---
 
-## PIT-144 — Free calls a "check your site" URL field an unprotected lead form; consent stub missed on SPAs
+## PIT-144 � Free calls a "check your site" URL field an unprotected lead form; consent stub missed on SPAs
 
 **Tags:** `audit`, `free`, `lead-capture`, `ga4`, `render-v2`
-**Seen:** 2026-10-27 — AUD-231 (myblindspot.eu, Lovable/Vite SPA, Free RU)
+**Seen:** 2026-10-27 � AUD-231 (myblindspot.eu, Lovable/Vite SPA, Free RU)
 
-**Symptom:** Top-1 and Step 1 "Lead forms are open to bots — Critical" for the site's only form: one URL field + submit (`Email: no, phone: no, submit: yes`). Its contact is asked on the next step (sign-up with name and email), which Free never opens. GA4 "consent stub incomplete" while `window.dataLayer` held a full `consent default` (all four keys denied).
+**Symptom:** Top-1 and Step 1 "Lead forms are open to bots � Critical" for the site's only form: one URL field + submit (`Email: no, phone: no, submit: yes`). Its contact is asked on the next step (sign-up with name and email), which Free never opens. GA4 "consent stub incomplete" while `window.dataLayer` held a full `consent default` (all four keys denied).
 
 **Cause:** The homepage form scan (`LEAD_AND_RTL_SCRIPT`) skipped only search forms and counted any other form as a lead form; the contact-field rule existed only in the agent snapshot (Diagnostic/Pro). `gtagConsentStub` looked for `consent` in inline scripts only; a bundled app queues it from its JS. In render, the agent's homepage snapshot `formsCount` also counted the start form as an on-page form.
 
-**Fix:** A form with one visible URL/site field and no email/phone/textarea is an entry form: counted in `entryFormsCount`, excluded from `formsCount`. The lead check becomes status `na` ("Не проверено в Free" / "Не проверено"), `rec_variant=entry`, no "no form" / "unprotected" findings, no lead-form plan step; the scale counts it as a path (+25, +5). Free states that it does not submit the form or open the sign-up step and that the full check is in Diagnostic and Pro ("Путь к заявке" verdict and the checklist note). render uses `leadFormsCount` from agent snapshots when present. Consent counts `['consent','default',…]` queued in `window.dataLayer`.
+**Fix:** A form with one visible URL/site field and no email/phone/textarea is an entry form: counted in `entryFormsCount`, excluded from `formsCount`. The lead check becomes status `na` ("�� ��������� � Free" / "�� ���������"), `rec_variant=entry`, no "no form" / "unprotected" findings, no lead-form plan step; the scale counts it as a path (+25, +5). Free states that it does not submit the form or open the sign-up step and that the full check is in Diagnostic and Pro ("���� � ������" verdict and the checklist note). render uses `leadFormsCount` from agent snapshots when present. Consent counts `['consent','default',�]` queued in `window.dataLayer`.
 
-**Prevent:** A finding about a step the audit does not open must say "not checked", never pass or fail. Test lead checks on a start-form funnel (URL → sign-up), not only on contact-form sites.
+**Prevent:** A finding about a step the audit does not open must say "not checked", never pass or fail. Test lead checks on a start-form funnel (URL > sign-up), not only on contact-form sites.
 
-**Follow-up (paid tiers go past the start form):** Free promised the full check in Diagnostic and Pro, but they also stopped at the form. Now, with `AUDIT_TIER=DIAGNOSTIC` or `PRO` (never Free, never the local all-tiers run, whose crawl also feeds Free), the agent browse fills the homepage start form with the site's own origin and submits it once (`ENTRY_FORM_SUBMIT_SCRIPT`), then only observes the page that opens (`ENTRY_STEP_SCRIPT` → `agent_browse.entry_step`): `kind` signup / signin / contact / oauth / started, the name/email/phone/password fields, anti-spam (Turnstile, reCAPTCHA, hCaptcha, honeypot) and OAuth buttons (Google / Apple count as protection). It never types credentials or creates an account. Lead check (`entryStepStatus`): protected contact step = good; sign-up/sign-in without protection = warn (email confirmation is not visible); plain contact form without protection = bad; service started without sign-up = bad (warn if the start form itself is protected); unrecognised step = `na` as before. Findings "Форма регистрации после формы запуска открыта для ботов" / "Форма запуска работает для ботов: сервис стартует без регистрации", `rec_variant` entry_protected / entry_unprotected / entry_started; the "Путь к заявке" block shows the step, its path and a real status (Free still reads "не проверено в Free"). `isEntryForm` is one shared JS snippet (`IS_ENTRY_FORM_JS`) for the locale probe, the agent snapshot (now also `entryFormsCount`) and the submit. Checked on myblindspot.eu: `/signup?domain=myblindspot.eu`, name + email + password, no anti-spam, no OAuth → Diagnostic/Pro "Требует внимания".
+**Follow-up (paid tiers go past the start form):** Free promised the full check in Diagnostic and Pro, but they also stopped at the form. Now, with `AUDIT_TIER=DIAGNOSTIC` or `PRO` (never Free, never the local all-tiers run, whose crawl also feeds Free), the agent browse fills the homepage start form with the site's own origin and submits it once (`ENTRY_FORM_SUBMIT_SCRIPT`), then only observes the page that opens (`ENTRY_STEP_SCRIPT` > `agent_browse.entry_step`): `kind` signup / signin / contact / oauth / started, the name/email/phone/password fields, anti-spam (Turnstile, reCAPTCHA, hCaptcha, honeypot) and OAuth buttons (Google / Apple count as protection). It never types credentials or creates an account. Lead check (`entryStepStatus`): protected contact step = good; sign-up/sign-in without protection = warn (email confirmation is not visible); plain contact form without protection = bad; service started without sign-up = bad (warn if the start form itself is protected); unrecognised step = `na` as before. Findings "����� ����������� ����� ����� ������� ������� ��� �����" / "����� ������� �������� ��� �����: ������ �������� ��� �����������", `rec_variant` entry_protected / entry_unprotected / entry_started; the "���� � ������" block shows the step, its path and a real status (Free still reads "�� ��������� � Free"). `isEntryForm` is one shared JS snippet (`IS_ENTRY_FORM_JS`) for the locale probe, the agent snapshot (now also `entryFormsCount`) and the submit. Checked on myblindspot.eu: `/signup?domain=myblindspot.eu`, name + email + password, no anti-spam, no OAuth > Diagnostic/Pro "������� ��������".
 
 **Local check pitfall:** on Windows the checkout has CRLF templates, so `render-v2-reports.mjs` fails with "anchor end not found" on `    </div>\n  </section>`; convert the scratch copy to LF. Java in a temp dir under a non-ASCII user path fails with "Unable to establish loopback connection": pass `-Djdk.net.unixdomain.tmpdir=<ASCII dir>`.
 
 ---
 
-## PIT-143 — Diagnostic/Pro treat the en+ru+he probes as the site's languages
+## PIT-143 � Diagnostic/Pro treat the en+ru+he probes as the site's languages
 
 **Tags:** `audit`, `diagnostic`, `pro`, `locales`, `agent-browse`, `render-v2`
-**Seen:** 2026-10-27 — manual Diagnostic + Pro runs for gillemitzvot.co.il (Hebrew-only WordPress)
+**Seen:** 2026-10-27 � manual Diagnostic + Pro runs for gillemitzvot.co.il (Hebrew-only WordPress)
 
-**Symptom:** axe ×3 (6 vs 2), "Locale EN/RU · needs attention", "three languages" protocol, L1 "sitemap 0", "robots.txt: 200" for HTML, homepage crawled twice (www + apex), raw Playwright timeout stack in the report, "broken pages" step with the headers snippet, dead `#diag-speed` / `#action-lead`.
+**Symptom:** axe ?3 (6 vs 2), "Locale EN/RU � needs attention", "three languages" protocol, L1 "sitemap 0", "robots.txt: 200" for HTML, homepage crawled twice (www + apex), raw Playwright timeout stack in the report, "broken pages" step with the headers snippet, dead `#diag-speed` / `#action-lead`.
 
 **Cause:** Paid tiers probe `LOCALES=en,ru,he`; `LocalePresence.forReport` dropped absent locales only for RTL. AI/L1 used the typed origin. URL keys kept the typed host. Raw error text stored. "broken" classified as `sec`. Links built before anchors are known.
 
-**Fix:** Drop any probed locale the site does not serve; axe = distinct rules on served locales; AI/L1 on `site_origin`; URL keys without `www.`; timeout → `timeout_45s` + plain sentence; `funnel` pillar with its own snippet; final pass repoints dead `#action-*/#diag-*` links; protocol counts from `locales_audited`.
+**Fix:** Drop any probed locale the site does not serve; axe = distinct rules on served locales; AI/L1 on `site_origin`; URL keys without `www.`; timeout > `timeout_45s` + plain sentence; `funnel` pillar with its own snippet; final pass repoints dead `#action-*/#diag-*` links; protocol counts from `locales_audited`.
 
 **Prevent:** Never count or report a probed locale before checking the site serves it. Test paid tiers on a single-language site.
 
 ---
 
-## PIT-142 — "No sitemap" on a www URL and an "hreflang & OG" step for a Hebrew-only site
+## PIT-142 � "No sitemap" on a www URL and an "hreflang & OG" step for a Hebrew-only site
 
 **Tags:** `audit`, `seo`, `sitemap`, `hreflang`, `render-v2`
-**Seen:** 2026-10-27 — AUD-229 (gillemitzvot.co.il, WordPress + Yoast, Free HE)
+**Seen:** 2026-10-27 � AUD-229 (gillemitzvot.co.il, WordPress + Yoast, Free HE)
 
-**Symptom:** SEO 74 with "no sitemap" (−10) although the site has a Yoast sitemap. Plan step 3 "hreflang и OpenGraph" for a site in Hebrew only with every OG tag present.
+**Symptom:** SEO 74 with "no sitemap" (?10) although the site has a Yoast sitemap. Plan step 3 "hreflang � OpenGraph" for a site in Hebrew only with every OG tag present.
 
 **Cause:** (1) robots.txt and sitemap were fetched at the typed origin `www.` only; there `/sitemap.xml` is 404 (Yoast redirects only on the apex where the homepage lands) and `/sitemap_index.xml` was never tried. (2) "Multilingual" meant "audited in several locales" (`LOCALES=en,ru,he`), not "the site serves several languages". (3) The SEO filler step had one fixed title whatever pulled the scale down. (4) The "multilingual funnel" top-3 pad claims "locales work" for any site.
 
-**Fix:** robots/sitemap use the origin the homepage lands on, then the typed one, and try `/sitemap.xml`, `/sitemap_index.xml`, `/wp-sitemap.xml`, `/sitemap-index.xml`. The DOM scan records `seo_assets.siteLanguages` / `languageSwitcher` (html lang, hreflang, switcher links incl. `/il/he/`, `?lang=`, subdomains, and button switchers with ≥2 language labels). hreflang costs points and shows as a gap only when the site has >1 language. `seoCausesFromData()` picks the SEO step by cause or drops it. The multilingual pad is skipped for single-language sites.
+**Fix:** robots/sitemap use the origin the homepage lands on, then the typed one, and try `/sitemap.xml`, `/sitemap_index.xml`, `/wp-sitemap.xml`, `/sitemap-index.xml`. The DOM scan records `seo_assets.siteLanguages` / `languageSwitcher` (html lang, hreflang, switcher links incl. `/il/he/`, `?lang=`, subdomains, and button switchers with ?2 language labels). hreflang costs points and shows as a gap only when the site has >1 language. `seoCausesFromData()` picks the SEO step by cause or drops it. The multilingual pad is skipped for single-language sites.
 
 **Prevent:** Never treat the requested audit locales as the site's languages. Check HTTP resources at the landed origin. Every filler step must say which signal it fixes.
 
 ---
 
-## PIT-141 — Report snippets named our own Next.js files; detector allowed several CMS at once
+## PIT-141 � Report snippets named our own Next.js files; detector allowed several CMS at once
 
 **Tags:** `audit`, `report`, `render-v2`, `tech-detect`
-**Seen:** 2026-10-27 — AUD-226 review (OpenCart site got `next.config.mjs:15-32`, `src/components/Footer.tsx:55-80`)
+**Seen:** 2026-10-27 � AUD-226 review (OpenCart site got `next.config.mjs:15-32`, `src/components/Footer.tsx:55-80`)
 
 **Symptom:** Every action-plan code box was titled with a file and line range from the erythro.ai repo, and the code was Next.js/React. A client on OpenCart, WordPress or Wix has none of those files. The detector could list Shopify, Squarespace and Webflow side by side.
 
@@ -2282,27 +2397,27 @@ And add multilingual semantic scanning of `aria-label`, `title`, and `innerText`
 
 ---
 
-## PIT-140 — Audit flags "Disallow: / for AI bots", Shopify+Squarespace+Webflow and drops the lead step
+## PIT-140 � Audit flags "Disallow: / for AI bots", Shopify+Squarespace+Webflow and drops the lead step
 
 **Tags:** `audit`, `report`, `render-v2`, `robots`, `tech-detect`, `free`
-**Seen:** 2026-10-27 — AUD-226 (bliainara.co.il, OpenCart, Free HE)
+**Seen:** 2026-10-27 � AUD-226 (bliainara.co.il, OpenCart, Free HE)
 
-**Symptom:** (1) Top-3 said "robots Disallow: / לבוטי AI", while robots.txt was `User-agent: *` + empty `Disallow:`. (2) "Detected technologies" listed Shopify, Squarespace and Webflow at once. (3) The action plan had 3 steps; lead capture (scale 45, no form, WhatsApp only) had none. (4) The lead check was "Критично" while the "Путь к заявке" block said "Требует внимания", and its recommendation read "if no form … / if a form …". (5) The AI step's fix offered /llms.txt the site already had and pointed at `public/robots.txt:1-8`.
+**Symptom:** (1) Top-3 said "robots Disallow: / ????? AI", while robots.txt was `User-agent: *` + empty `Disallow:`. (2) "Detected technologies" listed Shopify, Squarespace and Webflow at once. (3) The action plan had 3 steps; lead capture (scale 45, no form, WhatsApp only) had none. (4) The lead check was "��������" while the "���� � ������" block said "������� ��������", and its recommendation read "if no form � / if a form �". (5) The AI step's fix offered /llms.txt the site already had and pointed at `public/robots.txt:1-8`.
 
 **Cause:** (1) `robotsHasDisallowRoot` treated an empty `Disallow:` as a root block; RFC 9309 says it allows everything. (2) Platform rules matched the bare words `shopify` / `squarespace` / `webflow` anywhere in HTML+JS; Font Awesome ships `.fa-shopify` etc. (3) PIT-138 dropped the Turnstile filler step when there was no form (`contradicted.lead = isProtected || !hasForm`) instead of swapping it for "add a lead form". (4) Java lead status was `bad` for any `formsCount == 0` and the recommendation was keyed on status only. (5) The catalog fix text was a fixed list; snippets used Next.js paths.
 
-**Fix:** Empty `Disallow:` counts as allow-root; root block is `Disallow: /` or `/*`. Platform rules need a host or runtime marker (`cdn.shopify.com`, `myshopify.com`, `squarespace.com`, `sqsp.net`, `html[data-wf-site]`, `website-files.com`). Without a form the lead filler becomes "Добавить лид-форму…" with the `lead_form` snippet. No form + messenger/chat → `warn`; the row carries `rec_variant` (`no_form` / `unprotected` / `form_fields`) for a single-case recommendation. The AI fix names the gaps found; the robots snippet points at `/robots.txt`.
+**Fix:** Empty `Disallow:` counts as allow-root; root block is `Disallow: /` or `/*`. Platform rules need a host or runtime marker (`cdn.shopify.com`, `myshopify.com`, `squarespace.com`, `sqsp.net`, `html[data-wf-site]`, `website-files.com`). Without a form the lead filler becomes "�������� ���-�����" with the `lead_form` snippet. No form + messenger/chat > `warn`; the row carries `rec_variant` (`no_form` / `unprotected` / `form_fields`) for a single-case recommendation. The AI fix names the gaps found; the robots snippet points at `/robots.txt`.
 
 **Prevent:** Detector rules never match a bare product name. A filler step contradicted by data is replaced by the step that fits the data, not removed. Check robots parsing against an empty `Disallow:`.
 
 ---
 
-## PIT-139 — Free checklist showed another client's checks (or nothing)
+## PIT-139 � Free checklist showed another client's checks (or nothing)
 
 **Tags:** `audit`, `report`, `render-v2`, `free`, `privacy`
-**Seen:** 2026-10-27 — AUD-218 empty checklist; code review showed the leak path
+**Seen:** 2026-10-27 � AUD-218 empty checklist; code review showed the leak path
 
-**Symptom:** Free report checklist was empty under "Результаты: 5 из 28". In other runs it could list 5 checks of a **different site**: the last Pro audit in the worker container.
+**Symptom:** Free report checklist was empty under "����������: 5 �� 28". In other runs it could list 5 checks of a **different site**: the last Pro audit in the worker container.
 
 **Cause:** Java FREE rendered only `freeLockedChecksSection`, so its HTML had no `check-card`. `renderReport` then walked candidates down to `reports/pro/a44-audit-report_<lang>.html`. The worker runs one tier per audit (`AUDIT_TIER` in `runQaAuditor.js`), and `reports/` lives in the container with no volume, so that Pro file belonged to whichever client ran Pro last. With no Pro file (fresh container) the list was empty.
 
@@ -2312,72 +2427,72 @@ And add multilingual semantic scanning of `aria-label`, `title`, and `innerText`
 
 ---
 
-## PIT-138 — Free report contradicts itself: "no form" in top-3, "lead path OK" below
+## PIT-138 � Free report contradicts itself: "no form" in top-3, "lead path OK" below
 
 **Tags:** `audit`, `report`, `render-v2`, `free`
-**Seen:** 2026-10-27 — AUD-218 (theme.madsparrow.me, Free RU)
+**Seen:** 2026-10-27 � AUD-218 (theme.madsparrow.me, Free RU)
 
-**Symptom:** Top-3 and Step 1 said "На сайте нет формы захвата заявок", while "Путь к заявке" said "Исправен — форма и мессенджеры работают", "1/1", "Антиспам OK". Step 1 was tagged "Скорость" and showed the LCP preload snippet from our own Next.js repo. AI steps were also tagged "Скорость". A Turnstile step sat next to detected reCAPTCHA. The funnel lock card was printed twice, and the checklist was empty under "Результаты: 5 из 28".
+**Symptom:** Top-3 and Step 1 said "�� ����� ��� ����� ������� ������", while "���� � ������" said "�������� � ����� � ����������� ��������", "1/1", "�������� OK". Step 1 was tagged "��������" and showed the LCP preload snippet from our own Next.js repo. AI steps were also tagged "��������". A Turnstile step sat next to detected reCAPTCHA. The funnel lock card was printed twice, and the checklist was empty under "����������: 5 �� 28".
 
-**Cause:** (1) The "Путь к заявке" block (channels, steps, verdict, badge) was static template copy for every tier. (2) `classifyActionPillar` had no keywords for "ИИ", "формы", "заявок", RTL, OG, robots, so those findings fell through to `speed`, and the Free branch used `ACTION_CODE_SOLUTIONS[pillar] || speed`. (3) Filler steps were added whenever a pillar had a code snippet (`issues.length > 0 || ACTION_CODE_SOLUTIONS[pKey]`). (4) The template already ships the funnel lock card, and the render appended a second one. (5) The Java "no form" finding ignored messengers and chat. (6) Empty checklist: see PIT-139.
+**Cause:** (1) The "���� � ������" block (channels, steps, verdict, badge) was static template copy for every tier. (2) `classifyActionPillar` had no keywords for "��", "�����", "������", RTL, OG, robots, so those findings fell through to `speed`, and the Free branch used `ACTION_CODE_SOLUTIONS[pillar] || speed`. (3) Filler steps were added whenever a pillar had a code snippet (`issues.length > 0 || ACTION_CODE_SOLUTIONS[pKey]`). (4) The template already ships the funnel lock card, and the render appended a second one. (5) The Java "no form" finding ignored messengers and chat. (6) Empty checklist: see PIT-139.
 
-**Fix:** `leadPathFromData()` builds the block from `lead_capture` + `agent_browse` (Free: homepage, Diagnostic: 5 pages, Pro: all). The classifier covers every `ReportFindingsCatalog` title, plus `solutionFor()` and a new `lead_form` snippet. Filler steps need a failing check or a weak scale, and are dropped when the data contradicts them. The funnel lock card is replaced, not appended. Java: "no form" fires only without a form *and* without an instant channel, and top-3 holds one AI finding. An empty checklist says so honestly instead of "5 из 28".
+**Fix:** `leadPathFromData()` builds the block from `lead_capture` + `agent_browse` (Free: homepage, Diagnostic: 5 pages, Pro: all). The classifier covers every `ReportFindingsCatalog` title, plus `solutionFor()` and a new `lead_form` snippet. Filler steps need a failing check or a weak scale, and are dropped when the data contradicts them. The funnel lock card is replaced, not appended. Java: "no form" fires only without a form *and* without an instant channel, and top-3 holds one AI finding. An empty checklist says so honestly instead of "5 �� 28".
 
 **Prevent:** Never ship verdict text in a template; every status line comes from `audit_data`. A new finding title in the catalog must hit a keyword in `classifyActionPillar` (run the title list through it).
 
 ---
 
-## PIT-137 — Admin re-queue resent client report email (+ reset pro-offer)
+## PIT-137 � Admin re-queue resent client report email (+ reset pro-offer)
 
 **Tags:** `audit`, `email`, `requeue`, `pro-offer`
-**Seen:** 2026-10-26 — `adi_g@maabarot.com` (AUD-209) got two report emails ~22:18 and ~23:16
+**Seen:** 2026-10-26 � `adi_g@maabarot.com` (AUD-209) got two report emails ~22:18 and ~23:16
 
-**Symptom:** Second client “report ready” mail after an admin re-queue; pro-offer could be re-scheduled even after already sent.
+**Symptom:** Second client �report ready� mail after an admin re-queue; pro-offer could be re-scheduled even after already sent.
 
-**Cause:** Worker treated every successful run as a fresh funnel: `notifyClient` defaulted true, and `scheduleProOfferEmail` always reset `proOfferStatus` → `scheduled`.
+**Cause:** Worker treated every successful run as a fresh funnel: `notifyClient` defaulted true, and `scheduleProOfferEmail` always reset `proOfferStatus` > `scheduled`.
 
 **Fix:** Admin `/api/audit/admin/requeue` sends `notifyClient: false`. Worker skips SMTP when false. `scheduleProOfferEmail` no-ops if status is not `none`/`skipped`. After a mistaken reset, set `pro_offer_status='sent'` when `pro_offer_sent_at` is already set.
 
-**Prevent:** Never re-queue with client notify for polish-only re-renders. Persist `detectedTechnologies` into `audit_summary` on every run (chips in HTML ≠ empty CMS summary).
+**Prevent:** Never re-queue with client notify for polish-only re-renders. Persist `detectedTechnologies` into `audit_summary` on every run (chips in HTML ? empty CMS summary).
 
 ---
 
-## PIT-136 — Cleaning WIP Java dropped the v2 report pipeline (old A4-4 shipped)
+## PIT-136 � Cleaning WIP Java dropped the v2 report pipeline (old A4-4 shipped)
 
 **Tags:** udit, 
 eport, pro-v2, deploy, multi-agent
-**Seen:** 2026-10-26 — after VPS redeploy for PIT-135, client report HTML was the old A4-4 template again
+**Seen:** 2026-10-26 � after VPS redeploy for PIT-135, client report HTML was the old A4-4 template again
 
 **Symptom:** Live free/diagnostic/pro udit-report_*.html looks like legacy A44 layout (no modern v2 sections / polish).
 
 **Cause:** Local uncommitted WIP had generateV2Reports + PRO 44-audit-report_* naming. Aligning Java to HEAD for a clean deploy removed that wiring. Worker then wrote A44 straight to udit-report_*.html and never ran 
 ender-v2-reports.mjs / RenderV2Pdf.
 
-**Fix:** Restore from lab: PRO → 44-audit-report_*; after A44 export call AuditCollector.generateV2Reports → 
+**Fix:** Restore from lab: PRO > 44-audit-report_*; after A44 export call AuditCollector.generateV2Reports > 
 ode scripts/render-v2-reports.mjs + RenderV2Pdf. Keep pply-v2-polish.cjs in the image.
 
 **Prevent:** Do not strip generateV2Reports / 44- naming when cleaning unrelated WIP. Smoke: after redeploy, open a fresh report and confirm v2 markup (not A4-4 chrome).
 
 ---
 
-## PIT-135 — Audit report “Detected technologies” was a hardcoded Erythro demo stack
+## PIT-135 � Audit report �Detected technologies� was a hardcoded Erythro demo stack
 
 **Tags:** `audit`, `report`, `pro-v2`, `fingerprint`, `technologies`
-**Seen:** 2026-10-26 — every free/diagnostic/pro HTML showed Next.js / React / Cloudflare / Turnstile / GA4 / WhatsApp / Telegram / JSON-LD regardless of client site
+**Seen:** 2026-10-26 � every free/diagnostic/pro HTML showed Next.js / React / Cloudflare / Turnstile / GA4 / WhatsApp / Telegram / JSON-LD regardless of client site
 
 **Symptom:** Client audit reports claim technologies that belong to erythro.ai, not the audited origin.
 
 **Cause:** `render-v2-reports.mjs` used a constant `DETECTED_TECH`; templates shipped the same chips. No `detected_technologies` field was written to `audit_data.json`.
 
-**Fix:** `AuditCollector` runs a homepage DOM fingerprint + merges `technology_headers` / lead messengers into `detected_technologies`. Renderer fills chips from that array only (empty → localized “none detected”). Never reintroduce a demo list.
+**Fix:** `AuditCollector` runs a homepage DOM fingerprint + merges `technology_headers` / lead messengers into `detected_technologies`. Renderer fills chips from that array only (empty > localized �none detected�). Never reintroduce a demo list.
 
 **Prevent:** Any new tech chip must come from collector signals. Redeploy audit-agent after Java/script changes; re-run an audit to refresh samples.
 
 ---
-## PIT-127 — Pro v2 report HTML silently overwritten: all design disappears
+## PIT-127 � Pro v2 report HTML silently overwritten: all design disappears
 
 **Tags:** `audit`, `report`, `pro-v2`, `multi-agent`, `overwrite`
-**Seen:** 2026-10-25 — twice in one evening every v2 copy (RU/EN/HE, five locations) lost its CSS polish, "Шаг N" badges and sorted actions
+**Seen:** 2026-10-25 � twice in one evening every v2 copy (RU/EN/HE, five locations) lost its CSS polish, "��� N" badges and sorted actions
 
 **Symptom:** The report looks like the old version again (P1 priority badges, no accordion styling, hover effects gone), although edits were made and verified minutes earlier.
 
@@ -2389,10 +2504,10 @@ ode scripts/render-v2-reports.mjs + RenderV2Pdf. Keep pply-v2-polish.cjs in the
 
 ---
 
-## PIT-128 — Chromium print: `box-decoration-break: clone` and fixed-height flex corrupt PDF pages
+## PIT-128 � Chromium print: `box-decoration-break: clone` and fixed-height flex corrupt PDF pages
 
 **Tags:** `pdf`, `playwright`, `print-css`, `fragmentation`, `chromium`
-**Seen:** 2026-10-26 — Pro v2 PDF
+**Seen:** 2026-10-26 � Pro v2 PDF
 
 **Symptom:** In the PDF the last items of one section are painted over the first block of the next section (overlap), or the third card of a section disappears entirely.
 
@@ -2400,18 +2515,18 @@ ode scripts/render-v2-reports.mjs + RenderV2Pdf. Keep pply-v2-polish.cjs in the
 
 **Fix:** Long sections (top-3, actions, checklist) print frameless (transparent card, items are cards themselves). Fill a page with per-card `min-height` (top-3: 71mm) instead of fixed container height. Keep short sections whole with `break-inside: avoid`.
 
-**Prevent:** After any print-CSS change render the PDF and look at every page (pdf.js in Playwright works without poppler). Margins at a fragmentation break are truncated — put spacing inside blocks or use borders.
+**Prevent:** After any print-CSS change render the PDF and look at every page (pdf.js in Playwright works without poppler). Margins at a fragmentation break are truncated � put spacing inside blocks or use borders.
 
 ---
 
-## PIT-129 — PDF: only one accordion open, white page margins, locked output files
+## PIT-129 � PDF: only one accordion open, white page margins, locked output files
 
 **Tags:** `pdf`, `details`, `playwright`, `windows`
 **Seen:** 2026-10-25/26
 
 **Symptom:** (a) Checklist prints with only the last item expanded. (b) White strips around the grey page background. (c) `RenderV2Pdf.java` aborts: "file is used by another process"; the PDF in the viewer stays old.
 
-**Cause:** (a) `<details name="audit-checklist">` is an exclusive group — opening all closes the others. (b) Chrome never paints `@page` margins. (c) Windows locks a PDF open in a viewer.
+**Cause:** (a) `<details name="audit-checklist">` is an exclusive group � opening all closes the others. (b) Chrome never paints `@page` margins. (c) Windows locks a PDF open in a viewer.
 
 **Fix:** (a) Remove the `name` attribute and open all (`render-v2-pdf.cjs` + `matchMedia('print')` handler in the HTML). (b) `@page{margin:0}` and rebuild 10mm/8mm spacing with a wrapper table whose `thead`/`tfoot` repeat per page (reset inherited `td` styles: `text-transform`, `text-align`, `font`). (c) `render-v2-pdf.cjs` writes `*.new.pdf` next to a locked target and prints which file was locked.
 
@@ -2419,14 +2534,14 @@ ode scripts/render-v2-reports.mjs + RenderV2Pdf. Keep pply-v2-polish.cjs in the
 
 ---
 
-## PIT-130 — Local QA Auditor run fails: `Unable to establish loopback connection` (JDK 17 and 21)
+## PIT-130 � Local QA Auditor run fails: `Unable to establish loopback connection` (JDK 17 and 21)
 
 **Tags:** `qa-auditor`, `java`, `windows`, `httpclient`, `loopback`
-**Seen:** 2026-10-25 — dev machine (Windows 11 build 26300)
+**Seen:** 2026-10-25 � dev machine (Windows 11 build 26300)
 
 **Symptom:** `mvn compile exec:java` crashes after the Playwright steps at "TTFB, security headers, robots.txt" with `java.io.IOException: Unable to establish loopback connection: Invalid argument: connect`. A 6-line Java `HttpClient` probe fails the same way, also with `-Djava.net.preferIPv4Stack=true`, `useFastTcpLoopback=false` and JDK 21.
 
-**Cause:** On Windows the JDK selector wake-up pipe (`PipeImpl`) is a Unix-domain socket created in the user temp folder. The temp path here contains Cyrillic (`C:UsersВадимAppDataLocalTemp`), and `connect` on that socket path fails with `Invalid argument`. Not the sandbox (same error outside it), not the site.
+**Cause:** On Windows the JDK selector wake-up pipe (`PipeImpl`) is a Unix-domain socket created in the user temp folder. The temp path here contains Cyrillic (`C:Users�����AppDataLocalTemp`), and `connect` on that socket path fails with `Invalid argument`. Not the sandbox (same error outside it), not the site.
 
 **Fix (2026-10-26, confirmed):** point the JDK at an ASCII-only folder for that socket:
 
@@ -2440,18 +2555,34 @@ The full Pro run (10 funnel URLs, 3 locales, PSI, Gemini) then completes locally
 
 ---
 
-## PIT-131 — Idempotent text patches: replacement that contains its own source text
+## PIT-131 � Idempotent text patches: replacement that contains its own source text
 
 **Tags:** `scripts`, `i18n`, `he`, `idempotency`
-**Seen:** 2026-10-26 — Hebrew checklist title became "שיקוף שיקוף שיקוף … RTL ופריסה לישראל"
+**Seen:** 2026-10-26 � Hebrew checklist title became "????? ????? ????? � RTL ?????? ??????"
 
 **Symptom:** A heading repeats a word dozens of times after the polish script was re-run.
 
-**Cause:** The patch replaced `RTL ופריסה…` with `שיקוף RTL ופריסה…`; the result still contains the search text, so every run prepended one more `שיקוף`.
+**Cause:** The patch replaced `RTL ??????�` with `????? RTL ??????�`; the result still contains the search text, so every run prepended one more `?????`.
 
-**Fix:** In `apply-v2-polish.cjs`, a fix whose result contains its source is normalised first (`result → source`) and then applied once; the damaged title is repaired by regex.
+**Fix:** In `apply-v2-polish.cjs`, a fix whose result contains its source is normalised first (`result > source`) and then applied once; the damaged title is repaired by regex.
 
 **Prevent:** Re-run a patch script twice and diff the output; replacement text must not contain the search text.
+
+---
+
+
+## PIT-132 � Unauthorized heavy automated test runs during trivial UI styling tweaks
+
+**Tags:** workflow, 	esting, gent-rules, performance
+**Seen:** 2026-10-31 � Agent launched full project pnpm tsc and 8 Chrome DevTools scripts across 3 locales on a simple font size adjustment, causing massive user delays.
+
+**Symptom:** Simple visual CSS/style change takes 40+ seconds while agent executes full project typechecks and multi-viewport headless browser test suites in the background.
+
+**Cause:** Agent over-engineered verification by running full-suite background compilation and multi-language headless Chrome measurements without user instruction.
+
+**Fix:** Added strict rule to AGENTS.md: "������� �������������� �������� ��� ���������� �� ���������. ��� ����� � ������ �� �������."
+
+**Prevent:** Never run unrequested test suites (pnpm tsc, itest, automated Chrome evaluation cycles) on styling/markup tweaks. Run tests and verification strictly upon user command.
 
 ---
 
@@ -2463,16 +2594,16 @@ The full Pro run (10 funnel URLs, 3 locales, PSI, Gemini) then completes locally
 - [ ] Mobile modals: portal to `document.body` + `useLockBodyScroll`; never nest `fixed` dialogs in `z-20`/`z-40` overflow cards (PIT-073)
 - [ ] HE scorecard: desktop `max-content`; mobile 2-line labels in `108rem` EN/RU / `58rem` HE + `1fr` bars; RTL `text-align: left` (PIT-074)
 - [ ] Root `/favicon.ico` and `/apple-touch-icon.png` must exist in `public/` even if icons also live under `/images/favicon/` (PIT-075)
-- [ ] Summary finding cards: truncate sample URLs to ≤40 chars and enforce word-break: break-word + overflow-wrap: anywhere (PIT-076)
+- [ ] Summary finding cards: truncate sample URLs to ?40 chars and enforce word-break: break-word + overflow-wrap: anywhere (PIT-076)
 - [ ] Audit speed metrics: origin warmup + discard first PSI lab; TTFB median of 3 warm samples (PIT-077)
 - [ ] Audit 4xx list: ignore Cloudflare `/cdn-cgi/` and Turnstile challenge-platform 401s (PIT-078)
-- [ ] Routes that set their own `openGraph` must include `images` (width/height 1200×630); LinkedIn ignores `twitter:image` (PIT-079)
+- [ ] Routes that set their own `openGraph` must include `images` (width/height 1200?630); LinkedIn ignores `twitter:image` (PIT-079)
 - [ ] Free-audit submit: confirmation popup like `/order`, no auto-opened waiting tab (PIT-080)
 - [ ] Form POST / website DNS / SMTP: timeouts + localized catch; do not show English API `message` except cooldown (PIT-081)
-- [ ] Contact intake: sanitize/Turnstile/honeypot before DB; no IMAP→CMS; no AV on text-only forms (PIT-082)
-- [ ] Audit HE How-copy: CMS MT needles (`מפה`, `רומנית`, `מסירה`, `שלח את`) must not override `auditPage.ts`; run `pnpm db:fix-audit-he-copy` (PIT-083)
-- [ ] Audit pricing `<Link>`: CMS `ctaHref` must be `/order/…` (leading slash); run `pnpm db:fix-audit-pricing` (PIT-084)
-- [ ] `*.vercel.app` must `Disallow: /` + noindex; production alias 308 → `https://erythro.ai` (PIT-085)
+- [ ] Contact intake: sanitize/Turnstile/honeypot before DB; no IMAP>CMS; no AV on text-only forms (PIT-082)
+- [ ] Audit HE How-copy: CMS MT needles (`???`, `??????`, `?????`, `??? ??`) must not override `auditPage.ts`; run `pnpm db:fix-audit-he-copy` (PIT-083)
+- [ ] Audit pricing `<Link>`: CMS `ctaHref` must be `/order/�` (leading slash); run `pnpm db:fix-audit-pricing` (PIT-084)
+- [ ] `*.vercel.app` must `Disallow: /` + noindex; production alias 308 > `https://erythro.ai` (PIT-085)
 
 - [ ] Migration file under `src/migrations/` + registered in `index.ts`
 - [ ] Fix script if prod/CI may lag (`pnpm db:fix-*`)
@@ -2484,16 +2615,16 @@ The full Pro run (10 funnel URLs, 3 locales, PSI, Gemini) then completes locally
 - [ ] Contact/API changes: guard tests + do not skip SMTP vs CMS split (PIT-020)
 - [ ] UI copy/CTA: update Playwright asserts; Next `<Link>` waits use `commit`; mobile Hero e2e waits splash+1s and uses `#contacts-mobile` (PIT-023)
 - [ ] Local e2e with `PAYLOAD_DISABLE_PUSH=1` (PIT-022)
-- [ ] Middleware imports: Edge-safe only — no Payload/CMS (PIT-024)
+- [ ] Middleware imports: Edge-safe only � no Payload/CMS (PIT-024)
 - [ ] Markdown/order int tests: static slug or skipIf no DB (PIT-025)
 - [ ] Unit CI without DATABASE_URL must not dial Payload (PIT-026, `vitest.setup.ts`)
 - [ ] Do not run local `next dev` against prod DATABASE_URL without `PAYLOAD_DISABLE_PUSH=1` (PIT-027)
-- [ ] If CI reports missing CMS columns that migrations already list — restore with `pnpm db:fix-*` (PIT-028)
+- [ ] If CI reports missing CMS columns that migrations already list � restore with `pnpm db:fix-*` (PIT-028)
 - [ ] Audit landing/order copy must match QA_Auditor report tiers (PIT-029)
 - [ ] Audit order/form intake must POST structured website / auditLanguage / planSlug (PIT-030)
-- [ ] No hardcoded API keys / `AIza…` in source; secrets only via env (PIT-039)
+- [ ] No hardcoded API keys / `AIza�` in source; secrets only via env (PIT-039)
 - [ ] n8n IMAP autoresponder: Hostinger Autoreply/Vacation must be Off (PIT-040)
-- [ ] Ads `/audit?utm_…`: middleware 307 → `audit-{en|ru|he}.erythro.ai` (PIT-120)
+- [ ] Ads `/audit?utm_�`: middleware 307 > `audit-{en|ru|he}.erythro.ai` (PIT-120)
 - [ ] Commercial email senders: atomic SQL claim before SMTP (PIT-123)
 - [ ] n8n IMAP autoresponder: skip DMARC/`dmarcreport@` / `rua`/`ruf` senders (PIT-122)
 - [ ] User-supplied website check: DNS + public IP only, never HTTP-fetch the URL (PIT-041)
@@ -2514,8 +2645,8 @@ The full Pro run (10 funnel URLs, 3 locales, PSI, Gemini) then completes locally
 - [ ] Local `next dev`: public CSP must allow `'unsafe-eval'` only in development so webpack client chunks hydrate (PIT-066)
 - [ ] React form submit: read `e.currentTarget` / honeypot before any `await` (PIT-067)
 - [ ] Funnel review: CTA-opened modal forms and chat/WhatsApp count as a lead path; disclose the method in the Pro block (PIT-068)
-- [ ] Form-mail “not arriving”: check Hostinger INBOX (not Unread); `team@` password is not `SMTP_PASS` (PIT-054)
-- [ ] Contact honeypot must not be named company/website/email — mobile autofill silent-drops leads (PIT-055)
+- [ ] Form-mail �not arriving�: check Hostinger INBOX (not Unread); `team@` password is not `SMTP_PASS` (PIT-054)
+- [ ] Contact honeypot must not be named company/website/email � mobile autofill silent-drops leads (PIT-055)
 - [ ] Shared frontend layout / not-found must not call `cookies()`; middleware must not Set-Cookie on HTML; use `force-static` + `getPayloadLocal` for ISR HIT; `/services/[slug]` metadata must not read cookies (PIT-056)
 - [ ] Hero LCP media: CSS `lg:block` poster in SSR HTML, not `useState(isLg)` gate (PIT-057)
 - [ ] Absolute CDN hero stills: preload + `<img>` direct URL, skip `/_next/image` when bytes unchanged (PIT-058)
@@ -2531,12 +2662,12 @@ The full Pro run (10 funnel URLs, 3 locales, PSI, Gemini) then completes locally
 - [ ] Favicon: ship `public/favicon.ico` (and apple-touch at root); auditor must unique URL+status, not raw onResponse count (PIT-075)
 - [ ] Audit PSI/TTFB: warmup origin and discard the first Google lab run so cold cache is not the client score (PIT-077)
 - [ ] Audit 4xx: ignore `/cdn-cgi/` and Cloudflare challenge-platform 401 (Turnstile), not site breakage (PIT-078)
-- [ ] Routes that set their own `openGraph` must include `images` (width/height 1200×630); LinkedIn ignores `twitter:image` (PIT-079)
+- [ ] Routes that set their own `openGraph` must include `images` (width/height 1200?630); LinkedIn ignores `twitter:image` (PIT-079)
 - [ ] Free-audit submit: confirmation popup like `/order`, no auto-opened waiting tab (PIT-080)
 - [ ] Form POST / website DNS / SMTP: timeouts + localized catch; waiting page must show network copy (PIT-081)
-- [ ] Contact intake: sanitize/Turnstile/honeypot before DB; no IMAP→CMS; no AV on text-only forms (PIT-082)
+- [ ] Contact intake: sanitize/Turnstile/honeypot before DB; no IMAP>CMS; no AV on text-only forms (PIT-082)
 - [ ] Audit HE: do not trust a code-only deploy to fix `audit-page` CMS Hebrew; sanitize + `db:fix-audit-he-copy` (PIT-083)
-- [ ] Audit pricing CTAs: no relative `order/…` in CMS; `normalizeCtaHref` + `db:fix-audit-pricing` (PIT-084)
+- [ ] Audit pricing CTAs: no relative `order/�` in CMS; `normalizeCtaHref` + `db:fix-audit-pricing` (PIT-084)
 - [ ] Do not leave `*.vercel.app` indexable; sitemap must not 5xx (static fallback + health cron) (PIT-085)
 - [ ] Migrations: `pg_advisory_xact_lock`, never `pg_advisory_lock` + `finally` unlock (PIT-086)
 - [ ] R2 media `clientUploads`: CORS on `erythro-media` **and** admin CSP `connect-src` includes `*.r2.cloudflarestorage.com` (PIT-087)
@@ -2549,20 +2680,20 @@ The full Pro run (10 funnel URLs, 3 locales, PSI, Gemini) then completes locally
 - [ ] Solutions/order i18n: canonical Smart Card names + `copyHygiene`; never hardcode `| Order |` or `Get a start` (PIT-091)
 - [ ] Order Lexical includes: merge per-locale rich text when `locale: 'all'` is an empty shell; keep static `includes` on solution plans (PIT-092)
 - [ ] Consult Sessions transcript: custom Field/Cell, not Payload JSON/Monaco (PIT-096)
-- [ ] Consultant: reply language from last user message; How we work card; do not start ТЗ on collaboration (PIT-097)
+- [ ] Consultant: reply language from last user message; How we work card; do not start �� on collaboration (PIT-097)
 - [ ] PayPlus: paid only after IPN amount + `submission:` id; success page is not proof; no unpaid fallback (PIT-099)
 - [ ] Audit reconcile: never queue `paymentStatus` pending/failed or amount>0 unless paid (PIT-114)
 - [ ] Grow: paid only after `getTransactionInfo` status `2` + amount + process token; success `response=success` is not proof; still call `approveTransaction` (PIT-100)
 - [ ] Payload / storage-plugin bump: compare the generated schema with prod columns for every collection; smoke `/api/media` on the preview; after a DB fix revalidate `site-content` (PIT-104)
 - [ ] Gemini 3.x: no `temperature` / `top_p` / `top_k` / `thinking_budget` on GenerateContent or `streamText` (PIT-106)
-- [ ] Audit report links: always `/audit/report/[id]?k=…`; never bare id (PIT-107)
+- [ ] Audit report links: always `/audit/report/[id]?k=�`; never bare id (PIT-107)
 - [ ] Supabase: `anon` must not SELECT Payload `public` tables; keep REST schemas empty (PIT-110)
-- [ ] After `vercel env pull`: `[SENSITIVE]` placeholders — fill from `.env` or Save in admin to revalidate (PIT-111)
-- [ ] Ads free-audit Final URL: `audit-en` / `audit-ru` / `audit-he`.erythro.ai, not `/audit` (PIT-112; not `audit-rus` — NXDOMAIN)
-- [ ] GA4 conversions on AJAX forms: always fire explicit `qualify_lead` / `close_convert_lead` / `purchase` (`send_to: G-…`) after synchronous consent + GA4 config init (`ensureAnalyticsConsentAndGaConfig`), not just `send_to: AW-…` (PIT-116)
+- [ ] After `vercel env pull`: `[SENSITIVE]` placeholders � fill from `.env` or Save in admin to revalidate (PIT-111)
+- [ ] Ads free-audit Final URL: `audit-en` / `audit-ru` / `audit-he`.erythro.ai, not `/audit` (PIT-112; not `audit-rus` � NXDOMAIN)
+- [ ] GA4 conversions on AJAX forms: always fire explicit `qualify_lead` / `close_convert_lead` / `purchase` (`send_to: G-�`) after synchronous consent + GA4 config init (`ensureAnalyticsConsentAndGaConfig`), not just `send_to: AW-�` (PIT-116)
 - [ ] Splash only on `/`; skip all inner routes + paid ad clicks (`fbclid` / `gclid` / `utm_*`) / `/audit` / `/order/*` via `useSearchParams` + pre-paint bootstrap (`shouldSkipSplashSurface`, PIT-117 / PIT-126) and auto-attribute `fb / paid` or `google / cpc`
-- [ ] Sitemap & canonicals: exclude `checkoutMode === 'contact'` (`audit-manual`) and placeholder portfolio slugs (`next-project`) from `sitemap.xml`, 308-redirect legacy aliases (`/order/ai-business-card` → `/order/ai-smart-card`, `/portfolio/Interior` → `/portfolio/pro-interior`), and restrict GA4/Ads/Meta beacons to `erythro.ai` / `*.erythro.ai` (`isProductionAnalyticsHost`, PIT-118)
-- [ ] Solution-plan slugs: trim on read/write; no trailing spaces or null slugs — else order ProjectNav wraps to Free Start (PIT-119)
+- [ ] Sitemap & canonicals: exclude `checkoutMode === 'contact'` (`audit-manual`) and placeholder portfolio slugs (`next-project`) from `sitemap.xml`, 308-redirect legacy aliases (`/order/ai-business-card` > `/order/ai-smart-card`, `/portfolio/Interior` > `/portfolio/pro-interior`), and restrict GA4/Ads/Meta beacons to `erythro.ai` / `*.erythro.ai` (`isProductionAnalyticsHost`, PIT-118)
+- [ ] Solution-plan slugs: trim on read/write; no trailing spaces or null slugs � else order ProjectNav wraps to Free Start (PIT-119)
 - [ ] Email images: PNG/JPG only, never SVG (Gmail/Outlook show broken image) (PIT-121)
 - [ ] Pro v2 report: change `apply-v2-polish.cjs`, never hand-edit one copy; re-run it + `render-v2-pdf.cjs` after any overwrite (PIT-127)
 - [ ] PDF print CSS: no `box-decoration-break: clone`, no fixed-height flex over page breaks; look at every PDF page (PIT-128)
@@ -2573,9 +2704,166 @@ The full Pro run (10 funnel URLs, 3 locales, PSI, Gemini) then completes locally
 - [ ] Flat R2 media keys: keep `media._objectkey` NULL; never set it to the filename or Payload afterRead builds `file.webp/file.webp` (PIT-133)
 - [ ] Audit report order CTAs: always `?lang=` matching report locale (PIT-134)
 - [ ] Detected technologies: only from `audit_data.detected_technologies`; never a hardcoded demo stack (PIT-135)
-- [ ] Audit report status blocks ("Путь к заявке", verdicts, badges) only from audit_data; new catalog titles must classify in `classifyActionPillar` (PIT-138)
+- [ ] Audit report status blocks ("���� � ������", verdicts, badges) only from audit_data; new catalog titles must classify in `classifyActionPillar` (PIT-138)
 - [ ] render-v2 reads only its own tier's Java HTML from this run; never fall back to another tier's file (PIT-139)
-- [ ] Lead check: a start form (URL field → sign-up) is `na` "not checked" in Free; Diagnostic/Pro submit it once with the site origin and judge the step that opens, never typing credentials (PIT-144)
+- [ ] Lead check: a start form (URL field > sign-up) is `na` "not checked" in Free; Diagnostic/Pro submit it once with the site origin and judge the step that opens, never typing credentials (PIT-144)
 - [ ] Start form next to other lead forms: Diagnostic/Pro still judge the step behind it and report both; a paid tier never reports less than a cheaper one (PIT-145)
 - [ ] Worker redeploy: ship LF files only (`git -c core.autocrlf=false archive`), never a CRLF worktree; after it, check one audit log for a render-v2 exit code (PIT-147)
 - [ ] Web text files through `textBody()` (BOM); Step 1 snippet only adds what the existing file lacks; a training-only robots block is not "AI does not see the site" (PIT-148)
+- [ ] Before the audit, check for a site-wide bot challenge (`detectBotChallenge`); on a challenge send the blocked page, never findings from the challenge page (PIT-149)
+- [ ] Paid audit: check lab access from the worker before payment; a blocked paid run waits (30 min re-checks, 72 h) and alerts the team, never sends the blocked page (PIT-150)
+- [ ] next/font build crash `reading '1'` = extensionless Google font URL; keep `patches/next@15.5.27.patch` until next 16.4.3+ (PIT-151)
+- [ ] Per-letter spans in RTL text: wrap Latin/digit runs in a direction:ltr box (appendGlyphs), or they read mirrored (PIT-152)
+- [ ] Home pin + lead-in: upstream `pinSpacing: false` end must cover next section's `160vh` lead-in + overlay (`+=260%`, PIT-154)
+- [ ] n8n Code fan-out: both targets on output[0]; after CLI import prefer publish:workflow + restart n8n for IMAP (PIT-156)
+- [ ] n8n Telegram: native Telegram node + telegramApi cred; Meta/Gemini via httpQueryAuth; verify workflow_published_version after restart (PIT-159)
+- [ ] Header / Audit submenu Href: per-locale localized: true links; never one shared href for EN/RU/HE destinations (PIT-161)
+- [ ] Watch pin/magnet: one-screen height + full --hold + anticipatePin; do not pin with bottom bottom for vh+4px (PIT-162)
+- [ ] Watch marquee: absolute `.marq-row` + sizer; never leave `width: max-content` in flow inside flex (PIT-163)
+- [ ] Top-3 and the plan follow the status the card shows (`top_candidates` + `sevIdx`); a finding takes its status from its checklist row (PIT-153)
+
+---
+
+## PIT-162 — Watch: next full-screen block covers content too early
+
+**Tags:** `watch`, `gsap`, `scrolltrigger`, `pin`, `magnet`, `hold`
+**Seen:** 2026-11-09 — ORA Watch site; Movement / Design / Parts
+
+**Symptom:** On scroll down a section “skips” a little, and the next block starts rising immediately, covering the bottom of the current copy.
+
+**Cause:** (1) `min-height: vh + 4px` made `offsetHeight > innerHeight`, so `usePinnedBlock` chose `start: 'bottom bottom'` and the block scrolled up before pinning. (2) A short marquee before `.grp.over` (`-1vh`) let the next group overlap the still-visible pinned section. (3) `--hold` at 0.6 screen was too short.
+
+**Fix:** Pin at `top top` unless height is meaningfully taller (`> innerHeight + 24`); `anticipatePin: 1`; fixed `height: vh + 4px` + `overflow: hidden` on pinned sections; post-pin buffer (`.rise.after`) at least one screen; `--hold` / `HOLD` = one full screen.
+
+**Prevent:** Never treat the intentional `+4px` anti-gap as “taller than the screen”. Every `.grp.over` needs ≥1vh of trailing content after the previous pin. Keep `--hold` in sync with `HOLD` in `lib/scroll.tsx`.
+
+**Project note:** `C:\\dev\\Watch\\docs\\PITFALLS.md`
+
+
+---
+
+## PIT-163 — Watch: marquee ORA60A widens the page
+
+**Tags:** `watch`, `marquee`, `overflow`, `mobile`, `static`, `flex`
+**Seen:** 2026-11-09 — ORA Watch `.rise.after` / `.marq`
+
+**Symptom:** Giant `ORA60A` letters stick past the right edge; horizontal page scroll on mobile/static.
+
+**Cause:** `.marq-row { width: max-content }` lived in normal flow. Flex/`min-width: auto` ancestors grew with it even with `overflow: hidden` on `.marq`.
+
+**Fix:** Invisible `.marq-sizer` for height; `.marq-row` `position: absolute`; `contain: inline-size paint` + `overflow-x: clip` on `.marq`, `.rise.after`, smooth wrapper/content/main. On `html.static`: one centered word, hide repeat spans.
+
+**Prevent:** Never put a `max-content` horizontal strip in document flow inside a flex page. Absolute-clip or `contain: inline-size` first.
+
+**Project note:** `C:\\dev\\Watch\\docs\\PITFALLS.md`
+
+---
+
+## PIT-165 — Watch: transparent blocks on Vercel (gitignore ate /video)
+
+**Tags:** `watch`, `vercel`, `gitignore`, `video`, `css`
+**Seen:** 2026-11-10 — ora60a-delta after font deploy; Movement/Design/Parts washed out
+
+**Symptom:** Content blocks look semi-transparent / see-through on production; fine locally.
+
+**Cause:** `.gitignore` had `Video/`. On Windows git is case-insensitive, so it also ignored `site/public/video/*.mp4`. Deploy had no background videos (404). Sections used `.has-vbg { background: transparent }` with a veil over the video — without a video the veil composites over the assembly stage behind.
+
+**Fix:** Ignore only `/Video/` at repo root. Keep opaque `background: var(--panel)` under `.has-vbg`. Commit the three loop mp4s (not `watch-assembly.mov`).
+
+**Prevent:** Never use an unanchored folder name that can collide with `public/` asset paths on case-insensitive OS. Smoke-check `/video/*.mp4` after deploy.
+
+**Project note:** `C:\\dev\\Watch\\docs\\PITFALLS.md`
+
+---
+
+## PIT-164 — Watch: Vercel `next/font` crash on Inter/Heebo (Google extensionless URLs)
+
+**Tags:** `watch`, `build`, `vercel`, `next`, `fonts`, `fontsource`
+**Seen:** 2026-11-10 — ora60a Vercel build commit `63cc836`, Next 15.5.29, cold cache
+**Related:** PIT-151 (same upstream bug; erythro.ai uses a pnpm patch on next)
+
+**Symptom:** `app/layout.tsx` → `An error occurred in next/font` → `TypeError: Cannot read properties of null (reading '1')` in `@next/font/dist/google/loader.js:122` while loading Inter (also affects Heebo).
+
+**Cause:** Google Fonts intermittently returns extensionless `/l/font?kit=…` URLs. Next 15.x webpack loader requires a `.woff2` suffix. Fixed upstream in Next ≥16.4.3; 15.5.29 (backport tag) still lacks it. Cold Vercel builds without `.next` font cache hit the flake often.
+
+**Fix (Watch):** Drop `next/font/google` for Inter/Heebo. Self-host via `@fontsource/inter` + `@fontsource/heebo` CSS imports (latin+cyrillic / latin+hebrew, weights 300–600). Set `--font-main: Inter` and `--font-he: Heebo` in `globals.css`. Keep True Arabic on `next/font/local`.
+
+**Prevent:** On Next 15 projects prefer self-hosted fonts or a next patch (PIT-151). Do not rely on redeploy luck. Upgrade path: Next ≥16.4.3 restores `next/font/google` safely. New client landings: start from [[product-scroll-landing]] (`erythroai-droid/templates`) — fontsource is baked in.
+
+**Project note:** `C:\\dev\\Watch\\docs\\PITFALLS.md`
+
+---
+
+## PIT-161 — Header nav Href was shared across locales
+
+
+**Tags:** `cms`, `header`, `localization`, `nav`, `audit-lp`
+**Seen:** 2026-11-09 — Audit submenu (technical / commercial) could not keep per-language links
+
+**Symptom:** In Payload admin, editing Href under RU or HE still showed / saved the same URL as EN. Submenu Audit links duplicated the first locale’s target.
+
+**Cause:** `header.navItems.href` and `navItems.children.href` were non-localized `text` fields (stored once on the parent row), while labels were already localized.
+
+**Fix:** Mark both Href fields `localized: true`; migrate columns into `header_nav_items_locales` / `header_nav_items_children_locales`; frontend reads `{en,ru,he}` and picks the current locale. Migration: `20261109_180000_header_nav_href_localized`.
+
+**Prevent:** Any nav/CTA URL that must differ by language needs `locText` / `localized: true` from day one — do not reuse a single shared `href` string for multilingual destinations.
+
+---
+
+## PIT-160 — Leak calculator: failed view returned before hooks
+
+**Tags:** `leak-lp`, `react`, `hooks`, `error-state`
+**Seen:** 2026-11-09 — found by reading `AuditCalcFlow.tsx`; not reproduced live
+
+**Symptom:** When an audit fails while the page is open, React should throw "Rendered fewer hooks than expected" instead of showing the "could not finish the audit" screen.
+
+**Cause:** `if (stage.name === 'failed') return …` sat above `useRef` and `useEffect` for the `--calc-top` header height, so the failed render called fewer hooks than the renders before it.
+
+**Fix:** Move the early return below every hook in the component.
+
+---
+
+## PIT-159 — n8n 2.45 publish + Telegram token in HTTP URL
+
+**Tags:** 
+8n, credentials, 	elegram, publish, sqlite
+**Seen:** 2026-11-08 — Stage 2 migrate Meta/Gemini/Telegram off plaintext workflow JSON
+
+**Symptom:** After import:workflow + publish:workflow, Marketing Digest 404s on Telegram ({"ok":false,"error_code":404}). ctiveVersionId / workflow_published_version can diverge; CLI publish while the container is running often needs restart. SQLite copies without -wal hide new executions.
+
+**Cause:** (1) Bot token in an HTTP Request URL via $env.TELEGRAM_BOT_TOKEN or $credentials.telegramApi.accessToken often resolves empty → Telegram 404, even when getMe with process.env works. (2) n8n 2.45 publication uses workflow_published_version + outbox. (3) Meta/Gemini httpQueryAuth on HTTP Request works.
+
+**Fix:** Meta/Gemini → Generic Credential Type → Query Auth (ccess_token / key). Telegram → **native** 
+8n-nodes-base.telegram + 	elegramApi credential. After import: publish:workflow --id=… --versionId=…, then docker compose restart n8n. Verify workflow_published_version matches ctiveVersionId. Read executions via sqlite backup including WAL.
+
+**Prevent:** Do not put Telegram bot tokens in HTTP URLs/expressions. Do not trust CLI publish without checking workflow_published_version after restart. Copy database.sqlite + -wal/-shm when debugging executions. After publish+restart, webhook smoke can 404 for a few seconds — retry before declaring failure. IF v1→v2.x needs condition schema migration (legacy string/boolean arrays → filter conditions+combinator); do not only bump typeVersion.
+
+---
+
+## PIT-157 — Leak calculator LP stuck on the form: hidden scroll range in `overflow-hidden` main
+
+**Tags:** `leak-lp`, `mobile`, `facebook`, `in-app-browser`, `overflow`, `scroll`
+**Seen:** 2026-11-08 — leak-* LP opened from a Facebook ad on mobile: the page starts at the form fields; everything above is gone and cannot be scrolled back
+
+**Symptom:** Header stays, but the hero, step tracker and form heading are cut off. Swiping up does nothing.
+
+**Cause:** Decorative `.calc-loss-a` ends at 145% of the panel (`top: 55%` + `height: 90%`). It overflowed `<main class="overflow-hidden">`, giving main 630px of scroll range at 375px width (`scrollHeight` 2031 vs `clientHeight` 1401). `overflow: hidden` blocks user scrolling but not browser-initiated scrolling, so any scroll to the form moved main to its maximum and the user had no gesture to undo it. `window.scrollTo(0, 0)` does not reset it either.
+
+**Fix:** Clip the blobs on their own `aria-hidden` layer (`overflow-hidden`) and make the panel `overflow-clip`, which is not a scroll container. Applied to `AuditCalcFlow` main and both blob sections in `CalcReport`.
+
+**Prevent:** A panel with oversized decorative children and focusable content must not rely on `overflow-hidden` on the content's ancestor. Clip decoration on its own layer; use `overflow-clip` on the panel. Check `scrollHeight === clientHeight` on the panel.
+
+---
+
+## PIT-158 — Leak calculator: on-screen report and emailed report show different losses
+
+**Tags:** `leak-lp`, `calculator`, `report`, `state`
+**Seen:** 2026-11-08 — report 264 (erythro.ai): saved revenue ₪18,000, email showed ₪1,000 per month, the screen right after the check showed ₪56,000 (the result for ₪1,000,000, the slider maximum)
+
+**Symptom:** One report, two loss amounts.
+
+**Cause:** The email link takes revenue from the saved submission; step 4 used the live client `revenue` state. The slider is not disabled while the form checks the site and posts, so the two can diverge after the click. How the slider moved in report 264 was not confirmed.
+
+**Fix:** `AuditLpForm` returns the values it sent through `onSubmitted`; `AuditCalcFlow` sets `revenue` and `clients` from them.
+
+**Prevent:** A report must be computed from the persisted input, never from a control that can still change after submit.
