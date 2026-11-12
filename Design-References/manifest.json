@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "updatedAt": "2026-11-12T11:16:21.314Z",
+  "updatedAt": "2026-11-12T11:23:00.000Z",
   "totalReferences": 3,
   "references": [
     {
@@ -66,29 +66,41 @@
       "createdAt": "2026-11-12T10:51:31.964Z"
     },
     {
-      "id": "jeskojets-com",
-      "slug": "jeskojets-com",
+      "id": "jeskojets",
+      "slug": "jeskojets",
       "title": "Jesko Jets",
       "url": "https://jeskojets.com/",
       "type": "website",
       "tags": [
-        "light-mode",
-        "bento",
-        "grid",
-        "tight-typography",
+        "luxury",
+        "aviation",
+        "private-jets",
+        "editorial",
+        "extended-grotesque",
+        "split-typography",
+        "champagne-cream",
+        "espresso-dark",
+        "lenis",
+        "gsap",
+        "telemetry-clock",
+        "scrollytelling",
+        "3d-globe",
         "landing"
       ],
       "stack": [
-        "nextjs",
-        "tailwind",
-        "framer-motion",
-        "lucide-react"
+        "webflow",
+        "gsap",
+        "scrolltrigger",
+        "lenis",
+        "splittext",
+        "slater",
+        "threejs-globe"
       ],
-      "mood": "Чистый светлый хай-тек, воздух, легкие полупрозрачные границы",
-      "summary": "Our aircraft are among the first to deliver clients to the most iconic international events. Among DS Jets’ clients are some of the world’s leading companies in the nuclear industry, as well as in the oil and banking sectors.",
-      "previewImage": "jeskojets-com-desktop.jpg",
-      "mobilePreviewImage": "jeskojets-com-mobile.jpg",
-      "noteFile": "References/jeskojets-com.md",
+      "mood": "Private aviation quiet luxury, Swiss extended typography, warm champagne & deep roasted espresso",
+      "summary": "Jesko Jets — Private jet charter & luxury aviation concierge in Dubai. GT America Extended, champagne & espresso palette, live hub telemetry clock, and Lenis/GSAP scrollytelling.",
+      "previewImage": "jeskojets-desktop.jpg",
+      "mobilePreviewImage": "jeskojets-mobile.jpg",
+      "noteFile": "References/jeskojets.md",
       "createdAt": "2026-11-12T11:16:21.313Z"
     }
   ]

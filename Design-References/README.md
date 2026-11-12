@@ -14,7 +14,7 @@
 | :--- | :--- | :--- | :--- |
 | [[example-minimal-clean|Example Minimal Clean]] | `#dark-mode` `#landing` `#minimal` `#clean` `#light-mode` `#typography` | Премиальный темный минимализм, строгий контраст, неоновые микро-акценты | [Link](https://example.com) |
 | [[pear-no|Pear NO]] | `#dark-mode` `#bento` `#grid` `#rounded` `#soft-shadows` `#tight-typography` `#landing` `#minimal` `#editorial` `#typography` `#webgl` `#agency` `#scrollytelling` `#revenue-share` | Editorial neoclassical minimalism, high-craft typography and scrollytelling | [Link](https://pear.no/) |
-| [[jeskojets-com|Jesko Jets]] | `#light-mode` `#bento` `#grid` `#tight-typography` `#landing` | Чистый светлый хай-тек, воздух, легкие полупрозрачные границы | [Link](https://jeskojets.com/) |
+| [[jeskojets|Jesko Jets]] | `#luxury` `#aviation` `#private-jets` `#editorial` `#extended-grotesque` `#split-typography` `#champagne-cream` `#espresso-dark` `#lenis` `#gsap` `#telemetry-clock` `#scrollytelling` `#3d-globe` | Private aviation quiet luxury, Swiss extended typography, warm champagne & deep roasted espresso | [Link](https://jeskojets.com/) |
 
 ---
 
