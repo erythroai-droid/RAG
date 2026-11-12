@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
-  "updatedAt": "2026-11-12T11:39:00.000Z",
-  "totalReferences": 3,
+  "updatedAt": "2026-11-12T23:32:51.761Z",
+  "totalReferences": 4,
   "references": [
     {
       "id": "example-minimal-clean",
@@ -102,6 +102,44 @@
       "mobilePreviewImage": "Assets/jeskojets/mobile.jpg",
       "noteFile": "References/jeskojets.md",
       "createdAt": "2026-11-12T11:16:21.313Z"
+    },
+    {
+      "id": "mustang-6663rt",
+      "slug": "mustang-6663rt",
+      "title": "Mustang 6663 RT",
+      "url": "https://mustang-ashy.vercel.app/",
+      "type": "website",
+      "tags": [
+        "dark-mode",
+        "bento",
+        "grid",
+        "rounded",
+        "soft-shadows",
+        "landing",
+        "automotive",
+        "dark-brutalist",
+        "scroll-driven",
+        "gsap",
+        "frames",
+        "luxury",
+        "specs",
+        "canvas",
+        "nextjs15"
+      ],
+      "stack": [
+        "nextjs15",
+        "react19",
+        "gsap",
+        "scrolltrigger",
+        "typescript",
+        "tailwind-css"
+      ],
+      "mood": "Dark brutalist luxury automotive landing with scroll-scrubbed canvas sheet lift, telemetric cards, dynamic finish re-grading, and AI consultant",
+      "summary": "MUSTANG 6663 RT: a hand-built matte black fastback with gold-leaf stripes. Sixty-six cars, then the tooling burns.",
+      "previewImage": "Assets/mustang-6663rt/desktop.jpg",
+      "mobilePreviewImage": "Assets/mustang-6663rt/mobile.jpg",
+      "noteFile": "References/mustang-6663rt.md",
+      "createdAt": "2026-11-12T23:32:51.657Z"
     }
   ]
 }

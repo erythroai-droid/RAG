@@ -2721,6 +2721,22 @@ The full Pro run (10 funnel URLs, 3 locales, PSI, Gemini) then completes locally
 - [ ] Watch pin/magnet: one-screen height + full --hold + anticipatePin; do not pin with bottom bottom for vh+4px (PIT-162)
 - [ ] Watch marquee: absolute `.marq-row` + sizer; never leave `width: max-content` in flow inside flex (PIT-163)
 - [ ] Top-3 and the plan follow the status the card shows (`top_candidates` + `sevIdx`); a finding takes its status from its checklist row (PIT-153)
+- [ ] New Payload field: migrate first, then bump the `unstable_cache` key, then open the page — otherwise the seed fallback gets cached (PIT-166)
+
+---
+
+## PIT-166 — New CMS field before migration: page cached the seed fallback
+
+**Tags:** `payload`, `migrations`, `unstable_cache`, `portfolio`, `dev`
+**Seen:** 2026-11-12 — erythro.ai `/portfolio/ora-60a` → 404 locally right after adding `highlights` to Portfolio Projects and running the migration
+
+**Symptom:** After the migration succeeded and the data was in Postgres, the project page still returned 404 ("Project not found").
+
+**Cause:** The page was hit while the collection already had the new field but the tables did not exist yet (`PAYLOAD_DISABLE_PUSH=1`). `payload.find` failed, `fetchPortfolioProjects` returned the static `PORTFOLIO_PROJECTS` (no `ora-60a`), and `unstable_cache` (`revalidate: false`) stored that fallback under the new key.
+
+**Fix:** Bump the `getCachedPortfolioProjects` cache key again after the migration (or revalidate `SITE_CONTENT_TAG`).
+
+**Prevent:** Apply the migration first, then bump the cache key, then open the page. On prod the build runs `payload migrate` before `next build`, so this is a local-only trap.
 
 ---
 
