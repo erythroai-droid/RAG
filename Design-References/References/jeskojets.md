@@ -7,8 +7,8 @@ date: 2026-11-12
 tags: ["luxury", "aviation", "private-jets", "editorial", "extended-grotesque", "split-typography", "champagne-cream", "espresso-dark", "lenis", "gsap", "telemetry-clock", "scrollytelling", "3d-globe", "landing"]
 stack: ["webflow", "gsap", "scrolltrigger", "lenis", "splittext", "slater", "threejs-globe"]
 mood: "Private aviation quiet luxury, Swiss extended typography, warm champagne & deep roasted espresso"
-preview: "Assets/jeskojets-desktop.jpg"
-mobilePreview: "Assets/jeskojets-mobile.jpg"
+preview: "Assets/jeskojets/desktop.jpg"
+mobilePreview: "Assets/jeskojets/mobile.jpg"
 ---
 
 # ✈️ Референс: Jesko Jets
@@ -25,27 +25,27 @@ mobilePreview: "Assets/jeskojets-mobile.jpg"
 
 #### 01. Hero & Вводный экран («We are movement · We are distinction»)
 Симметрично-асимметричная типографика, иллюминатор бизнес-джета со шторкой-прелоадером и деликатный призыв к скроллу.
-![[jeskojets-01-hero.jpg]]
+![[Assets/jeskojets/01-hero.jpg]]
 
 #### 02. Виджет телеметрии и Живое время (Live Dubai Telemetry)
 Минималистичная статусная плашка: поддерживаемые страны (174), база операций (Dubai, UAE) и живые цифровые часы по местному времени хаба.
-![[jeskojets-02-stats-time.jpg]]
+![[Assets/jeskojets/02-stats-time.jpg]]
 
 #### 03. Интерактивный аккордеон преимуществ (Benefits & Services)
 Кастомный аккордеон с параллаксом и зумом фотографий (Pets on board, 24/7 Availability, Onboard Services, Efficiency).
-![[jeskojets-03-benefits-services.jpg]]
+![[Assets/jeskojets/03-benefits-services.jpg]]
 
 #### 04. 3D Интерактивный глобус и маршрутная сеть («Fly anywhere»)
 Картографический модуль планирования трансконтинентальных полетов с динамической отрисовкой ортодромий (дуг полета).
-![[jeskojets-04-globe-destinations.jpg]]
+![[Assets/jeskojets/04-globe-destinations.jpg]]
 
 #### 05. Флот джетов (Fleet Showcase)
 Каталог воздушных судов: сверхдальние (Ultra Long Range), тяжелые и среднемагистральные джеты с тактико-техническими характеристиками.
-![[jeskojets-05-fleet-showcase.jpg]]
+![[Assets/jeskojets/05-fleet-showcase.jpg]]
 
 #### 06. Консьерж-форма и Футер (Bespoke Inquiry & Footer)
 Премиальная минималистичная форма бронирования с тонкими волосяными разделителями и контрастной типографикой.
-![[jeskojets-06-inquiry-footer.jpg]]
+![[Assets/jeskojets/06-inquiry-footer.jpg]]
 
 ---
 
@@ -53,11 +53,11 @@ mobilePreview: "Assets/jeskojets-mobile.jpg"
 
 | 01. Hero | 02. Stats & Time | 03. Benefits |
 | :---: | :---: | :---: |
-| ![[jeskojets-mobile-01-hero.jpg]] | ![[jeskojets-mobile-02-stats.jpg]] | ![[jeskojets-mobile-03-benefits.jpg]] |
+| ![[Assets/jeskojets/mobile-01-hero.jpg]] | ![[Assets/jeskojets/mobile-02-stats.jpg]] | ![[Assets/jeskojets/mobile-03-benefits.jpg]] |
 
 | 04. Globe & Destinations | 05. Fleet & Footer | Полный экран |
 | :---: | :---: | :---: |
-| ![[jeskojets-mobile-04-globe.jpg]] | ![[jeskojets-mobile-05-footer.jpg]] | ![[jeskojets-mobile.jpg]] |
+| ![[Assets/jeskojets/mobile-04-globe.jpg]] | ![[Assets/jeskojets/mobile-05-footer.jpg]] | ![[Assets/jeskojets/mobile.jpg]] |
 
 ---
 

@@ -7,8 +7,8 @@ date: 2026-11-12
 tags: ["dark-mode", "landing", "minimal", "clean", "light-mode", "typography"]
 stack: ["nextjs", "tailwind", "framer-motion", "lucide-react"]
 mood: "Премиальный темный минимализм, строгий контраст, неоновые микро-акценты"
-preview: "Assets/example-minimal-clean-desktop.jpg"
-mobilePreview: "Assets/example-minimal-clean-mobile.jpg"
+preview: "Assets/example-minimal-clean/desktop.jpg"
+mobilePreview: "Assets/example-minimal-clean/mobile.jpg"
 ---
 
 # 🎨 Референс: Example Minimal Clean
@@ -21,10 +21,10 @@ mobilePreview: "Assets/example-minimal-clean-mobile.jpg"
 
 ## 📸 1. Визуальный слой (Visual Preview)
 
-![[example-minimal-clean-desktop.jpg]]
+![[Assets/example-minimal-clean/desktop.jpg]]
 
 > **Мобильная версия:**
-> ![[example-minimal-clean-mobile.jpg]]
+> ![[Assets/example-minimal-clean/mobile.jpg]]
 
 ---
 

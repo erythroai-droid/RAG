@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "updatedAt": "2026-11-12T11:23:00.000Z",
+  "updatedAt": "2026-11-12T11:39:00.000Z",
   "totalReferences": 3,
   "references": [
     {
@@ -25,8 +25,8 @@
       ],
       "mood": "Премиальный темный минимализм, строгий контраст, неоновые микро-акценты",
       "summary": "Референс интерфейса Example Minimal Clean с разобранными токенами, сеткой и эталонной версткой.",
-      "previewImage": "example-minimal-clean-desktop.jpg",
-      "mobilePreviewImage": "example-minimal-clean-mobile.jpg",
+      "previewImage": "Assets/example-minimal-clean/desktop.jpg",
+      "mobilePreviewImage": "Assets/example-minimal-clean/mobile.jpg",
       "noteFile": "References/example-minimal-clean.md",
       "createdAt": "2026-11-12T10:40:23.533Z"
     },
@@ -60,8 +60,8 @@
       ],
       "mood": "Editorial neoclassical minimalism, high-craft typography and scrollytelling",
       "summary": "Pear makes you appear. Data-driven SEO, tailored software and revenue-share partnerships. Grow your traffic and outrun your competitors.",
-      "previewImage": "pear-no-desktop.jpg",
-      "mobilePreviewImage": "pear-no-mobile.jpg",
+      "previewImage": "Assets/pear-no/desktop.jpg",
+      "mobilePreviewImage": "Assets/pear-no/mobile.jpg",
       "noteFile": "References/pear-no.md",
       "createdAt": "2026-11-12T10:51:31.964Z"
     },
@@ -98,8 +98,8 @@
       ],
       "mood": "Private aviation quiet luxury, Swiss extended typography, warm champagne & deep roasted espresso",
       "summary": "Jesko Jets — Private jet charter & luxury aviation concierge in Dubai. GT America Extended, champagne & espresso palette, live hub telemetry clock, and Lenis/GSAP scrollytelling.",
-      "previewImage": "jeskojets-desktop.jpg",
-      "mobilePreviewImage": "jeskojets-mobile.jpg",
+      "previewImage": "Assets/jeskojets/desktop.jpg",
+      "mobilePreviewImage": "Assets/jeskojets/mobile.jpg",
       "noteFile": "References/jeskojets.md",
       "createdAt": "2026-11-12T11:16:21.313Z"
     }
