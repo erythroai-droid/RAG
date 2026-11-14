@@ -162,6 +162,7 @@ graph TD
 - **[[spring-oauth2-auth-skill|spring-oauth2-auth-skill.md]]** вЂ” РџРѕС€Р°РіРѕРІР°СЏ РёРЅСЃС‚СЂСѓРєС†РёСЏ РїРѕ РЅР°СЃС‚СЂРѕР№РєРµ Spring Boot СЃ Google Рё X (Twitter) OAuth2 PKCE.
 - **[[transactional-email-skill|transactional-email-skill.md]]** вЂ” Р РµРіР»Р°РјРµРЅС‚ РІРµСЂСЃС‚РєРё С‚СЂР°РЅР·Р°РєС†РёРѕРЅРЅС‹С… РїРёСЃРµРј СЃ РіР°СЂР°РЅС‚РёСЂРѕРІР°РЅРЅРѕР№ РїРѕРґРґРµСЂР¶РєРѕР№ РєР°СЂС‚РёРЅРѕРє С‡РµСЂРµР· CID (JavaMailSender / Nodemailer).
 - **[[seo-analytics-agent-skill|seo-analytics-agent-skill.md]]** вЂ” РђРІС‚РѕРЅРѕРјРЅС‹Р№ Java SEO Analytics Agent: SerpApi, 24h РєСЌС€ (Redis+Caffeine), СЃС‚СЂРѕРіР°СЏ Р»РѕРєР°Р»РёР·Р°С†РёСЏ (RU/EN/HE), РїСЂРµРґРѕР±СЂР°Р±РѕС‚РєР° РґР°РЅРЅС‹С… РґР»СЏ LLM (-85% С‚РѕРєРµРЅРѕРІ), Gemini 3.6 Flash.
+- **[[demo-notice-whatsapp|demo-notice-whatsapp.md]]** — Обязательное правило для демо-сайтов: карточка «Спасибо за просмотр → WhatsApp», пульсирующая кнопка, события в Vercel Web Analytics (`demo_whatsapp_click` и др.), `NEXT_PUBLIC_DEMO_NOTICE=0` для сданных сайтов.
 - **[[obsidian-git-sync-rule|obsidian-git-sync-rule.md]]** вЂ” РћР±СЏР·Р°С‚РµР»СЊРЅРѕРµ РїСЂР°РІРёР»Рѕ Рё РїСЂРѕС‚РѕРєРѕР» СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё Р±Р°Р·С‹ Р·РЅР°РЅРёР№ СЃ GitHub СЂРµРїРѕР·РёС‚РѕСЂРёРµРј РїСЂРё Р»СЋР±С‹С… РёР·РјРµРЅРµРЅРёСЏС… (Agent rules + Obsidian Git plugin).
 
 ### [[04-Templates/portfolio-case-template|рџ“Ѓ 04-Templates (РЁР°Р±Р»РѕРЅС‹ Р°СЂС‚РµС„Р°РєС‚РѕРІ)]]

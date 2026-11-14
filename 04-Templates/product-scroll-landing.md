@@ -32,7 +32,12 @@ npm run i18n
 | Шрифты | `@fontsource/inter` + `@fontsource/heebo` + local Arabic — **без** `next/font/google` |
 | Видео-секции | opaque `--panel` под `.has-vbg` |
 | Agent | `robots.txt`, `llms.txt`, `sitemap.ts`, Speed Insights |
+| Демо-уведомление | `lib/demo.ts` + `DemoNotice.tsx` + `@vercel/analytics` — обязательно, см. [[demo-notice-whatsapp]] |
 | Медиа в git | только stub webp (3–5 кадров × 3 ширины); mp4 не коммитим |
+
+## Демо-уведомление (обязательно для демо)
+
+Каждый демо-сайт получает карточку «Спасибо за просмотр → WhatsApp», которая сворачивается в пульсирующую кнопку, и статистику кликов в Vercel Web Analytics. Полное правило и чеклист: [[demo-notice-whatsapp]]. Пока код живёт только в Watch (`C:devWatchsite`) — копировать оттуда; в `templates.git` ещё не перенесён.
 
 ## Деплой
 
@@ -40,6 +45,7 @@ npm run i18n
 2. Vercel → Next.js → Production Branch `main`.
 3. Cloudflare CNAME `<slug>` → `*.vercel-dns-*.com`, DNS only.
 4. Smoke: `/`, `/robots.txt`, `/llms.txt`, `/sitemap.xml`, Speed Insights.
+5. Vercel → Analytics → **Enable Web Analytics** (события демо-уведомления). Для сданного клиенту сайта: `NEXT_PUBLIC_DEMO_NOTICE=0`.
 
 ## Pitfalls (коротко)
 
