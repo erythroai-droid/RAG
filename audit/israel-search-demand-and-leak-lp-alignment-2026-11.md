@@ -52,7 +52,7 @@ related:
 2. **Семантический `<h1 className="sr-only">`:** в прод-сборке тег `<h1>` оказывался пустым при видимом заголовке `<h2>`.
 3. **Перекрытие UI кнопкой WhatsApp:** плавающая кнопка `54×54` перекрывала правый/нижний край на мобильных (`bottom-[66px]`) и нижнюю карточку на десктопе (`bottom-[82px]`).
 
-### Внесённые изменения (`C:\dev\erythro-ai`, ветка `revert/calc-lp-step2-mobile`, коммиты `3bc1f21..e690f86` запушены в `origin`)
+### Внесённые изменения (`C:\dev\erythro-ai`, ветка `revert/calc-lp-step2-mobile`, коммиты `3bc1f21..724acbb` запушены в `origin`)
 - **`src/lib/auditCalcCopy.ts`**:
   - Обновлены `metaTitle` (без дублирования `| Erythro.ai`, который добавляется в `page.tsx`), `heroKicker`, `heroL1`/`heroL2`/`heroL3`, `heroSubForm*`, `step1Heading`, `step1Sub`, `nextStepCalc`, `mobile.*` под оффер **AI Website Audit (CRO & GEO Visibility) + Revenue Leak** для всех трёх локалей (`EN` / `HE` / `RU`).
   - Убрана узкая привязка к e-commerce: `checkout flow` → `lead forms (CRO)`, `תהליך ההזמנה` → `טפסי לידים (CRO)`.
@@ -66,6 +66,7 @@ related:
   - Видимый заголовок первого экрана (шаги 1–3) переведён с `<h2>` на `<h1>`; для состояния `failed` оставлен `<h1 className="sr-only">` (на `ready` дублирующий `sr-only` `<h1>` убран, т.к. в `LossHero` есть собственный `<h1>`).
   - Трекер шагов 1–3 (`Step 1 of 4 — 25%`) над карточкой формы скрыт и на десктопе (`sm+`), как на мобильных, чтобы не пугать холодный трафик видом 4-шаговой анкеты.
   - Переключатель языков `EN / RU / HE` в `<header>` оставлен только на шаге 1 (`currentStep === 1`), чтобы переключение языка на шагах 2–4 не сбрасывало состояние на шаг 1.
+  - Под формой на шаге 1 добавлена ссылка на пример HTML-отчёта (`auditSampleReportHref('audit-free', locale)` → `/samples/audit/free-{en,ru,he}.html`), как на `audit-*`.
 - **`src/components/audit/CalcReport.tsx`**:
   - Аккордеон `Technical Details & Audit Protocol` на шаге 4 открыт по умолчанию (`useState(true)` — сворачивается только по клику), чтобы сразу отображались все 5 шкал диагностики (включая `SEO & Visibility` и `AI Visibility`), таблица CWV и ссылка `Open Free report`.
 - **`src/components/audit/AuditCalcClient.tsx`**:
