@@ -62,6 +62,14 @@ DNS: Cloudflare CNAME → `cname.vercel-dns.com` (Proxied). Vercel Project → D
 
 Отдельный UI (`AuditLpClient`): бренд, короткий hero, 3 карточки, 3 шага, cookie banner, ссылки privacy/terms на `erythro.ai`. Без полного Navbar, FAQ, табов pricing, splash.
 
+Для **`leak-{en,ru,he}.erythro.ai`** (`AuditCalcClient` + `AuditCalcFlow` + `auditCalcCopy.ts`):
+- Оффер сфокусирован на связке **AI Website Audit (CRO & GEO Visibility) + Revenue Leak Calculator** (`checkout flow` заменён на `lead forms (CRO)` / `טפסי לידים (CRO)`).
+- Первый экран (шаги 1–3) рендерит видимый `<h1>`, а на шаге 4 и в `failed` — единый `<h1 className="sr-only">`.
+- Поддерживается динамический **UTM Message Match** (по `utm_content` с ID Ad Group или `utm_term`/`keyword`):
+  - `ai_geo` (`197400968130` / `204838307449` или `ai|geo|aeo|chatgpt|perplexity|claude|llm|סוכני|בינה`)
+  - `cro` (`205134464874` / `202376409095` или `cro|conversion|lead|funnel|המרה|המרות|לידים|נשירת`)
+  - `default` (универсальный AI Website Audit + Revenue Leak).
+
 | Product | Форма | API |
 |---------|--------|-----|
 | Free | `AuditLpForm` (email + website) | `POST /api/contact` + `trackFreeAuditLead` |

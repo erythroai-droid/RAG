@@ -1380,8 +1380,9 @@ Do not put a raw URL or hash into a fixed summary card. Clip the card even when 
 - Business Automation: dedicated 1200?630 offer JPEG at `https://pub-bca1ac764c56451890e973c90029a977.r2.dev/og/Business-Automation-4.jpg` (source in `public/images/og/business-automation.jpg`). Helper: `src/lib/ogImages.ts`.
 - After deploy, refresh LinkedIn cache via [Post Inspector](https://www.linkedin.com/post-inspector/). LinkedInBot currently gets `200` HTML from `erythro.ai` (not a Bot Fight challenge).
 - **Repeat 2026-11-07:** calc LP `/lp/audit/calc/[locale]` (`leak-{en,ru,he}.erythro.ai`) had the same gap: `openGraph` and `twitter` without `images`. Fix: `ogImageForLeakCalc(locale)` with per-locale 1200x630 cards `public/images/og/leak-calc-{en,ru,he}.jpg`.
+- **Repeat 2026-11-15:** `/portfolio` (and about/contacts/legal) set `openGraph` without `images`. WhatsApp/Telegram scraped the first project card (La Scala) instead of the brand logo. Fix: `defaultShareImages()` → `DEFAULT_OG_IMAGE` (logo on red) on all main pages; dedicated assets only on subpages (portfolio projects, LPs, consultants) when provided.
 
-**Prevent:** If a page sets `openGraph: { title, description, url }`, also set `images: [{ url, width: 1200, height: 630 }]`. Do not rely on the layout OG image leaking through. Prefer a public R2 JPEG (absolute URL) so the crawler does not have to fetch the image through the site�s Cloudflare zone.
+**Prevent:** If a page sets `openGraph: { title, description, url }`, also set `images: [{ url, width: 1200, height: 630 }]`. Do not rely on the layout OG image leaking through. Prefer a public R2 JPEG (absolute URL) so the crawler does not have to fetch the image through the site�s Cloudflare zone. Main pages → \defaultShareImages()\ / \DEFAULT_OG_IMAGE\; do not let listing pages inherit the first card image from the HTML body.
 
 ## PIT-080 � Free audit opens a blank tab before the waiting page
 
@@ -2722,6 +2723,22 @@ The full Pro run (10 funnel URLs, 3 locales, PSI, Gemini) then completes locally
 - [ ] Watch marquee: absolute `.marq-row` + sizer; never leave `width: max-content` in flow inside flex (PIT-163)
 - [ ] Top-3 and the plan follow the status the card shows (`top_candidates` + `sevIdx`); a finding takes its status from its checklist row (PIT-153)
 - [ ] New Payload field: migrate first, then bump the `unstable_cache` key, then open the page — otherwise the seed fallback gets cached (PIT-166)
+- [ ] Lexical `<RichText>` with Media uploads: use `richTextConverters` so video is `<video>`, not a filename link (PIT-167)
+
+---
+
+## PIT-167 — Lexical rich text: video upload renders as a filename link
+
+**Tags:** `portfolio`, `richtext`, `lexical`, `video`, `payload`
+**Seen:** 2026-11-14 — Portfolio project body: images inserted into paragraph rich text show; video inserts do not play / look missing.
+
+**Symptom:** In CMS you can attach a Media video inside a body paragraph (or subtitle/summary). On `/portfolio/[slug]` the video does not appear as a player (Payload default turns non-images into `<a>filename</a>`). Gallery `body[].images` always used `next/image`, so a video URL there also failed.
+
+**Cause:** `@payloadcms/richtext-lexical` `UploadJSXConverter` only emits `<img>` / `<picture>` for `mimeType` starting with `image`; everything else is a download link. No custom `converters` were passed to `<RichText>`.
+
+**Fix:** Shared `richTextConverters` (`src/lib/richTextConverters.tsx`) — video → `<video controls playsInline>` with `mediaDocUrl` (PIT-003). Wire `converters={richTextConverters}` on portfolio `RichText`. Gallery rows detect video by URL extension.
+
+**Prevent:** Any frontend `<RichText>` that may contain Media uploads must override the upload converter (or reuse `richTextConverters`). Do not assume Payload's default JSX converter plays video.
 
 ---
 

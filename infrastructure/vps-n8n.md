@@ -15,7 +15,7 @@
 
 | Service | URL | Notes |
 |---|---|---|
-| n8n | `https://n8n.erythro.ai` | Image pinned `2.45.5`; DNS A (DNS only) → VPS |
+| n8n | `https://n8n.erythro.ai` | Image pinned `2.47.6`; DNS A (DNS only) → VPS |
 | Audit worker | `https://agent-api.erythro.ai` | `GET /health`, `POST /api/run-audit` |
 
 Until DNS exists, hit via IP + Host header for smoke tests.
@@ -37,7 +37,7 @@ Deploy from repo: `py -3 scripts/deploy_vps_audit_stack.py` (needs `VPS_PASSWORD
 
 **Новые контейнеры:** не публиковать порты на `0.0.0.0` — см. [`vps-docker-ports.md`](./vps-docker-ports.md) (PIT-053).
 
-**Image:** `docker.n8n.io/n8nio/n8n:2.45.5` in [`infra/n8n/docker-compose.yml`](../../infra/n8n/docker-compose.yml) (live: `/root/n8n/compose.yaml`). Do **not** use `:latest` — it is not auto-pulled. Security floor from n8n advisories (2026-10-28): `2.45.5` (stable) / `2.46.1` (beta) / `1.123.89` (v1) / `3.0.1` (v3). Stay on the stable patch line.
+**Image:** `docker.n8n.io/n8nio/n8n:2.47.6` in [`infra/n8n/docker-compose.yml`](../../infra/n8n/docker-compose.yml) (live: `/root/n8n/compose.yaml`). Do **not** use `:latest` — it is not auto-pulled. Security floor from n8n advisories (2026-11-13): `2.47.6` (stable) / `2.48.3` (beta) / `1.123.96` (v1) / `3.2.2` (v3). Stay on the stable patch line.
 
 See also: [`caddy-dns-audit-worker.md`](./caddy-dns-audit-worker.md), [`n8n-audit-reconcile.md`](./n8n-audit-reconcile.md).
 
@@ -74,4 +74,4 @@ docker exec n8n n8n list:workflow --active=true
 curl -fsS https://n8n.erythro.ai/healthz
 ```
 
-Volume `n8n_data` must stay. Port 5678 must stay unpublished (PIT-053). After 2.39.6 → 2.41.4 (2026-10-01) and 2.41.4 → 2.41.7 (2026-10-07), Email Autoresponder stayed Active; optional Audit reconcile stayed inactive (Vercel Cron is primary). 2.41.7 → 2.45.5 (2026-10-28, advisories through GHSA-9p7v-45m2-wxgj / GHSA-f2cw-9483-7vcp / GHSA-gx3v-3x3v-f8r5 + 9 medium): migrate DB in place, `N8N_WEBHOOK_URL` replaces deprecated `WEBHOOK_URL`. Schedule Trigger uses durable scheduler by default (cron/hourly unchanged; fixed-interval “every N min” no longer clock-aligned).
+Volume `n8n_data` must stay. Port 5678 must stay unpublished (PIT-053). History: 2.39.6 → 2.41.4 (2026-10-01) → 2.41.7 (2026-10-07) → 2.47.6 (2026-11-13, GHSA-m7qq / q8rc / h59h / g333 / c772). Prefer `py -3 scripts/upgrade_n8n_image.py` (backup under `/root/n8n/backups/<stamp>/`, pull, recreate, healthz + active workflows). Optional Audit reconcile stays inactive (Vercel Cron is primary).

@@ -135,6 +135,7 @@ graph TD
 - **[[playbook|playbook.md]]** вЂ” РџСЂРѕРґСѓРєС‚РѕРІС‹Р№ playbook Рё С…СЂРѕРЅРѕР»РѕРіРёСЏ v1 (С„Р°Р·С‹ AвЂ“F, i18n, GSAP, CMS). Synced from `docs/PLAYBOOK.md`.
 - **[[ai-visibility|ai-visibility.md]]** вЂ” AI visibility pack: llms.txt, MCP, schema, Content Signals, markdown negotiation. Synced from `docs/AI_VISIBILITY.md`.
 - **[[meta-ads-campaigns-analysis-2026-10-30|audit/meta-ads-campaigns-analysis-2026-10-30.md]]** — Анализ рекламных кампаний Meta (Facebook / Instagram) и лидогенерации (30.10.2026).
+- **[[israel-search-demand-and-leak-lp-alignment-2026-11|audit/israel-search-demand-and-leak-lp-alignment-2026-11.md]]** — Анализ спроса в Израиле (HE/EN/RU), чистка утечек Google Ads и выравнивание `leak-en`/`leak-he` под AI Audit + CRO + GEO (15.11.2026).
 - **[[bigcars-co-il-seo-analytics|audit/bigcars-co-il-seo-analytics.md]]** — Комплексный SEO и маркетинговый аудит: BigCars.co.il.
 - **[[meta-pixel|architecture/meta-pixel.md]]** — Архитектура и настройка Meta Pixel, Conversions API, CSP и события Lead.
 - **[[audit-ads-landing|architecture/audit-ads-landing.md]]** — Ads landing: AI Audit (fixed locale subdomains для Google Ads и Meta).
