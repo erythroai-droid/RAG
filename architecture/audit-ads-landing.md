@@ -65,9 +65,9 @@ DNS: Cloudflare CNAME → `cname.vercel-dns.com` (Proxied). Vercel Project → D
 Для **`leak-{en,ru,he}.erythro.ai`** (`AuditCalcClient` + `AuditCalcFlow` + `auditCalcCopy.ts`):
 - Оффер сфокусирован на связке **AI Website Audit (CRO & GEO Visibility) + Revenue Leak Calculator** (`checkout flow` заменён на `lead forms (CRO)` / `טפסי לידים (CRO)`).
 - Первый экран (шаги 1–3) рендерит видимый `<h1>`, а на шаге 4 и в `failed` — единый `<h1 className="sr-only">`.
-- Поддерживается динамический **UTM Message Match** (по `utm_content` с ID Ad Group или `utm_term`/`keyword`):
-  - `ai_geo` (`197400968130` / `204838307449` или `ai|geo|aeo|chatgpt|perplexity|claude|llm|סוכני|בינה`)
-  - `cro` (`205134464874` / `202376409095` или `cro|conversion|lead|funnel|המרה|המרות|לידים|נשירת`)
+- Поддерживается динамический **UTM Message Match** под все 3 языка (`EN`, `HE`, `RU`) по `utm_content` (ID Ad Group или slug) и `utm_term`/`keyword`:
+  - `ai_geo` (`197400968130` / `204838307449` / `ai_geo` или `ai`, `geo`, `aeo`, `llm`, `chatgpt`, `perplexity`, `claude`, `סוכני`, `בינה`, `ии`, `нейросет`, `чатгпт`, `перплексити`)
+  - `cro` (`205134464874` / `202376409095` / `cro` или `cro`, `conversion`, `convert`, `lead`, `drop`, `funnel`, `המרה`, `המרות`, `לידים`, `נשירת`, `конверс`, `лид`, `заявк`, `воронк`, `продаж`, `отказ`)
   - `default` (универсальный AI Website Audit + Revenue Leak).
 
 | Product | Форма | API |
