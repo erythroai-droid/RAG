@@ -68,7 +68,7 @@ DNS: Cloudflare CNAME → `cname.vercel-dns.com` (Proxied). Vercel Project → D
 - Поддерживается динамический **UTM Message Match** под все 3 языка (`EN`, `HE`, `RU`) по `utm_content` (ID Ad Group или slug) и `utm_term`/`keyword`:
   - `ai_geo` (`197400968130` / `204838307449` / `ai_geo` или `ai`, `geo`, `aeo`, `llm`, `chatgpt`, `perplexity`, `claude`, `סוכני`, `בינה`, `ии`, `нейросет`, `чатгпт`, `перплексити`)
   - `cro` (`205134464874` / `202376409095` / `cro` или `cro`, `conversion`, `convert`, `lead`, `drop`, `funnel`, `המרה`, `המרות`, `לידים`, `נשירת`, `конверс`, `лид`, `заявк`, `воронк`, `продаж`, `отказ`)
-  - `default` (универсальный AI Website Audit + Revenue Leak).
+  - `default` (универсальный `AI, CRO & GEO AUDIT: WHERE YOU LOSE LEADS IN GOOGLE & AI SEARCH` на EN / HE / RU).
 
 | Product | Форма | API |
 |---------|--------|-----|

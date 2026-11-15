@@ -56,8 +56,8 @@ related:
 - **`src/lib/auditCalcCopy.ts`**:
   - Обновлены `metaTitle` (без дублирования `| Erythro.ai`, который добавляется в `page.tsx`), `heroKicker`, `heroL1`/`heroL2`/`heroL3`, `heroSubForm*`, `step1Heading`, `step1Sub`, `nextStepCalc`, `mobile.*` под оффер **AI Website Audit (CRO & GEO Visibility) + Revenue Leak**.
   - Убрана узкая привязка к e-commerce: `checkout flow` → `lead forms (CRO)`, `תהליך ההזמנה` → `טפסי לידים (CRO)`.
-  - Добавлен словарь `heroVariants` с тремя состояниями первого экрана:
-    - `default`: **AI Website Audit + Revenue Leak**
+  - Добавлен словарь `heroVariants` с тремя состояниями первого экрана (без «money/денег» в базовом H1 и мобайл-акценте):
+    - `default`: **AI, CRO & GEO audit: where you lose leads in Google & AI search** (EN / HE / RU)
     - `ai_geo`: **AI & GEO Website Audit** (видимость в Google, ChatGPT, Perplexity)
     - `cro`: **CRO & Funnel Audit** (утечки лидов и падение конверсии)
 - **`src/components/audit/AuditCalcFlow.tsx`**:
