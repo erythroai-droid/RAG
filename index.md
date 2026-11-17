@@ -54,6 +54,7 @@ graph TD
         SKILL_SPRING["[[spring-oauth2-auth-skill|Spring OAuth2 Р’РЅРµРґСЂРµРЅРёРµ]]"]
         SKILL_EMAIL["[[transactional-email-skill|Email СЃ CID Inline]]"]
         SKILL_SEO["[[seo-analytics-agent-skill|SEO Analytics Agent]]"]
+        SKILL_AIVIS["[[ai-search-visibility-skill|AI Search Visibility (Cursor/Claude/Antigravity/Grok)]]"]
         SKILL_GIT["[[obsidian-git-sync-rule|Obsidian Git Sync]]"]
     end
     
@@ -83,7 +84,7 @@ graph TD
 
     INDEX --> ARCH_BE & ARCH_FE & ARCH_AI & ARCH_OPS & ARCH_AUDIT & ARCH_DEPLOY & ARCH_PLAY & ARCH_AIVIS & ARCH_RAG & ARCH_SPRING & ARCH_GOOGLE & ARCH_X & ARCH_EMAIL & ARCH_LEGAL & ARCH_TARGO & ARCH_RLS
     INDEX --> TOK_FIGMA & TOK_COL & TOK_TYP & TOK_GEO & TOK_ANI & TOK_HERO & TOK_CMP
-    INDEX --> SKILL_PROMPT & SKILL_MCP & SKILL_ACP & SKILL_MD & SKILL_QA & SKILL_L1 & SKILL_CMS & SKILL_IMPORT & SKILL_SPRING & SKILL_EMAIL & SKILL_SEO & SKILL_GIT
+    INDEX --> SKILL_PROMPT & SKILL_MCP & SKILL_ACP & SKILL_MD & SKILL_QA & SKILL_L1 & SKILL_CMS & SKILL_IMPORT & SKILL_SPRING & SKILL_EMAIL & SKILL_SEO & SKILL_AIVIS & SKILL_GIT
     INDEX --> TPL_BRIEF & TPL_FIELDMAP & TPL_SPRING & TPL_CASE & TPL_CASEMD & TPL_SERV & TPL_ORD & TPL_SEO & TPL_LEG & TPL_CLIENT & TPL_AGREE & TPL_SCROLL & CASE_AUDIT & CASE_CONSULT
     INDEX --> PIT & RAG & GLOSS & FAQ
 ```
@@ -163,6 +164,7 @@ graph TD
 - **[[spring-oauth2-auth-skill|spring-oauth2-auth-skill.md]]** вЂ” РџРѕС€Р°РіРѕРІР°СЏ РёРЅСЃС‚СЂСѓРєС†РёСЏ РїРѕ РЅР°СЃС‚СЂРѕР№РєРµ Spring Boot СЃ Google Рё X (Twitter) OAuth2 PKCE.
 - **[[transactional-email-skill|transactional-email-skill.md]]** вЂ” Р РµРіР»Р°РјРµРЅС‚ РІРµСЂСЃС‚РєРё С‚СЂР°РЅР·Р°РєС†РёРѕРЅРЅС‹С… РїРёСЃРµРј СЃ РіР°СЂР°РЅС‚РёСЂРѕРІР°РЅРЅРѕР№ РїРѕРґРґРµСЂР¶РєРѕР№ РєР°СЂС‚РёРЅРѕРє С‡РµСЂРµР· CID (JavaMailSender / Nodemailer).
 - **[[seo-analytics-agent-skill|seo-analytics-agent-skill.md]]** вЂ” РђРІС‚РѕРЅРѕРјРЅС‹Р№ Java SEO Analytics Agent: SerpApi, 24h РєСЌС€ (Redis+Caffeine), СЃС‚СЂРѕРіР°СЏ Р»РѕРєР°Р»РёР·Р°С†РёСЏ (RU/EN/HE), РїСЂРµРґРѕР±СЂР°Р±РѕС‚РєР° РґР°РЅРЅС‹С… РґР»СЏ LLM (-85% С‚РѕРєРµРЅРѕРІ), Gemini 3.6 Flash.
+- **[[ai-search-visibility-skill|ai-search-visibility-skill.md]]** — Чек-лист видимости в AI-поиске (Google AI Overviews/AI Mode, Bing Copilot, ChatGPT, Claude, Perplexity): robots/WAF, sitemap, SEO-мета, контент под цитирование. Канон skill в `templates/ai-smart-card` (`.agents|.cursor|.claude|.grok/skills/ai-search-visibility` — Cursor, Claude, Antigravity, Grok).
 - **[[demo-notice-whatsapp|demo-notice-whatsapp.md]]** — Обязательное правило для демо-сайтов: карточка «Спасибо за просмотр → WhatsApp», пульсирующая кнопка, события в Vercel Web Analytics (`demo_whatsapp_click` и др.), `NEXT_PUBLIC_DEMO_NOTICE=0` для сданных сайтов.
 - **[[obsidian-git-sync-rule|obsidian-git-sync-rule.md]]** вЂ” РћР±СЏР·Р°С‚РµР»СЊРЅРѕРµ РїСЂР°РІРёР»Рѕ Рё РїСЂРѕС‚РѕРєРѕР» СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё Р±Р°Р·С‹ Р·РЅР°РЅРёР№ СЃ GitHub СЂРµРїРѕР·РёС‚РѕСЂРёРµРј РїСЂРё Р»СЋР±С‹С… РёР·РјРµРЅРµРЅРёСЏС… (Agent rules + Obsidian Git plugin).
 

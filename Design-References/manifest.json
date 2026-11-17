@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
-  "updatedAt": "2026-11-12T23:32:51.761Z",
-  "totalReferences": 4,
+  "updatedAt": "2026-11-17T21:38:29.815Z",
+  "totalReferences": 5,
   "references": [
     {
       "id": "example-minimal-clean",
@@ -140,6 +140,34 @@
       "mobilePreviewImage": "Assets/mustang-6663rt/mobile.jpg",
       "noteFile": "References/mustang-6663rt.md",
       "createdAt": "2026-11-12T23:32:51.657Z"
+    },
+    {
+      "id": "searchable",
+      "slug": "searchable",
+      "title": "Searchable",
+      "url": "https://www.searchable.com/",
+      "type": "website",
+      "tags": [
+        "light-mode",
+        "bento",
+        "grid",
+        "rounded",
+        "soft-shadows",
+        "tight-typography",
+        "landing"
+      ],
+      "stack": [
+        "nextjs",
+        "tailwind",
+        "framer-motion",
+        "lucide-react"
+      ],
+      "mood": "Чистый светлый хай-тек, воздух, легкие полупрозрачные границы",
+      "summary": "Track and optimize your brand visibility across ChatGPT, Claude, Perplexity, and all major AI search engines. Get actionable insights to drive growth.",
+      "previewImage": "Assets/searchable/desktop.jpg",
+      "mobilePreviewImage": "Assets/searchable/mobile.jpg",
+      "noteFile": "References/searchable.md",
+      "createdAt": "2026-11-17T21:38:29.814Z"
     }
   ]
 }

@@ -1,4 +1,4 @@
-# Deferred follow-ups (updated 2026-10-19)
+# Deferred follow-ups (updated 2026-11-17)
 
 Напомнить в следующем сеансе, когда пользователь спросит про безопасность / perf / R2 / admin.
 
@@ -11,6 +11,7 @@
 | Priority | Item | Notes |
 |---|---|---|
 | medium | CSP nonce (drop `'unsafe-inline'`) | **Not critical now** — defense-in-depth only; public prod already without `'unsafe-eval'` (`next.config.ts` adds `'unsafe-eval'` only when `NODE_ENV===development'` — see PIT-066). Needs middleware nonce + wire GA consent / JSON-LD / Turnstile / `next/script`; `style-src` still hard with `experimental.inlineCss`. Admin keeps `'unsafe-eval'` for Payload. |
+| medium | Audit report route: 404 for a missing submission | `findAuditSubmission` (`src/lib/auditReportLoad.ts`) calls `payload.findByID`, which throws on a deleted/unknown id, so `/api/audit/report/:id` and `/:id/html` return 500 "Server error" instead of 404 (seen 2026-10-27 after test reports 226–228 were deleted). Catch NotFound → `null`; site PR to `main`. |
 | medium | Desktop CLS (~1.1) | Partially addressed: poster LCP without isLg gate, heading min-height + cross-locale slot, useLayoutEffect locale — re-measure after deploy |
 | low | Purge Vercel Blob copies | After admin upload→R2 verified; then drop `BLOB_READ_WRITE_TOKEN` |
 | low | Leftover ~4 Blob URL mentions in HTML | Rewrite/cache already mostly on R2 |
@@ -19,9 +20,9 @@
 | medium | Consultant wizard / intent router (v2) | **Not now.** Dynamic chips + intent router + engineer in the same thread. How-we-work card and reply-language detection are already in v1. See § Consultant v2 below. |
 | low | Purge `consult-sessions` older than 12 months | Retention promised on `/privacy` is manual today; add a cron |
 | later | CF-only UFW 80/443 | Needs orange cloud + Origin Cert for n8n/agent-api |
-| later | ISR remaining frontend pages | services/order/audit still use `getRequestPrefs` / dynamic params (PIT-056) |
+| later | ISR remaining frontend pages | `/services/[slug]` done (2026-10-26). Still dynamic: order/audit + `/portfolio/[slug]` (`getRequestPrefs`, PIT-056) |
 | later | Custom domain `media.erythro.ai` | r2.dev is rate-limited |
-| later | Supabase RLS / grants hardening (PIT-110) | **Not urgent** — Data API not used; baseline = empty exposed schemas + revoke `anon`. When back: (1) verify `has_table_privilege('anon',…)` false on `users` + intake; (2) codify revoke into `src/migrations/`; (3) optional `ENABLE ROW LEVEL SECURITY` on sensitive tables without client policies. Never enable PostgREST `public` without RLS. Canon: `docs/architecture/supabase-rls.md`. |
+| later | Supabase RLS / grants hardening (PIT-110) | **Not urgent / not an open leak.** Verified 2026-11-17 on `txyykmjocvbaqgkxlotu`: RLS off on **120/120** `public` tables (incl. `users`, `contact_submissions`, `consult_sessions`), but `anon`/`authenticated` have **0 SELECT** and no schema `USAGE` (revoke migrations applied 2026-10-15). App uses `DATABASE_URL` as `postgres` (`bypassrls`); Data API not used. When back: (1) re-check `has_table_privilege('anon',…)` after new Payload tables; (2) codify revoke SQL into `src/migrations/` (prod-only today); (3) optional `ENABLE ROW LEVEL SECURITY` on sensitive tables **without** client policies — does **not** break Payload. Never enable PostgREST exposed `public` / `GRANT … TO anon` on CMS tables. Canon: `docs/architecture/supabase-rls.md`. |
 
 ## Consultant v2 (wizard + grounded facts)
 
