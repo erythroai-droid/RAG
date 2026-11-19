@@ -158,7 +158,7 @@ flowchart TD
    ```
 2. Обновить `sameAs` у `Organization`:
    * Добавить `https://www.instagram.com/erythro.ai/`
-   * Добавить канонический URL YouTube-канала Erythro.ai
+   * Добавить `https://www.youtube.com/@ErythroAi`
    * Заменить `https://www.facebook.com/share/1DKaM3k5ox/` на постоянный канонический URL Facebook-страницы
    * После создания LinkedIn Company Page (Track E) добавить `https://www.linkedin.com/company/erythro-ai` (плюс `Clutch`, `Crunchbase`, `Easy.co.il`).
 3. Расширить `areaServed` и `knowsAbout`:
@@ -168,7 +168,7 @@ flowchart TD
 
 **Definition of Done (A3):**
 - Валидация JSON-LD через Schema Validator / Rich Results Test без ошибок.
-- `"name": "Vadym Kovalenko"` и `instagram.com/erythro.ai` присутствуют в SSR HTML.
+- `"name": "Vadym Kovalenko"`, `https://www.instagram.com/erythro.ai/` и `https://www.youtube.com/@ErythroAi` присутствуют в SSR HTML.
 - Все юнит/интеграционные тесты `brandSchema.int.spec.ts` зелёные.
 
 ---
@@ -244,7 +244,7 @@ flowchart TD
 
 ### Задача B2 — Обновление `public/llms.txt` и `/about`
 1. Проверить и синхронизировать единые контакты (NAP): телефон **`+972-50-530-8305`**, email **`team@erythro.ai`** / **`order@erythro.ai`**, география: *Headquartered in Eilat, Israel; serving clients nationwide across Israel (Tel Aviv, Herzliya, Haifa, Jerusalem) and globally*.
-2. Добавить в `public/llms.txt` ссылки на `/he`, `/he/audit`, `/he/services/ai-automation`, `/ru`, имя основателя (`Vadym Kovalenko`), Instagram (`@erythro.ai`) и YouTube.
+2. Добавить в `public/llms.txt` ссылки на `/he`, `/he/audit`, `/he/services/ai-automation`, `/ru`, имя основателя (`Vadym Kovalenko`), Instagram (`https://www.instagram.com/erythro.ai/`) и YouTube (`https://www.youtube.com/@ErythroAi`).
 
 ### Задача B3 — Актуализация шаблона в базе знаний
 Обновить [seo-metadata-template.md](file:///D:/Obsidian/Knowledge-Base/04-Templates/seo-metadata-template.md): убрать устаревший паттерн `?lang=en|ru|he` и заменить его на path-based `buildLocaleAlternates` (`/`, `/he/...`, `/ru/...` + `x-default`).
@@ -352,7 +352,7 @@ flowchart TD
    * **Clutch.co** & **GoodFirms** & **Crunchbase** — заполнить профили с фокусом на Israel, Next.js, AI Agents, GEO Audit.
    * **B144.co.il** — базовая локальная карточка Израиля.
 4. **Оптимизация уже ранжирующихся профилей бренда:**
-   * Instagram `@erythro.ai` (#2 в выдаче) и YouTube-канал (#4–5): добавить в описания ключевые фразы `Erythro AI` (с пробелом!), `Erythro.ai`, `איריתרו`, `ישראל`, ссылки на `https://erythro.ai/he/audit` и `https://erythro.ai/audit`.
+   * Instagram `@erythro.ai` (`https://www.instagram.com/erythro.ai/`, #2 в выдаче) и YouTube-канал (`https://www.youtube.com/@ErythroAi`, #4–5): добавить в описания ключевые фразы `Erythro AI` (с пробелом!), `Erythro.ai`, `איריתרו`, `ישראל`, ссылки на `https://erythro.ai/he/audit` и `https://erythro.ai/audit`.
    * После создания всех профилей передать список URL агенту Track A для добавления в `sameAs` (`brandSchema.ts`).
 
 ### Задача E3 — Внешние публикации / Digital PR (недели 4–8)
@@ -381,7 +381,7 @@ flowchart TD
    * `/ru/*` содержит `<html lang="ru" dir="ltr">`, русский контент и `FAQPage` (`"inLanguage": "ru"`).
    * На `/` в `<h1>` отсутствует кириллица (`МАСШТАБИРУЕМЫЕ СИСТЕМЫ`).
 3. **`hreflang` & `canonical`:** на каждой странице `canonical` указывает на саму себя; присутствуют все 4 симметричные `hreflang` (`en`, `he-IL`, `ru`, `x-default`) без битых URL.
-4. **JSON-LD:** `Organization` содержит `"name": "Vadym Kovalenko"`, `instagram.com/erythro.ai`, YouTube, `areaServed: Israel`; 0 синтаксических ошибок JSON-LD.
+4. **JSON-LD:** `Organization` содержит `"name": "Vadym Kovalenko"`, `https://www.instagram.com/erythro.ai/`, `https://www.youtube.com/@ErythroAi`, `areaServed: Israel`; 0 синтаксических ошибок JSON-LD.
 5. **Скорость и CWV:** `x-vercel-cache: HIT` и TTFB `< 350 ms` на `/`, `/he`, `/ru`, `/audit`, `/he/audit`, `/services/*`; Lighthouse Mobile Performance `≥ 85`, SEO `= 100`, CLS `< 0.05`.
 6. **PPC-лендинги:** `leak-he.erythro.ai` и `audit-he.erythro.ai` отдают `lang="he" dir="rtl"` и согласованный `noindex, nofollow`.
 7. **AI Visibility регрессия:** `robots.txt` (с `Content-Signal`), `/llms.txt`, `/.well-known/mcp`, `/.well-known/api-catalog`, `Accept: text/markdown` и 6 Security Headers остаются зелёными (см. чек-лист в `AI_VISIBILITY.md`).

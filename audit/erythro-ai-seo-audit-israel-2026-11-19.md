@@ -156,7 +156,7 @@ flowchart TD
    * Видимый `<h1>` (`ENGINEERING FUTURE`) — абстрактный слоган без единого коммерческого ключевого слова (*AI Automation*, *Web Development*, *AI Website Audit*, *Israel*).
 2. **Ошибки в `Organization` JSON-LD (удар по E-E-A-T и Knowledge Graph):**
    * `"founder": { "@type": "Person", "name": "Founder" }` — стоит заглушка **`"Founder"`** вместо реального имени **`"Vadym Kovalenko"`** (при этом его профиль LinkedIn уже ранжируется #3 по запросу `erythro.ai`!).
-   * В массиве `sameAs` **отсутствуют Instagram (`https://www.instagram.com/erythro.ai/`) и YouTube-канал**, которые уже занимают #2, #4 и #5 в выдаче по бренду. Ссылка на Facebook дана через временный share-URL (`facebook.com/share/1DKaM3k5ox/`) вместо канонического URL страницы.
+   * В массиве `sameAs` **отсутствуют Instagram (`https://www.instagram.com/erythro.ai/`) и YouTube-канал (`https://www.youtube.com/@ErythroAi`)**, которые уже занимают #2, #4 и #5 в выдаче по бренду. Ссылка на Facebook дана через временный share-URL (`facebook.com/share/1DKaM3k5ox/`) вместо канонического URL страницы.
 3. **Длина Title и Meta Description (требуют оптимизации под CTR):**
    * **Обрезаются в SERP (Title > 60 симв.):**
      * `/services/ai-automation` — **84 симв.** (*AI & Automation Services: Custom AI Agents, Chatbots & Voice AI | Erythro.ai*)
@@ -200,7 +200,7 @@ flowchart TD
      * RU: *AI-аудит сайтов, автоматизация бизнеса и веб-разработка в Израиле*
 3. **Починить `Organization` JSON-LD (Entity Disambiguation против медицинского `erythro`):**
    * Заменить `"founder": {"name": "Founder"}` на `"name": "Vadym Kovalenko"`.
-   * Добавить в `sameAs`: `https://www.instagram.com/erythro.ai/`, официальный YouTube-канал, заменить Facebook share-ссылку на постоянный URL страницы.
+   * Добавить в `sameAs`: `https://www.instagram.com/erythro.ai/`, `https://www.youtube.com/@ErythroAi`, заменить Facebook share-ссылку на постоянный URL страницы.
    * Добавить `areaServed` с упоминанием Tel Aviv / Israel.
 4. **Доиндексировать 6 выпавших URL и обновить GSC/GA4:**
    * Проверить внутренние ссылки на `/services/management`, `/portfolio/ai-consultant`, `/portfolio/ai-audit-agent`, `/portfolio/ember`, `/portfolio/ora-60a`, `/portfolio/rosso-garage` (убедиться, что все они доступны в SSR-HTML из меню/карточек без JS-зависимости) и отправить на ручную переиндексацию в GSC.
