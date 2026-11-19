@@ -82,11 +82,17 @@ graph TD
         FAQ["[[architectural-faq|РђСЂС…РёС‚РµРєС‚СѓСЂРЅС‹Р№ FAQ]]"]
     end
 
+    subgraph "06 Installed Plugins & Skills"
+        PLG_REG["[[plugins-skills-registry|Реестр плагинов и скиллов]]"]
+        PLG_UPD["[[plugin-update-policy|Правила обновления плагинов]]"]
+    end
+
     INDEX --> ARCH_BE & ARCH_FE & ARCH_AI & ARCH_OPS & ARCH_AUDIT & ARCH_DEPLOY & ARCH_PLAY & ARCH_AIVIS & ARCH_RAG & ARCH_SPRING & ARCH_GOOGLE & ARCH_X & ARCH_EMAIL & ARCH_LEGAL & ARCH_TARGO & ARCH_RLS
     INDEX --> TOK_FIGMA & TOK_COL & TOK_TYP & TOK_GEO & TOK_ANI & TOK_HERO & TOK_CMP
     INDEX --> SKILL_PROMPT & SKILL_MCP & SKILL_ACP & SKILL_MD & SKILL_QA & SKILL_L1 & SKILL_CMS & SKILL_IMPORT & SKILL_SPRING & SKILL_EMAIL & SKILL_SEO & SKILL_AIVIS & SKILL_GIT
     INDEX --> TPL_BRIEF & TPL_FIELDMAP & TPL_SPRING & TPL_CASE & TPL_CASEMD & TPL_SERV & TPL_ORD & TPL_SEO & TPL_LEG & TPL_CLIENT & TPL_AGREE & TPL_SCROLL & CASE_AUDIT & CASE_CONSULT
     INDEX --> PIT & RAG & GLOSS & FAQ
+    INDEX --> PLG_REG & PLG_UPD
 ```
 
 ---
@@ -192,3 +198,7 @@ graph TD
 - **[[technical-glossary|technical-glossary.md]]** вЂ” РђР»С„Р°РІРёС‚РЅС‹Р№ РіР»РѕСЃСЃР°СЂРёР№ С‚РµСЂРјРёРЅРѕРІ: MCP, ACP, RAG, ISR, Drizzle, Lexical, GSAP, TTFB, CSP, HSTS, WCAG.
 - **[[architectural-faq|architectural-faq.md]]** вЂ” РћС‚РІРµС‚С‹ РЅР° С‡Р°СЃС‚С‹Рµ Р°СЂС…РёС‚РµРєС‚СѓСЂРЅС‹Рµ РІРѕРїСЂРѕСЃС‹ РґР»СЏ Р±С‹СЃС‚СЂРѕРіРѕ СЃС‚Р°СЂС‚Р° РЅРѕРІС‹С… РєР»РёРµРЅС‚СЃРєРёС… РїСЂРѕРµРєС‚РѕРІ.
 - **[[vercel-agent-readiness|vercel-agent-readiness.md]]** вЂ” Р РµРіР»Р°РјРµРЅС‚ Рё С‡РµРє-Р»РёСЃС‚ РіРѕС‚РѕРІРЅРѕСЃС‚Рё РїСЂРѕРµРєС‚Р° Рє РІР·Р°РёРјРѕРґРµР№СЃС‚РІРёСЋ СЃ AI-Р°РіРµРЅС‚Р°РјРё РїРѕ СЃС‚Р°РЅРґР°СЂС‚Р°Рј Vercel Level 1.
+
+### [[06-Installed-Plugins-Skills/plugins-skills-registry|📁 06-Installed-Plugins-Skills (Установленные плагины и скиллы агентов)]]
+- **[[plugins-skills-registry|plugins-skills-registry.md]]** — Единый реестр всех установленных плагинов и скиллов для всех AI-агентов (Antigravity, Claude Code, Cursor, `.agents`) с версиями, источниками и датами проверки.
+- **[[plugin-update-policy|plugin-update-policy.md]]** — Регламент учёта, периодической проверки и безопасного обновления плагинов и скиллов, включая настроенные автоматизации.
