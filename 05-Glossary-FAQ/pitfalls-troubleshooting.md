@@ -2724,6 +2724,31 @@ The full Pro run (10 funnel URLs, 3 locales, PSI, Gemini) then completes locally
 - [ ] Top-3 and the plan follow the status the card shows (`top_candidates` + `sevIdx`); a finding takes its status from its checklist row (PIT-153)
 - [ ] New Payload field: migrate first, then bump the `unstable_cache` key, then open the page — otherwise the seed fallback gets cached (PIT-166)
 - [ ] Lexical `<RichText>` with Media uploads: use `richTextConverters` so video is `<video>`, not a filename link (PIT-167)
+- [ ] Multilingual LLM translator (Targo / WhatsApp): isolate outgoing system prompts and glossary per target language, strip foreign RTL scripts from dialogue context, and enforce a deterministic script validator (`validate_translation_script`) + auto-retry + fail-closed delivery block (PIT-168)
+
+---
+
+## PIT-168 — WhatsApp translator (Targo): Hebrew letters leaking into Arabic translations
+
+**Tags:** `targo`, `whatsapp-translator`, `arabic`, `hebrew`, `llm`, `prompt-pollution`, `gemini`, `bidi`
+**Seen:** 2026-11-20 — `whatsapp_translator` (`https://wa.erythro.ai`, `gemini-3.6-flash`, `GEMINI_THINKING_LEVEL=minimal`): Arabic replies contained Hebrew characters (`[\u0590-\u05FF]`, e.g. `ש״ח` / Hebrew IT tokens) and translation errors.
+
+**Symptom:** Outgoing Arabic messages sent to WhatsApp customers occasionally included Hebrew letters or words. Also, short Arabic messages containing long Latin URLs could be misclassified as English, and Gemini responses with `thinkingConfig` read `parts[0]` blindly without skipping `thought: true` parts. In the older `C:\agents\Translater` lab, `DialogSessionStore.record_incoming` also omitted `"ar"` and reset Arabic sessions to `"he"`.
+
+**Cause:**
+1. **Cross-language prompt pollution:** `WHATSAPP_OUTGOING_SYSTEM_PROMPT` and `GENERIC_OUTGOING_SYSTEM_PROMPT` (`core/whatsapp_translator.py`) sent rules for Hebrew (`500 ש״ח`, `עברית של הייטק`, `שלום`) and Arabic in the same system prompt, and `core/glossary.py` injected 14 Hebrew-only IT glossary entries (`HE High-Tech` + `Formal HE`, zero Arabic entries) into every Arabic outgoing translation.
+2. **Foreign RTL context leakage:** `last_original` (including Hebrew Facebook ad/post referrals) was passed verbatim into `context` for Arabic replies.
+3. **No deterministic script guard:** LLM output went straight to WhatsApp with zero Unicode-script validation or correction retry.
+4. **Gemini `parts[0]` bug & URL heuristic bias:** `core/engine.py` took `parts[0].get("text")` without filtering `thought: true`; `detect_language_heuristic` counted Latin characters inside URLs/e-mails; `is_rtl_char` / `format_bidi_rtl` missed extended Arabic blocks and Arabic punctuation (`؟،؛`).
+
+**Fix (deployed 2026-11-20 to VPS `/home/whatsapp-translator`, also synced to `C:\agents\Translater`):**
+1. Added Arabic equivalents (`ar_tech`, `ar_formal`) to `core/glossary.py` and isolated `get_glossary_prompt_context(target_lang)` so Arabic prompts contain **zero Hebrew characters**.
+2. Replaced monolithic outgoing prompt with per-language builders (`build_outgoing_system_prompt`, `build_generic_outgoing_system_prompt`) with explicit script rules (`شيكل` / `₪`, strict ban on Hebrew/Cyrillic in Arabic).
+3. Added `sanitize_context_for_target()` to strip foreign RTL script (e.g. Hebrew ad copy) from dialogue context before translating to Arabic.
+4. Added deterministic `validate_translation_script()` + `_call_outgoing_with_script_guard()` (up to 2 self-healing retries with offending fragments; raises `TranslationScriptError` on persistent failure so Telegram warns the operator and WhatsApp never receives corrupted text).
+5. Updated `detect_language_heuristic()` to strip URLs/e-mails and cover full Arabic Unicode blocks, added `_resolve_detected_lang()` to block Hebrew/Arabic confusion on unambiguous scripts, filtered `thought: true` parts in `LLMEngine._extract_gemini_text()`, updated `Dockerfile` pins (`fastapi>=0.165.0`, `pydantic>=2.14.4`, `uvicorn>=0.54.0`, `requests>=2.34.2`, `pywebpush>=2.5.0`), and added 7 regression tests (178 passed in Targo, 25 passed in Translater).
+
+**Prevent:** Never mix Hebrew and Arabic rules or glossary rows in a single outgoing translation system prompt; always filter context by target script; always gate outbound LLM translations behind a deterministic Unicode script check that fails closed instead of shipping mixed-script text.
 
 ---
 

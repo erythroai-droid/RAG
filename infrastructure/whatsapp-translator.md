@@ -51,7 +51,9 @@ Incoming text is translated to Russian for the operator. The reply language foll
 - Arabic original → operator writes Russian → customer receives simple Modern Standard Arabic (added 2026-10-04).
 - Russian original → the operator's text is sent unchanged.
 
-Hebrew and Arabic replies get right-to-left marks at the end of lines that end in punctuation. The card shows the code as `HE`, `EN`, `AR` or `RU`.
+Hebrew and Arabic replies get right-to-left marks at the end of lines that end in punctuation (including Arabic `؟`, `،`, `؛`). The card shows the code as `HE`, `EN`, `AR` or `RU`.
+
+Outgoing script guard (2026-11-20): outgoing prompts and the IT glossary (`core/glossary.py`) are isolated per target language so Hebrew rules/terms never enter Arabic prompts (and vice versa). Foreign RTL scripts in dialogue context (e.g. a Hebrew Facebook ad) are stripped before translating to Arabic. Every outgoing translation passes a deterministic script validator (`validate_translation_script` in `core/whatsapp_translator.py`); on forbidden characters (such as Hebrew inside Arabic) the worker automatically retries up to 2 times with correction feedback, and if the violation persists raises `TranslationScriptError` — blocking WhatsApp delivery and notifying the operator in Telegram (or returning HTTP 502 in PWA) rather than sending corrupted text. Incoming language detection strips URLs/e-mails before counting scripts and prevents LLM confusion between unambiguous Arabic and Hebrew. `core/engine.py` skips Gemini `thought: true` parts when extracting JSON answers.
 
 Latin-script languages other than English (French, Spanish, German) are treated as English, so the reply goes out in English. Chinese and other scripts without Hebrew, Arabic, Cyrillic, or Latin are also labeled English. The original line on the card still shows the customer's text.
 
@@ -224,4 +226,4 @@ curl -fsS https://wa.erythro.ai/health
 curl -I --max-time 5 http://46.202.155.56:8000
 ```
 
-Health JSON reports `whatsapp_gateway: cloud_api` and pairs `he/en → ru`, `ru → he/en`. The last command must time out or refuse the connection.
+Health JSON reports `whatsapp_gateway: cloud_api` and pairs `he/en/ar → ru`, `ru → he/en/ar`. The last command must time out or refuse the connection.
